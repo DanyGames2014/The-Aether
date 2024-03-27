@@ -2,48 +2,40 @@ package com.gildedgames.aether.block;
 
 import com.gildedgames.aether.event.listener.TextureListener;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
+import net.minecraft.block.Material;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.stat.Stats;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.block.TemplateBlockBase;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.block.TemplateBlock;
+import net.modificationstation.stationapi.api.util.Identifier;
 
-public class BlockHolystone extends TemplateBlockBase
-{
+public class BlockHolystone extends TemplateBlock {
 
-    public BlockHolystone(Identifier identifier)
-    {
+    public BlockHolystone(Identifier identifier) {
         super(identifier, Material.STONE);
     }
 
     @Override
-    public void afterBreak(Level level, PlayerBase playerBase, int x, int y, int z, int meta)
-    {
+    public void afterBreak(World level, PlayerEntity playerBase, int x, int y, int z, int meta) {
         int i;
-        playerBase.increaseStat(Stats.mineBlock[this.id], 1);
+        playerBase.increaseStat(Stats.MINE_BLOCK[this.id], 1);
         int i2 = this.id;
-        if (meta <= 1)
-        {
+        if (meta <= 1) {
             i = 0;
-        }
-        else
-        {
+        } else {
             i = 2;
         }
-        ItemInstance stack = new ItemInstance(i2, 1, i);
-        if (playerBase.getHeldItem() != null)
-            if (meta == 0 && playerBase.getHeldItem().getType() == AetherItems.PickSkyroot)
-            {
+        ItemStack stack = new ItemStack(i2, 1, i);
+        if (playerBase.getHand() != null)
+            if (meta == 0 && playerBase.getHand().getItem() == AetherItems.PickSkyroot) {
                 stack.count *= 2;
             }
-        this.drop(level, x, y, z, stack);
+        this.dropStack(level, x, y, z, stack);
     }
 
     @Override
-    public int getTextureForSide(int side, int meta)
-    {
+    public int getTexture(int side, int meta) {
         return TextureListener.sprHolystone;
     }
 }

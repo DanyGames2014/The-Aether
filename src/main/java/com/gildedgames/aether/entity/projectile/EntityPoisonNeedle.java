@@ -3,32 +3,32 @@ package com.gildedgames.aether.entity.projectile;
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.effect.AetherPoison;
 import com.gildedgames.aether.entity.base.EntityProjectileBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 import java.util.List;
 
 public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawnDataProvider
 {
-    public Living victim;
+    public LivingEntity victim;
     public int poisonTime;
     public static int texfxindex;
 
-    public EntityPoisonNeedle(final Level level)
+    public EntityPoisonNeedle(final World level)
     {
         super(level);
     }
 
-    public EntityPoisonNeedle(final Level world, final double x, final double y, final double z)
+    public EntityPoisonNeedle(final World world, final double x, final double y, final double z)
     {
         super(world, x, y, z);
     }
 
-    public EntityPoisonNeedle(final Level world, final Living ent)
+    public EntityPoisonNeedle(final World world, final LivingEntity ent)
     {
         super(world, ent);
     }
@@ -41,36 +41,36 @@ public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawn
     }
 
     @Override
-    public boolean method_1393()
+    public boolean isSubmergedInWater()
     {
-        return this.victim == null && super.method_1393();
+        return this.victim == null && super.isSubmergedInWater();
     }
 
     @Override
-    public boolean onHitTarget(final EntityBase entity)
+    public boolean onHitTarget(final Entity entity)
     {
-        if (!(entity instanceof Living) || !AetherPoison.canPoison(entity))
+        if (!(entity instanceof LivingEntity) || !AetherPoison.canPoison(entity))
         {
             return super.onHitTarget(entity);
         }
-        final Living ent = (Living) entity;
-        if (ent instanceof PlayerBase)
+        final LivingEntity ent = (LivingEntity) entity;
+        if (ent instanceof PlayerEntity)
         {
             AetherPoison.afflictPoison();
             return super.onHitTarget(entity);
         }
-        final List list = this.level.getEntities(this, ent.boundingBox.expand(2.0, 2.0, 2.0));
+        final List list = this.world.getEntities(this, ent.boundingBox.expand(2.0, 2.0, 2.0));
         for (int i = 0; i < list.size(); ++i)
         {
-            final EntityBase lr2 = (EntityBase) list.get(i);
+            final Entity lr2 = (Entity) list.get(i);
             if (lr2 instanceof EntityPoisonNeedle)
             {
                 final EntityPoisonNeedle arr = (EntityPoisonNeedle) lr2;
                 if (arr.victim == ent)
                 {
                     arr.poisonTime = 500;
-                    arr.removed = false;
-                    this.remove();
+                    arr.dead = false;
+                    this.markDead();
                     return false;
                 }
             }
@@ -81,10 +81,10 @@ public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawn
     }
 
     @Override
-    public void remove()
+    public void markDead()
     {
         this.victim = null;
-        super.remove();
+        super.markDead();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawn
     }
 
     @Override
-    public boolean canBeShot(final EntityBase ent)
+    public boolean canBeShot(final Entity ent)
     {
         return super.canBeShot(ent) && this.victim == null;
     }
@@ -103,15 +103,15 @@ public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawn
     public void tick()
     {
         super.tick();
-        if (this.removed)
+        if (this.dead)
         {
             return;
         }
         if (this.victim != null)
         {
-            if (this.victim.removed || this.poisonTime == 0)
+            if (this.victim.dead || this.poisonTime == 0)
             {
-                this.remove();
+                this.markDead();
                 return;
             }
             /* todo:
@@ -119,10 +119,10 @@ public class EntityPoisonNeedle extends EntityProjectileBase implements MobSpawn
             fx.renderDistanceMultiplier = 10.0;
             ((ParticleBaseAccessor)fx).set2635(EntityPoisonNeedle.texfxindex);*/
             //AetherPoison.mc.particleManager.addParticle(fx);
-            this.removed = false;
+            this.dead = false;
             this.inGround = false;
             this.x = this.victim.x;
-            this.y = this.victim.boundingBox.minY + this.victim.height * 0.8;
+            this.y = this.victim.boundingBox.minY + this.victim.spacingY * 0.8;
             this.z = this.victim.z;
             AetherPoison.distractEntity(this.victim);
             --this.poisonTime;

@@ -1,11 +1,11 @@
 package com.gildedgames.aether.gui.container;
 
-import net.minecraft.container.Chest;
-import net.minecraft.inventory.InventoryBase;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.screen.GenericContainerScreenHandler;
 
-public class ContainerTreasureChest extends Chest
+public class ContainerTreasureChest extends GenericContainerScreenHandler
 {
-    public ContainerTreasureChest(InventoryBase arg, InventoryBase arg2)
+    public ContainerTreasureChest(Inventory arg, Inventory arg2)
     {
         super(arg, arg2);
     }

@@ -3,8 +3,8 @@ package com.gildedgames.aether.generator;
 import com.gildedgames.aether.block.BlockTreasureChest;
 import com.gildedgames.aether.entity.boss.EntityValkyrie;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.block.BlockBase;
-import net.minecraft.level.Level;
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
 
 import java.util.Random;
 
@@ -36,14 +36,14 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         this.replaceAir = true;
         if (!this.isBoxEmpty(level, x, y, z, 55, 20, 30))
         {
             return false;
         }
-        if (level.getTileId(x, y - 5, z) == 0 || level.getTileId(x + 55, y - 5, z) == 0 || level.getTileId(x, y - 5, z + 30) == 0 || level.getTileId(x + 55, y - 5, z + 30) == 0)
+        if (level.getBlockId(x, y - 5, z) == 0 || level.getBlockId(x + 55, y - 5, z) == 0 || level.getBlockId(x, y - 5, z + 30) == 0 || level.getBlockId(x + 55, y - 5, z + 30) == 0)
         {
             for (int n = 0; n < 100; ++n)
             {
@@ -88,7 +88,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         {
             for (int z4 = z + 14; z4 < z + 16; ++z4)
             {
-                level.setTileInChunk(x + 4, y3, z4, 0);
+                level.method_200(x + 4, y3, z4, 0);
             }
         }
         this.setBlocks(0, 0, 1);
@@ -112,7 +112,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         {
             for (int z2 = z + 7 + 7 * row; z2 < z + 9 + 7 * row; ++z2)
             {
-                level.setTileInChunk(x2, y2, z2, 0);
+                level.method_200(x2, y2, z2, 0);
             }
         }
         row = rand.nextInt(3);
@@ -142,7 +142,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                             {
                                 for (int z2 = z + 7 + 7 * r; z2 < z + 9 + 7 * r; ++z2)
                                 {
-                                    level.setTileInChunk(x2, y2, z2, 0);
+                                    level.method_200(x2, y2, z2, 0);
                                 }
                             }
                         }
@@ -159,7 +159,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                             {
                                 for (int z2 = z + 7 + 7 * r; z2 < z + 9 + 7 * r; ++z2)
                                 {
-                                    level.setTileInChunk(x2, y2, z2, 0);
+                                    level.method_200(x2, y2, z2, 0);
                                 }
                             }
                         }
@@ -176,7 +176,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                             {
                                 for (int x3 = x + 7 + 7 * p; x3 < x + 9 + 7 * p; ++x3)
                                 {
-                                    level.setTileInChunk(x3, y2, z2, 0);
+                                    level.method_200(x3, y2, z2, 0);
                                 }
                             }
                         }
@@ -193,7 +193,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                             {
                                 for (int x4 = x + 7 + 7 * p; x4 < x + 9 + 7 * p; ++x4)
                                 {
-                                    level.setTileInChunk(x4, y2, z2, 0);
+                                    level.method_200(x4, y2, z2, 0);
                                 }
                             }
                         }
@@ -205,7 +205,7 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                         {
                             case 0:
                             {
-                                level.setTileWithMetadata(x + 7 + p * 7, y - 1 + q * 5, z + 7 + r * 7, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 1);
+                                level.method_154(x + 7 + p * 7, y - 1 + q * 5, z + 7 + r * 7, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 1);
                                 break;
                             }
                             case 1:
@@ -213,9 +213,9 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                                 this.addPlaneY(level, rand, x + 7 + 7 * p, y + 5 * q, z + 7 + 7 * r, 2, 2);
                                 int u = x + 7 + 7 * p + rand.nextInt(2);
                                 final int v = z + 7 + 7 * r + rand.nextInt(2);
-                                if (level.getTileId(u, y + 5 * q + 1, v) == 0)
+                                if (level.getBlockId(u, y + 5 * q + 1, v) == 0)
                                 {
-                                    level.setTile(u, y + 5 * q + 1, v, AetherBlocks.AETHER_CHEST.id);
+                                    level.setBlock(u, y + 5 * q + 1, v, AetherBlocks.AETHER_CHEST.id);
                                     break;
                                 }
                                 break;
@@ -223,8 +223,8 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                             case 2:
                             {
                                 this.addPlaneY(level, rand, x + 7 + 7 * p, y + 5 * q, z + 7 + 7 * r, 2, 2);
-                                level.setTile(x + 7 + 7 * p + rand.nextInt(2), y + 5 * q + 1, z + 7 + 7 * r + rand.nextInt(2), AetherBlocks.CHEST_MIMIC.id);
-                                level.setTile(x + 7 + 7 * p + rand.nextInt(2), y + 5 * q + 1, z + 7 + 7 * r + rand.nextInt(2), AetherBlocks.CHEST_MIMIC.id);
+                                level.setBlock(x + 7 + 7 * p + rand.nextInt(2), y + 5 * q + 1, z + 7 + 7 * r + rand.nextInt(2), AetherBlocks.CHEST_MIMIC.id);
+                                level.setBlock(x + 7 + 7 * p + rand.nextInt(2), y + 5 * q + 1, z + 7 + 7 * r + rand.nextInt(2), AetherBlocks.CHEST_MIMIC.id);
                                 break;
                             }
                         }
@@ -239,11 +239,11 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
                 final int distance = (int) (Math.sqrt((double) (x2 * x2 + (z2 - 7) * (z2 - 7))) + Math.sqrt((double) (x2 * x2 + (z2 - 12) * (z2 - 12))));
                 if (distance == 21)
                 {
-                    level.setTileWithMetadata(x + 26 + x2, y, z + 5 + z2, this.lockedBlockID2, 1);
+                    level.method_154(x + 26 + x2, y, z + 5 + z2, this.lockedBlockID2, 1);
                 }
                 else if (distance > 21)
                 {
-                    level.setTileWithMetadata(x + 26 + x2, y, z + 5 + z2, this.lockedBlockID1, 1);
+                    level.method_154(x + 26 + x2, y, z + 5 + z2, this.lockedBlockID1, 1);
                 }
             }
         }
@@ -254,17 +254,17 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         this.addLineX(level, rand, x + 46, y + 4, z + 13, 4);
         this.addLineX(level, rand, x + 46, y + 4, z + 16, 4);
         this.addPlaneX(level, rand, x + 49, y + 4, z + 13, 4, 4);
-        this.setBlocks(BlockBase.WOOL.id, BlockBase.WOOL.id, 1);
+        this.setBlocks(Block.WOOL.id, Block.WOOL.id, 1);
         this.setMetadata(11, 11);
         this.addPlaneY(level, rand, x + 47, y + 3, z + 14, 2, 2);
         for (x2 = 0; x2 < 2; ++x2)
         {
             for (int z2 = 0; z2 < 2; ++z2)
             {
-                level.setTileInChunk(x + 44 + x2 * 5, y + 2, z + 11 + z2 * 7, AetherBlocks.AMBROSIUM_TORCH.id);
+                level.method_200(x + 44 + x2 * 5, y + 2, z + 11 + z2 * 7, AetherBlocks.AMBROSIUM_TORCH.id);
             }
         }
-        this.setBlocks(BlockBase.STILL_WATER.id, BlockBase.STILL_WATER.id, 1);
+        this.setBlocks(Block.WATER.id, Block.WATER.id, 1);
         this.setMetadata(0, 0);
         this.addPlaneY(level, rand, x + 35, y + 1, z + 5, 6, 3);
         this.addPlaneY(level, rand, x + 35, y + 1, z + 22, 6, 3);
@@ -273,18 +273,18 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         this.addLineZ(level, rand, x + 34, y + 1, z + 5, 2);
         this.addLineZ(level, rand, x + 41, y + 1, z + 5, 2);
         this.addLineX(level, rand, x + 36, y + 1, z + 8, 4);
-        level.setTileWithMetadata(x + 35, y + 1, z + 7, this.lockedBlockID1, 1);
-        level.setTileWithMetadata(x + 40, y + 1, z + 7, this.lockedBlockID1, 1);
+        level.method_154(x + 35, y + 1, z + 7, this.lockedBlockID1, 1);
+        level.method_154(x + 40, y + 1, z + 7, this.lockedBlockID1, 1);
         this.addLineZ(level, rand, x + 34, y + 1, z + 23, 2);
         this.addLineZ(level, rand, x + 41, y + 1, z + 23, 2);
         this.addLineX(level, rand, x + 36, y + 1, z + 21, 4);
-        level.setTileWithMetadata(x + 35, y + 1, z + 22, this.lockedBlockID1, 1);
-        level.setTileWithMetadata(x + 40, y + 1, z + 22, this.lockedBlockID1, 1);
+        level.method_154(x + 35, y + 1, z + 22, this.lockedBlockID1, 1);
+        level.method_154(x + 40, y + 1, z + 22, this.lockedBlockID1, 1);
         for (x2 = x + 36; x2 < x + 40; x2 += 3)
         {
             for (int z2 = z + 8; z2 < z + 22; z2 += 13)
             {
-                level.setTileInChunk(x2, y + 2, z2, AetherBlocks.AMBROSIUM_TORCH.id);
+                level.method_200(x2, y + 2, z2, AetherBlocks.AMBROSIUM_TORCH.id);
             }
         }
         this.addChandelier(level, x + 28, y, z + 10, 8);
@@ -294,9 +294,9 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         this.addSapling(level, rand, x + 45, y + 1, z + 6);
         this.addSapling(level, rand, x + 45, y + 1, z + 21);
         final EntityValkyrie valk = new EntityValkyrie(level, x + 40.0, y + 1.5, z + 15.0, true);
-        valk.setPosition(x + 40, y + 2, z + 15);
+        valk.method_1340(x + 40, y + 2, z + 15);
         valk.setDungeon(x + 26, y, z + 5);
-        level.spawnEntity(valk);
+        level.method_210(valk);
         this.setBlocks(this.lockedBlockID1, this.lockedBlockID1, 1);
         this.setMetadata(1, 1);
         this.addHollowBox(level, rand, x + 41, y - 2, z + 13, 4, 4, 4);
@@ -308,43 +308,43 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         return true;
     }
 
-    private void addSapling(final Level world, final Random random, final int i, final int j, final int k)
+    private void addSapling(final World world, final Random random, final int i, final int j, final int k)
     {
         this.setBlocks(this.lockedBlockID1, this.lockedBlockID1, 1);
         this.setMetadata(1, 1);
         this.addPlaneY(world, random, i, j, k, 3, 3);
-        world.setTileInChunk(i + 1, j, k + 1, AetherBlocks.AETHER_DIRT.id);
-        world.setTileInChunk(i + 1, j + 1, k + 1, AetherBlocks.GOLDEN_OAK_SAPLING.id);
+        world.method_200(i + 1, j, k + 1, AetherBlocks.AETHER_DIRT.id);
+        world.method_200(i + 1, j + 1, k + 1, AetherBlocks.GOLDEN_OAK_SAPLING.id);
         for (int x = i; x < i + 3; x += 2)
         {
             for (int z = k; z < k + 3; z += 2)
             {
-                world.setTileInChunk(x, j + 1, z, AetherBlocks.AMBROSIUM_TORCH.id);
+                world.method_200(x, j + 1, z, AetherBlocks.AMBROSIUM_TORCH.id);
             }
         }
     }
 
-    private void addChandelier(final Level world, final int i, final int j, final int k, final int h)
+    private void addChandelier(final World world, final int i, final int j, final int k, final int h)
     {
         for (int y = j + h + 3; y < j + h + 6; ++y)
         {
-            world.setTileInChunk(i, y, k, BlockBase.FENCE.id);
+            world.method_200(i, y, k, Block.FENCE.id);
         }
         for (int x = i - 1; x < i + 2; ++x)
         {
-            world.setTileInChunk(x, j + h + 1, k, BlockBase.GLOWSTONE.id);
+            world.method_200(x, j + h + 1, k, Block.GLOWSTONE.id);
         }
         for (int y = j + h; y < j + h + 3; ++y)
         {
-            world.setTileInChunk(i, y, k, BlockBase.GLOWSTONE.id);
+            world.method_200(i, y, k, Block.GLOWSTONE.id);
         }
         for (int z = k - 1; z < k + 2; ++z)
         {
-            world.setTileInChunk(i, j + h + 1, z, BlockBase.GLOWSTONE.id);
+            world.method_200(i, j + h + 1, z, Block.GLOWSTONE.id);
         }
     }
 
-    private void addColumn(final Level world, final Random random, final int i, final int j, final int k, final int h)
+    private void addColumn(final World world, final Random random, final int i, final int j, final int k, final int h)
     {
         this.setBlocks(this.wallBlockID1, this.wallBlockID2, 20);
         this.setMetadata(1, 1);
@@ -353,39 +353,39 @@ public class AetherGenDungeonSilver extends AetherGenBuildings
         this.setBlocks(this.columnID, this.columnID, 1);
         this.setMetadata(0, 0);
         this.addLineY(world, random, i + 1, j, k + 1, h - 1);
-        world.setTileWithMetadata(i + 1, j + h - 1, k + 1, this.columnID, 1);
+        world.method_154(i + 1, j + h - 1, k + 1, this.columnID, 1);
     }
 
-    private void addStaircase(final Level world, final Random random, final int i, final int j, final int k, final int h)
+    private void addStaircase(final World world, final Random random, final int i, final int j, final int k, final int h)
     {
         this.setBlocks(0, 0, 1);
         this.addSolidBox(world, random, i + 1, j, k + 1, 4, h, 4);
         this.setBlocks(this.lockedBlockID1, this.lockedBlockID2, 5);
         this.setMetadata(1, 1);
         this.addSolidBox(world, random, i + 2, j, k + 2, 2, h + 4, 2);
-        world.setTileInChunk(i + 1, j + 0, k + 1, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 2, j + 0, k + 1, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 3, j + 1, k + 1, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 1, k + 1, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 2, k + 2, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 2, k + 3, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 3, k + 4, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 3, j + 3, k + 4, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 2, j + 4, k + 4, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 1, j + 4, k + 4, BlockBase.DOUBLE_STONE_SLAB.id);
+        world.method_200(i + 1, j + 0, k + 1, Block.SLAB.id);
+        world.method_200(i + 2, j + 0, k + 1, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 3, j + 1, k + 1, Block.SLAB.id);
+        world.method_200(i + 4, j + 1, k + 1, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 4, j + 2, k + 2, Block.SLAB.id);
+        world.method_200(i + 4, j + 2, k + 3, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 4, j + 3, k + 4, Block.SLAB.id);
+        world.method_200(i + 3, j + 3, k + 4, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 2, j + 4, k + 4, Block.SLAB.id);
+        world.method_200(i + 1, j + 4, k + 4, Block.DOUBLE_SLAB.id);
         if (h == 5)
         {
             return;
         }
-        world.setTileInChunk(i + 1, j + 5, k + 3, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 1, j + 5, k + 2, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 1, j + 6, k + 1, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 2, j + 6, k + 1, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 3, j + 7, k + 1, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 7, k + 1, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 8, k + 2, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 8, k + 3, BlockBase.DOUBLE_STONE_SLAB.id);
-        world.setTileInChunk(i + 4, j + 9, k + 4, BlockBase.STONE_SLAB.id);
-        world.setTileInChunk(i + 3, j + 9, k + 4, BlockBase.DOUBLE_STONE_SLAB.id);
+        world.method_200(i + 1, j + 5, k + 3, Block.SLAB.id);
+        world.method_200(i + 1, j + 5, k + 2, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 1, j + 6, k + 1, Block.SLAB.id);
+        world.method_200(i + 2, j + 6, k + 1, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 3, j + 7, k + 1, Block.SLAB.id);
+        world.method_200(i + 4, j + 7, k + 1, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 4, j + 8, k + 2, Block.SLAB.id);
+        world.method_200(i + 4, j + 8, k + 3, Block.DOUBLE_SLAB.id);
+        world.method_200(i + 4, j + 9, k + 4, Block.SLAB.id);
+        world.method_200(i + 3, j + 9, k + 4, Block.DOUBLE_SLAB.id);
     }
 }

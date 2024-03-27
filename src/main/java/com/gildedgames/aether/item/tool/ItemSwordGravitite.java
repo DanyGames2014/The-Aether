@@ -1,14 +1,14 @@
 package com.gildedgames.aether.item.tool;
 
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.tool.TemplateSword;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.modificationstation.stationapi.api.template.item.TemplateSwordItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemSwordGravitite extends TemplateSword
+public class ItemSwordGravitite extends TemplateSwordItem
 {
     public ItemSwordGravitite(final @NotNull Identifier identifier, final ToolMaterial mat)
     {
@@ -16,12 +16,12 @@ public class ItemSwordGravitite extends TemplateSword
     }
 
     @Override
-    public boolean postHit(final ItemInstance itemstack, final Living damageSource, final Living damageTarget)
+    public boolean postHit(final ItemStack itemstack, final LivingEntity damageSource, final LivingEntity damageTarget)
     {
-        if (damageTarget != null && damageTarget instanceof PlayerBase && (damageSource.hurtTime > 0 || damageSource.deathTime > 0))
+        if (damageTarget != null && damageTarget instanceof PlayerEntity && (damageSource.hurtTime > 0 || damageSource.field_1041 > 0))
         {
             ++damageSource.velocityY;
-            itemstack.applyDamage(1, damageTarget);
+            itemstack.damage(1, damageTarget);
         }
         return true;
     }

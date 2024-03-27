@@ -3,8 +3,8 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.entity.projectile.EntityDartGolden;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 public class RenderDartGolden extends EntityRenderer
@@ -42,14 +42,14 @@ public class RenderDartGolden extends EntityRenderer
         GL11.glScalef(f10, f10, f10);
         GL11.glTranslatef(-4.0f, 0.0f, 0.0f);
         GL11.glNormal3f(f10, 0.0f, 0.0f);
-        tessellator.start();
+        tessellator.startQuads();
         tessellator.vertex(-7.0, -2.0, -2.0, f6, f8);
         tessellator.vertex(-7.0, -2.0, 2.0, f7, f8);
         tessellator.vertex(-7.0, 2.0, 2.0, f7, f9);
         tessellator.vertex(-7.0, 2.0, -2.0, f6, f9);
         tessellator.draw();
         GL11.glNormal3f(-f10, 0.0f, 0.0f);
-        tessellator.start();
+        tessellator.startQuads();
         tessellator.vertex(-7.0, 2.0, -2.0, f6, f8);
         tessellator.vertex(-7.0, 2.0, 2.0, f7, f8);
         tessellator.vertex(-7.0, -2.0, 2.0, f7, f9);
@@ -59,7 +59,7 @@ public class RenderDartGolden extends EntityRenderer
         {
             GL11.glRotatef(72.0f, 1.0f, 0.0f, 0.0f);
             GL11.glNormal3f(0.0f, 0.0f, f10);
-            tessellator.start();
+            tessellator.startQuads();
             tessellator.vertex(-8.0, -2.0, 0.0, f2, f4);
             tessellator.vertex(8.0, -2.0, 0.0, f3, f4);
             tessellator.vertex(8.0, 2.0, 0.0, f3, f5);
@@ -71,7 +71,7 @@ public class RenderDartGolden extends EntityRenderer
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.renderDartGolden((EntityDartGolden) entity, x, y, z, f, f1);
     }

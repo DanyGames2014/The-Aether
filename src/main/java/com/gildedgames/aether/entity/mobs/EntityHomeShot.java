@@ -1,56 +1,56 @@
 package com.gildedgames.aether.entity.mobs;
 
 import com.gildedgames.aether.AetherMod;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Lightning;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.living.FlyingBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.FlyingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
-public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
+public class EntityHomeShot extends FlyingEntity implements MobSpawnDataProvider
 {
     public float[] sinage;
-    public Living target;
+    public LivingEntity target;
     public boolean firstRun;
     public int life;
     public int lifeSpan;
     private static final double topSpeed = 0.125;
     private static final float sponge = 57.295773f;
 
-    public EntityHomeShot(final Level level)
+    public EntityHomeShot(final World level)
     {
         super(level);
         this.texture = "aether:textures/entity/electroball.png";
         this.lifeSpan = 200;
         this.life = this.lifeSpan;
-        this.setSize(0.7f, 0.7f);
+        this.setBoundingBoxSpacing(0.7f, 0.7f);
         this.firstRun = true;
         this.sinage = new float[3];
-        this.immuneToFire = true;
+        this.fireImmune = true;
         for (int i = 0; i < 3; ++i)
         {
-            this.sinage[i] = this.rand.nextFloat() * 6.0f;
+            this.sinage[i] = this.random.nextFloat() * 6.0f;
         }
     }
 
-    public EntityHomeShot(final Level world, final double x, final double y, final double z, final Living ep)
+    public EntityHomeShot(final World world, final double x, final double y, final double z, final LivingEntity ep)
     {
         super(world);
         this.texture = "aether:textures/entity/electroball.png";
         this.lifeSpan = 200;
         this.life = this.lifeSpan;
-        this.setSize(0.7f, 0.7f);
-        this.setPosition(x, y, z);
+        this.setBoundingBoxSpacing(0.7f, 0.7f);
+        this.method_1340(x, y, z);
         this.target = ep;
         this.sinage = new float[3];
-        this.immuneToFire = true;
+        this.fireImmune = true;
         for (int i = 0; i < 3; ++i)
         {
-            this.sinage[i] = this.rand.nextFloat() * 6.0f;
+            this.sinage[i] = this.random.nextFloat() * 6.0f;
         }
     }
 
@@ -61,18 +61,18 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
         --this.life;
         if (this.firstRun && this.target == null)
         {
-            this.target = (Living) this.findPlayerToAttack();
+            this.target = (LivingEntity) this.findPlayerToAttack();
             this.firstRun = false;
         }
-        if (this.target == null || this.target.removed || this.target.health <= 0)
+        if (this.target == null || this.target.dead || this.target.health <= 0)
         {
-            this.removed = true;
+            this.dead = true;
         }
         else if (this.life <= 0)
         {
-            final Lightning thunder = new Lightning(this.level, this.x, this.y, this.z);
-            this.level.spawnEntity(thunder);
-            this.removed = true;
+            final LightningEntity thunder = new LightningEntity(this.world, this.x, this.y, this.z);
+            this.world.method_210(thunder);
+            this.dead = true;
         }
         else
         {
@@ -82,7 +82,7 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
         }
     }
 
-    public void moveIt(final EntityBase e1, final double sped)
+    public void moveIt(final Entity e1, final double sped)
     {
         final double angle1 = this.yaw / 57.295773f;
         this.velocityX -= Math.sin(angle1) * sped;
@@ -100,9 +100,9 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
         {
             this.velocityY += (a - this.boundingBox.minY) * (sped / 2.0);
         }
-        if (this.onGround)
+        if (this.field_1623)
         {
-            this.onGround = false;
+            this.field_1623 = false;
             this.velocityY = 0.10000000149011612;
         }
     }
@@ -129,16 +129,16 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("LifeLeft", (short) this.life);
+        super.writeNbt(tag);
+        tag.putShort("LifeLeft", (short) this.life);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.life = tag.getShort("LifeLeft");
     }
 
@@ -157,9 +157,9 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
         }
     }
 
-    public EntityBase findPlayerToAttack()
+    public Entity findPlayerToAttack()
     {
-        final PlayerBase entityplayer = this.level.getClosestPlayerTo(this, 16.0);
+        final PlayerEntity entityplayer = this.world.method_186(this, 16.0);
         if (entityplayer != null && this.method_928(entityplayer))
         {
             return entityplayer;
@@ -168,7 +168,7 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
     }
 
     @Override
-    public void method_1353(final EntityBase entity)
+    public void method_1353(final Entity entity)
     {
         super.method_1353(entity);
         if (entity != null && this.target != null && entity == this.target)
@@ -182,7 +182,7 @@ public class EntityHomeShot extends FlyingBase implements MobSpawnDataProvider
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
         if (target != null)
         {

@@ -1,24 +1,24 @@
 package com.gildedgames.aether.entity.projectile;
 
 import com.gildedgames.aether.AetherMod;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.Box;
-import net.minecraft.util.maths.MathHelper;
-import net.minecraft.util.maths.Vec3f;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 import java.util.List;
 
-public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvider
+public class EntityFlamingArrow extends Entity implements MobSpawnDataProvider
 {
     private int xTile;
     private int yTile;
@@ -28,11 +28,11 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
     private boolean inGround;
     public boolean doesArrowBelongToPlayer;
     public int arrowShake;
-    public Living owner;
+    public LivingEntity owner;
     private int ticksInGround;
     private int ticksInAir;
 
-    public EntityFlamingArrow(final Level level)
+    public EntityFlamingArrow(final World level)
     {
         super(level);
         this.xTile = -1;
@@ -44,11 +44,11 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         this.doesArrowBelongToPlayer = false;
         this.arrowShake = 0;
         this.ticksInAir = 0;
-        this.setSize(0.5f, 0.5f);
+        this.setBoundingBoxSpacing(0.5f, 0.5f);
         this.fire = 1;
     }
 
-    public EntityFlamingArrow(final Level world, final double d, final double d1, final double d2)
+    public EntityFlamingArrow(final World world, final double d, final double d1, final double d2)
     {
         super(world);
         this.xTile = -1;
@@ -60,12 +60,12 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         this.doesArrowBelongToPlayer = false;
         this.arrowShake = 0;
         this.ticksInAir = 0;
-        this.setSize(0.5f, 0.5f);
+        this.setBoundingBoxSpacing(0.5f, 0.5f);
         this.method_1338(d, d1, d2, this.yaw, this.pitch);
-        this.standingEyeHeight = 0.0f;
+        this.eyeHeight = 0.0f;
     }
 
-    public EntityFlamingArrow(final Level world, final Living entityliving)
+    public EntityFlamingArrow(final World world, final LivingEntity entityliving)
     {
         super(world);
         this.xTile = -1;
@@ -78,14 +78,14 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         this.arrowShake = 0;
         this.ticksInAir = 0;
         this.owner = entityliving;
-        this.doesArrowBelongToPlayer = (entityliving instanceof PlayerBase);
-        this.setSize(0.5f, 0.5f);
-        this.setPositionAndAngles(entityliving.x, entityliving.y + entityliving.getStandingEyeHeight(), entityliving.z, entityliving.yaw, entityliving.pitch);
+        this.doesArrowBelongToPlayer = (entityliving instanceof PlayerEntity);
+        this.setBoundingBoxSpacing(0.5f, 0.5f);
+        this.method_1341(entityliving.x, entityliving.y + entityliving.method_1378(), entityliving.z, entityliving.yaw, entityliving.pitch);
         this.x -= MathHelper.cos(this.yaw / 180.0f * 3.141593f) * 0.16f;
         this.y -= 0.10000000149011612;
         this.z -= MathHelper.sin(this.yaw / 180.0f * 3.141593f) * 0.16f;
         this.method_1338(this.x, this.y, this.z, this.yaw, this.pitch);
-        this.standingEyeHeight = 0.0f;
+        this.eyeHeight = 0.0f;
         this.velocityX = -MathHelper.sin(this.yaw / 180.0f * 3.141593f) * MathHelper.cos(this.pitch / 180.0f * 3.141593f);
         this.velocityZ = MathHelper.cos(this.yaw / 180.0f * 3.141593f) * MathHelper.cos(this.pitch / 180.0f * 3.141593f);
         this.velocityY = -MathHelper.sin(this.pitch / 180.0f * 3.141593f);
@@ -103,9 +103,9 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         d /= f2;
         d1 /= f2;
         d2 /= f2;
-        d += this.rand.nextGaussian() * 0.007499999832361937 * f1;
-        d1 += this.rand.nextGaussian() * 0.007499999832361937 * f1;
-        d2 += this.rand.nextGaussian() * 0.007499999832361937 * f1;
+        d += this.random.nextGaussian() * 0.007499999832361937 * f1;
+        d1 += this.random.nextGaussian() * 0.007499999832361937 * f1;
+        d2 += this.random.nextGaussian() * 0.007499999832361937 * f1;
         d *= f;
         d1 *= f;
         d2 *= f;
@@ -123,7 +123,7 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
     }
 
     @Override
-    public void setVelocity(final double velocityX, final double velocityY, final double velocityZ)
+    public void method_1365(final double velocityX, final double velocityY, final double velocityZ)
     {
         this.velocityX = velocityX;
         this.velocityY = velocityY;
@@ -139,7 +139,7 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
             this.prevPitch = n2;
             this.prevPitch = this.pitch;
             this.prevYaw = this.yaw;
-            this.setPositionAndAngles(this.x, this.y, this.z, this.yaw, this.pitch);
+            this.method_1341(this.x, this.y, this.z, this.yaw, this.pitch);
             this.ticksInGround = 0;
         }
     }
@@ -158,12 +158,12 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
             this.pitch = n2;
             this.prevPitch = n2;
         }
-        final int i = this.level.getTileId(this.xTile, this.yTile, this.zTile);
+        final int i = this.world.getBlockId(this.xTile, this.yTile, this.zTile);
         if (i > 0)
         {
-            BlockBase.BY_ID[i].updateBoundingBox(this.level, this.xTile, this.yTile, this.zTile);
-            final Box axisalignedbb = BlockBase.BY_ID[i].getCollisionShape(this.level, this.xTile, this.yTile, this.zTile);
-            if (axisalignedbb != null && axisalignedbb.method_88(Vec3f.from(this.x, this.y, this.z)))
+            Block.BLOCKS[i].updateBoundingBox(this.world, this.xTile, this.yTile, this.zTile);
+            final Box axisalignedbb = Block.BLOCKS[i].getCollisionShape(this.world, this.xTile, this.yTile, this.zTile);
+            if (axisalignedbb != null && axisalignedbb.contains(Vec3d.createCached(this.x, this.y, this.z)))
             {
                 this.inGround = true;
             }
@@ -174,33 +174,33 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         }
         if (!this.inGround)
         {
-            this.level.addParticle(this.rand.nextBoolean() ? "flame" : "smoke", this.x, this.y, this.z, 0.0, 0.0, 0.0);
+            this.world.addParticle(this.random.nextBoolean() ? "flame" : "smoke", this.x, this.y, this.z, 0.0, 0.0, 0.0);
             ++this.ticksInAir;
-            Vec3f vec3d = Vec3f.from(this.x, this.y, this.z);
-            Vec3f vec3d2 = Vec3f.from(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
-            HitResult movingobjectposition = this.level.method_162(vec3d, vec3d2, false, true);
-            vec3d = Vec3f.from(this.x, this.y, this.z);
-            vec3d2 = Vec3f.from(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
+            Vec3d vec3d = Vec3d.createCached(this.x, this.y, this.z);
+            Vec3d vec3d2 = Vec3d.createCached(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
+            HitResult movingobjectposition = this.world.method_162(vec3d, vec3d2, false, true);
+            vec3d = Vec3d.createCached(this.x, this.y, this.z);
+            vec3d2 = Vec3d.createCached(this.x + this.velocityX, this.y + this.velocityY, this.z + this.velocityZ);
             if (movingobjectposition != null)
             {
-                vec3d2 = Vec3f.from(movingobjectposition.field_1988.x, movingobjectposition.field_1988.y, movingobjectposition.field_1988.z);
+                vec3d2 = Vec3d.createCached(movingobjectposition.pos.x, movingobjectposition.pos.y, movingobjectposition.pos.z);
             }
-            EntityBase entity = null;
-            final List list = this.level.getEntities(this, this.boundingBox.method_86(this.velocityX, this.velocityY, this.velocityZ).expand(1.0, 1.0, 1.0));
+            Entity entity = null;
+            final List list = this.world.getEntities(this, this.boundingBox.stretch(this.velocityX, this.velocityY, this.velocityZ).expand(1.0, 1.0, 1.0));
             double d = 0.0;
             for (int l = 0; l < list.size(); ++l)
             {
-                final EntityBase entity2 = (EntityBase) list.get(l);
+                final Entity entity2 = (Entity) list.get(l);
                 if (entity2.method_1356())
                 {
                     if (entity2 != this.owner || this.ticksInAir >= 5)
                     {
                         final float f2 = 0.3f;
                         final Box axisalignedbb2 = entity2.boundingBox.expand(f2, f2, f2);
-                        final HitResult movingobjectposition2 = axisalignedbb2.method_89(vec3d, vec3d2);
+                        final HitResult movingobjectposition2 = axisalignedbb2.raycast(vec3d, vec3d2);
                         if (movingobjectposition2 != null)
                         {
-                            final double d2 = vec3d.method_1294(movingobjectposition2.field_1988);
+                            final double d2 = vec3d.distanceTo(movingobjectposition2.pos);
                             if (d2 < d || d == 0.0)
                             {
                                 entity = entity2;
@@ -216,17 +216,17 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
             }
             if (movingobjectposition != null)
             {
-                if (movingobjectposition.field_1989 != null)
+                if (movingobjectposition.entity != null)
                 {
-                    if (movingobjectposition.field_1989.damage(this.owner, 4))
+                    if (movingobjectposition.entity.damage(this.owner, 4))
                     {
-                        this.level.playSound((EntityBase) this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
-                        movingobjectposition.field_1989.fire = 100;
-                        final int x = MathHelper.floor(movingobjectposition.field_1989.boundingBox.minX);
-                        final int y = MathHelper.floor(movingobjectposition.field_1989.boundingBox.minY);
-                        final int z = MathHelper.floor(movingobjectposition.field_1989.boundingBox.minZ);
-                        this.level.setTile(x, y, z, 51);
-                        this.remove();
+                        this.world.playSound((Entity) this, "random.drr", 1.0f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
+                        movingobjectposition.entity.fire = 100;
+                        final int x = MathHelper.floor(movingobjectposition.entity.boundingBox.minX);
+                        final int y = MathHelper.floor(movingobjectposition.entity.boundingBox.minY);
+                        final int z = MathHelper.floor(movingobjectposition.entity.boundingBox.minZ);
+                        this.world.setBlock(x, y, z, 51);
+                        this.markDead();
                     }
                     else
                     {
@@ -240,23 +240,23 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
                 }
                 else
                 {
-                    this.xTile = movingobjectposition.x;
-                    this.yTile = movingobjectposition.y;
-                    this.zTile = movingobjectposition.z;
-                    this.inTile = this.level.getTileId(this.xTile, this.yTile, this.zTile);
-                    this.field_28019_h = this.level.getTileMeta(this.xTile, this.yTile, this.zTile);
-                    this.velocityX = (float) (movingobjectposition.field_1988.x - this.x);
-                    this.velocityY = (float) (movingobjectposition.field_1988.y - this.y);
-                    this.velocityZ = (float) (movingobjectposition.field_1988.z - this.z);
+                    this.xTile = movingobjectposition.blockX;
+                    this.yTile = movingobjectposition.blockY;
+                    this.zTile = movingobjectposition.blockZ;
+                    this.inTile = this.world.getBlockId(this.xTile, this.yTile, this.zTile);
+                    this.field_28019_h = this.world.getBlockMeta(this.xTile, this.yTile, this.zTile);
+                    this.velocityX = (float) (movingobjectposition.pos.x - this.x);
+                    this.velocityY = (float) (movingobjectposition.pos.y - this.y);
+                    this.velocityZ = (float) (movingobjectposition.pos.z - this.z);
                     final float f3 = MathHelper.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY + this.velocityZ * this.velocityZ);
                     this.x -= this.velocityX / f3 * 0.05000000074505806;
                     this.y -= this.velocityY / f3 * 0.05000000074505806;
                     this.z -= this.velocityZ / f3 * 0.05000000074505806;
-                    this.level.playSound((EntityBase) this, "random.drr", 1.0f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                    this.world.playSound((Entity) this, "random.drr", 1.0f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
                     final int xPos = MathHelper.floor(this.x);
                     final int yPos = MathHelper.floor(this.y);
                     final int zPos = MathHelper.floor(this.z);
-                    this.level.setTile(xPos, yPos, zPos, 51);
+                    this.world.setBlock(xPos, yPos, zPos, 51);
                     this.inGround = true;
                     this.arrowShake = 7;
                 }
@@ -292,7 +292,7 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
                 for (int i2 = 0; i2 < 4; ++i2)
                 {
                     final float f7 = 0.25f;
-                    this.level.addParticle("bubble", this.x - this.velocityX * f7, this.y - this.velocityY * f7, this.z - this.velocityZ * f7, this.velocityX, this.velocityY, this.velocityZ);
+                    this.world.addParticle("bubble", this.x - this.velocityX * f7, this.y - this.velocityY * f7, this.z - this.velocityZ * f7, this.velocityX, this.velocityY, this.velocityZ);
                 }
                 f5 = 0.8f;
             }
@@ -303,14 +303,14 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
             this.method_1338(this.x, this.y, this.z, this.yaw, this.pitch);
             return;
         }
-        final int j = this.level.getTileId(this.xTile, this.yTile, this.zTile);
-        final int k = this.level.getTileMeta(this.xTile, this.yTile, this.zTile);
+        final int j = this.world.getBlockId(this.xTile, this.yTile, this.zTile);
+        final int k = this.world.getBlockMeta(this.xTile, this.yTile, this.zTile);
         if (j != this.inTile || k != this.field_28019_h)
         {
             this.inGround = false;
-            this.velocityX *= this.rand.nextFloat() * 0.2f;
-            this.velocityY *= this.rand.nextFloat() * 0.2f;
-            this.velocityZ *= this.rand.nextFloat() * 0.2f;
+            this.velocityX *= this.random.nextFloat() * 0.2f;
+            this.velocityY *= this.random.nextFloat() * 0.2f;
+            this.velocityZ *= this.random.nextFloat() * 0.2f;
             this.ticksInGround = 0;
             this.ticksInAir = 0;
             return;
@@ -318,23 +318,23 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
         ++this.ticksInGround;
         if (this.ticksInGround == 1200)
         {
-            this.remove();
+            this.markDead();
         }
     }
 
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        tag.put("xTile", (short) this.xTile);
-        tag.put("yTile", (short) this.yTile);
-        tag.put("zTile", (short) this.zTile);
-        tag.put("inTile", (byte) this.inTile);
-        tag.put("inData", (byte) this.field_28019_h);
-        tag.put("shake", (byte) this.arrowShake);
-        tag.put("inGround", (byte) (byte) (this.inGround ? 1 : 0));
-        tag.put("player", this.doesArrowBelongToPlayer);
+        tag.putShort("xTile", (short) this.xTile);
+        tag.putShort("yTile", (short) this.yTile);
+        tag.putShort("zTile", (short) this.zTile);
+        tag.putByte("inTile", (byte) this.inTile);
+        tag.putByte("inData", (byte) this.field_28019_h);
+        tag.putByte("shake", (byte) this.arrowShake);
+        tag.putByte("inGround", (byte) (byte) (this.inGround ? 1 : 0));
+        tag.putBoolean("player", this.doesArrowBelongToPlayer);
     }
 
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
         this.xTile = tag.getShort("xTile");
         this.yTile = tag.getShort("yTile");
@@ -347,22 +347,22 @@ public class EntityFlamingArrow extends EntityBase implements MobSpawnDataProvid
     }
 
     @Override
-    public void onPlayerCollision(final PlayerBase entityplayer)
+    public void onPlayerInteraction(final PlayerEntity entityplayer)
     {
-        if (this.level.isServerSide)
+        if (this.world.isRemote)
         {
             return;
         }
-        if (this.inGround && this.doesArrowBelongToPlayer && this.arrowShake <= 0 && entityplayer.inventory.addStack(new ItemInstance(ItemBase.arrow, 1)))
+        if (this.inGround && this.doesArrowBelongToPlayer && this.arrowShake <= 0 && entityplayer.inventory.method_671(new ItemStack(Item.ARROW, 1)))
         {
-            this.level.playSound((EntityBase) this, "random.pop", 0.2f, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
-            entityplayer.onItemPickup(this, 1);
-            this.remove();
+            this.world.playSound((Entity) this, "random.pop", 0.2f, ((this.random.nextFloat() - this.random.nextFloat()) * 0.7f + 1.0f) * 2.0f);
+            entityplayer.method_491(this, 1);
+            this.markDead();
         }
     }
 
     @Override
-    public float getEyeHeight()
+    public float method_1366()
     {
         return 0.0f;
     }

@@ -1,14 +1,14 @@
 package com.gildedgames.aether.utils;
 
-import net.minecraft.item.ItemInstance;
+import net.minecraft.item.ItemStack;
 
 public class Frozen
 {
-    public ItemInstance frozenFrom;
-    public ItemInstance frozenTo;
+    public ItemStack frozenFrom;
+    public ItemStack frozenTo;
     public int frozenPowerNeeded;
 
-    public Frozen(final ItemInstance from, final ItemInstance to, final int i)
+    public Frozen(final ItemStack from, final ItemStack to, final int i)
     {
         this.frozenFrom = from;
         this.frozenTo = to;

@@ -1,12 +1,12 @@
 package com.gildedgames.aether.client.render.model;
 
-import net.minecraft.client.model.Cuboid;
-import net.minecraft.client.render.entity.model.EntityModelBase;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.model.EntityModel;
 import org.lwjgl.opengl.GL11;
 
-public class ModelHomeShot extends EntityModelBase
+public class ModelHomeShot extends EntityModel
 {
-    public Cuboid[] head;
+    public ModelPart[] head;
     public float[] sinage;
     private static final float sponge = 57.295773f;
 
@@ -23,13 +23,13 @@ public class ModelHomeShot extends EntityModelBase
     public ModelHomeShot(final float f, final float f1)
     {
         this.sinage = new float[3];
-        (this.head = new Cuboid[3])[0] = new Cuboid(0, 0);
-        this.head[1] = new Cuboid(32, 0);
-        this.head[2] = new Cuboid(0, 16);
+        (this.head = new ModelPart[3])[0] = new ModelPart(0, 0);
+        this.head[1] = new ModelPart(32, 0);
+        this.head[2] = new ModelPart(0, 16);
         for (int i = 0; i < 3; ++i)
         {
-            this.head[i].method_1818(-4.0f, -4.0f, -4.0f, 8, 8, 8, f);
-            this.head[i].setRotationPoint(0.0f, 0.0f + f1, 0.0f);
+            this.head[i].addCuboid(-4.0f, -4.0f, -4.0f, 8, 8, 8, f);
+            this.head[i].setPivot(0.0f, 0.0f + f1, 0.0f);
         }
     }
 
@@ -45,15 +45,15 @@ public class ModelHomeShot extends EntityModelBase
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         GL11.glPushMatrix();
         GL11.glRotatef(this.sinage[0] * 57.295773f, 1.0f, 0.0f, 0.0f);
-        this.head[0].method_1815(f5);
+        this.head[0].render(f5);
         GL11.glPopMatrix();
         GL11.glPushMatrix();
         GL11.glRotatef(this.sinage[1] * 57.295773f, 0.0f, 1.0f, 0.0f);
-        this.head[1].method_1815(f5);
+        this.head[1].render(f5);
         GL11.glPopMatrix();
         GL11.glPushMatrix();
         GL11.glRotatef(this.sinage[2] * 57.295773f, 0.0f, 0.0f, 1.0f);
-        this.head[2].method_1815(f5);
+        this.head[2].render(f5);
         GL11.glPopMatrix();
         GL11.glEnable(3008);
     }

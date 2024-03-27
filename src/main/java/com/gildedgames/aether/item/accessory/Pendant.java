@@ -6,14 +6,14 @@ import com.matthewperiut.accessoryapi.api.render.HasCustomRenderer;
 import com.matthewperiut.accessoryapi.api.render.builtin.NecklaceRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 import java.awt.*;
 import java.util.Optional;
 
-public class Pendant extends TemplateItemBase implements Accessory, HasCustomRenderer
+public class Pendant extends TemplateItem implements Accessory, HasCustomRenderer
 {
     String texture;
     int colour;
@@ -21,8 +21,8 @@ public class Pendant extends TemplateItemBase implements Accessory, HasCustomRen
     public Pendant(Identifier identifier, String texture, int colour)
     {
         super(identifier);
-        setMaxStackSize(1);
-        setDurability(500);
+        setMaxCount(1);
+        setMaxDamage(500);
         this.colour = colour;
         this.texture = texture;
     }
@@ -39,7 +39,7 @@ public class Pendant extends TemplateItemBase implements Accessory, HasCustomRen
     }
 
     @Override
-    public String[] getAccessoryTypes(ItemInstance item)
+    public String[] getAccessoryTypes(ItemStack item)
     {
         return new String[]{"pendant"};
     }

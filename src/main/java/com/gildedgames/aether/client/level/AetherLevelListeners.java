@@ -4,7 +4,7 @@ import com.gildedgames.aether.client.render.AetherWorldRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.client.Minecraft;
-import net.modificationstation.stationapi.api.event.level.LevelEvent;
+import net.modificationstation.stationapi.api.event.world.WorldEvent;
 import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
 import net.modificationstation.stationapi.api.mod.entrypoint.EventBusPolicy;
 
@@ -13,7 +13,7 @@ public class AetherLevelListeners
 {
 
     @EventListener
-    private static void registerLevelListeners(LevelEvent.Init event)
+    private static void registerLevelListeners(WorldEvent.Init event)
     {
         if (!init)
         {
@@ -21,7 +21,7 @@ public class AetherLevelListeners
             //noinspection deprecation
             AETHER_WORLD_RENDERER = new AetherWorldRenderer((Minecraft) FabricLoader.getInstance().getGameInstance());
         }
-        AETHER_WORLD_RENDERER.updateLevel(event.level);
+        AETHER_WORLD_RENDERER.updateLevel(event.world);
     }
 
     private static boolean init;

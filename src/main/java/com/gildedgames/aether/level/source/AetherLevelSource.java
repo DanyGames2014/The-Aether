@@ -3,23 +3,19 @@ package com.gildedgames.aether.level.source;
 import com.gildedgames.aether.generator.*;
 import com.gildedgames.aether.level.biome.AetherBiomes;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.block.BlockBase;
-import net.minecraft.block.Sand;
-import net.minecraft.level.Level;
-import net.minecraft.level.biome.Biome;
-import net.minecraft.level.chunk.Chunk;
-import net.minecraft.level.gen.Cave;
-import net.minecraft.level.gen.OverworldCave;
-import net.minecraft.level.source.LevelSource;
-import net.minecraft.level.structure.Lake;
-import net.minecraft.level.structure.Structure;
-import net.minecraft.util.ProgressListener;
-import net.minecraft.util.noise.PerlinOctaveNoise;
-import net.modificationstation.stationapi.impl.level.chunk.FlattenedChunk;
+import net.minecraft.block.Block;
+import net.minecraft.block.SandBlock;
+import net.minecraft.*;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.LakeFeature;
+import net.modificationstation.stationapi.impl.world.chunk.FlattenedChunk;
 
 import java.util.Random;
 
-public class AetherLevelSource implements LevelSource
+public class AetherLevelSource implements class_51
 {
 
     private static int GUM_COUNT;
@@ -27,7 +23,7 @@ public class AetherLevelSource implements LevelSource
     private static int gumCount;
 
     private final Random random;
-    private final PerlinOctaveNoise
+    private final class_209
             perlinOctaveNoise1,
             perlinOctaveNoise2,
             perlinOctaveNoise3,
@@ -36,13 +32,13 @@ public class AetherLevelSource implements LevelSource
             perlinOctaveNoise6,
             perlinOctaveNoise7,
             perlinOctaveNoise8;
-    private final Level level;
+    private final World level;
     private double[]
             climateNoise,
             sandNoise = new double[256],
             gravelNoise = new double[256],
             stoneNoise = new double[256];
-    private final Cave caveGen = new OverworldCave();
+    private final class_105 caveGen = new class_415();
     private Biome[] biomes;
     private double[]
             noise3,
@@ -52,17 +48,17 @@ public class AetherLevelSource implements LevelSource
             noise7;
     private double[] temperatures;
 
-    public AetherLevelSource(Level level, long l)
+    public AetherLevelSource(World level, long l)
     {
         random = new Random(l);
-        perlinOctaveNoise1 = new PerlinOctaveNoise(random, 16);
-        perlinOctaveNoise2 = new PerlinOctaveNoise(random, 16);
-        perlinOctaveNoise3 = new PerlinOctaveNoise(random, 8);
-        perlinOctaveNoise4 = new PerlinOctaveNoise(random, 4);
-        perlinOctaveNoise5 = new PerlinOctaveNoise(random, 4);
-        perlinOctaveNoise6 = new PerlinOctaveNoise(random, 10);
-        perlinOctaveNoise7 = new PerlinOctaveNoise(random, 16);
-        perlinOctaveNoise8 = new PerlinOctaveNoise(random, 8);
+        perlinOctaveNoise1 = new class_209(random, 16);
+        perlinOctaveNoise2 = new class_209(random, 16);
+        perlinOctaveNoise3 = new class_209(random, 8);
+        perlinOctaveNoise4 = new class_209(random, 4);
+        perlinOctaveNoise5 = new class_209(random, 4);
+        perlinOctaveNoise6 = new class_209(random, 10);
+        perlinOctaveNoise7 = new class_209(random, 16);
+        perlinOctaveNoise8 = new class_209(random, 8);
         this.level = level;
     }
 
@@ -126,9 +122,9 @@ public class AetherLevelSource implements LevelSource
     public void buildSurface(int chunkX, int chunkZ, byte[] tiles, Biome[] biomes)
     {
         double d = 0.03125D;
-        sandNoise = perlinOctaveNoise4.sample(sandNoise, chunkX * 16, chunkZ * 16, 0.0D, 16, 16, 1, d, d, 1.0D);
-        gravelNoise = perlinOctaveNoise4.sample(gravelNoise, chunkX * 16, 109.0134D, chunkZ * 16, 16, 1, 16, d, 1.0D, d);
-        stoneNoise = perlinOctaveNoise5.sample(stoneNoise, chunkX * 16, chunkZ * 16, 0.0D, 16, 16, 1, d * 2D, d * 2D, d * 2D);
+        sandNoise = perlinOctaveNoise4.method_1514(sandNoise, chunkX * 16, chunkZ * 16, 0.0D, 16, 16, 1, d, d, 1.0D);
+        gravelNoise = perlinOctaveNoise4.method_1514(gravelNoise, chunkX * 16, 109.0134D, chunkZ * 16, 16, 1, 16, d, 1.0D, d);
+        stoneNoise = perlinOctaveNoise5.method_1514(stoneNoise, chunkX * 16, chunkZ * 16, 0.0D, 16, 16, 1, d * 2D, d * 2D, d * 2D);
         for (int k = 0; k < 16; k++)
             for (int l = 0; l < 16; l++)
             {
@@ -169,28 +165,29 @@ public class AetherLevelSource implements LevelSource
     }
 
     @Override
-    public Chunk getChunk(int chunkX, int chunkZ)
+    public Chunk method_1806(int chunkX, int chunkZ)
     {
-        return loadChunk(chunkX, chunkZ);
+        return method_1807(chunkX, chunkZ);
     }
 
     @Override
-    public Chunk loadChunk(int chunkX, int chunkZ)
+    public Chunk method_1807(int chunkX, int chunkZ)
     {
         random.setSeed((long) chunkX * 0x4f9939f508L + (long) chunkZ * 0x1ef1565bd5L);
         byte[] tiles = new byte[32768];
         //Chunk chunk = new Chunk(level, tiles, chunkX, chunkZ);
-        biomes = level.getBiomeSource().getBiomes(biomes, chunkX * 16, chunkZ * 16, 16, 16);
-        double[] temperatures = level.getBiomeSource().temperatureNoises;
+        biomes = level.method_1781().method_1791(biomes, chunkX * 16, chunkZ * 16, 16, 16);
+        double[] temperatures = level.method_1781().field_2235;
         shapeChunk(chunkX, chunkZ, tiles, biomes, temperatures);
         buildSurface(chunkX, chunkZ, tiles, biomes);
-        caveGen.generate(this, level, chunkX, chunkZ, tiles);
+        caveGen.method_395(this, level, chunkX, chunkZ, tiles);
         //
         //return chunk;
 
         FlattenedChunk chunk = new FlattenedChunk(level, chunkX, chunkZ);
         chunk.fromLegacy(tiles);
-        chunk.generateHeightmap();
+        //TODO : IS THIS CORRECT ?
+        chunk.populateHeightmap();
         return chunk;
     }
 
@@ -200,12 +197,12 @@ public class AetherLevelSource implements LevelSource
             noises = new double[noiseResolutionX * noiseResolutionY * noiseResolutionZ];
         double d = 684.41200000000003D;
         double d1 = 684.41200000000003D;
-        noise6 = perlinOctaveNoise6.sample(noise6, chunkX, chunkZ, noiseResolutionX, noiseResolutionZ, 1.121D, 1.121D, 0.5D);
-        noise7 = perlinOctaveNoise7.sample(noise7, chunkX, chunkZ, noiseResolutionX, noiseResolutionZ, 200D, 200D, 0.5D);
+        noise6 = perlinOctaveNoise6.method_1515(noise6, chunkX, chunkZ, noiseResolutionX, noiseResolutionZ, 1.121D, 1.121D, 0.5D);
+        noise7 = perlinOctaveNoise7.method_1515(noise7, chunkX, chunkZ, noiseResolutionX, noiseResolutionZ, 200D, 200D, 0.5D);
         d *= 2D;
-        noise3 = perlinOctaveNoise3.sample(noise3, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d / 80D, d1 / 160D, d / 80D);
-        noise1 = perlinOctaveNoise1.sample(noise1, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d, d1, d);
-        noise2 = perlinOctaveNoise2.sample(noise2, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d, d1, d);
+        noise3 = perlinOctaveNoise3.method_1514(noise3, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d / 80D, d1 / 160D, d / 80D);
+        noise1 = perlinOctaveNoise1.method_1514(noise1, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d, d1, d);
+        noise2 = perlinOctaveNoise2.method_1514(noise2, chunkX, chunkY, chunkZ, noiseResolutionX, noiseResolutionY, noiseResolutionZ, d, d1, d);
         int k1 = 0;
         for (int j2 = 0; j2 < noiseResolutionX; j2++)
             for (int l2 = 0; l2 < noiseResolutionZ; l2++)
@@ -241,18 +238,18 @@ public class AetherLevelSource implements LevelSource
     }
 
     @Override
-    public boolean isChunkLoaded(int chunkX, int chunkZ)
+    public boolean method_1802(int chunkX, int chunkZ)
     {
         return true;
     }
 
     @Override
-    public void decorate(LevelSource levelSource, int chunkX, int chunkZ)
+    public void method_1803(class_51 levelSource, int chunkX, int chunkZ)
     {
-        Sand.fallInstantly = true;
+        SandBlock.field_375 = true;
         final int k = chunkX * 16;
         final int l = chunkZ * 16;
-        final Biome biomegenbase = this.level.getBiomeSource().getBiome(k + 16, l + 16);
+        final Biome biomegenbase = this.level.method_1781().method_1787(k + 16, l + 16);
         this.random.setSeed(this.level.getSeed());
         final long l2 = this.random.nextLong() / 2L * 2L + 1L;
         final long l3 = this.random.nextLong() / 2L * 2L + 1L;
@@ -279,7 +276,7 @@ public class AetherLevelSource implements LevelSource
             final int x2 = k + this.random.nextInt(16) + 8;
             final int y2 = this.random.nextInt(128);
             final int z2 = l + this.random.nextInt(16) + 8;
-            new Lake(BlockBase.STILL_WATER.id).generate(this.level, this.random, x2, y2, z2);
+            new LakeFeature(Block.WATER.id).generate(this.level, this.random, x2, y2, z2);
         }
         for (int n = 0; n < 20; ++n)
         {
@@ -383,7 +380,7 @@ public class AetherLevelSource implements LevelSource
                 {
                     for (int n2 = 0; n2 < 48; ++n2)
                     {
-                        if (this.level.getTileId(x2, n2, z3) == 0 && this.level.getTileId(x2, n2 + 1, z3) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.level.getTileId(x2, n2 + 2, z3) == 0)
+                        if (this.level.getBlockId(x2, n2, z3) == 0 && this.level.getBlockId(x2, n2 + 1, z3) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.level.getBlockId(x2, n2 + 2, z3) == 0)
                         {
                             new AetherGenQuicksoil(AetherBlocks.QUICKSOIL.id).generate(this.level, this.random, x2, n2, z3);
                             n2 = 128;
@@ -393,7 +390,7 @@ public class AetherLevelSource implements LevelSource
             }
         }
         d = 0.5;
-        final int k2 = (int) ((this.perlinOctaveNoise8.sample(k * d, l * d) / 8.0 + this.random.nextDouble() * 4.0 + 4.0) / 3.0);
+        final int k2 = (int) ((this.perlinOctaveNoise8.method_1513(k * d, l * d) / 8.0 + this.random.nextDouble() * 4.0 + 4.0) / 3.0);
         int l4 = 0;
         if (this.random.nextInt(10) == 0)
         {
@@ -408,9 +405,9 @@ public class AetherLevelSource implements LevelSource
         {
             final int k3 = k + this.random.nextInt(16) + 8;
             final int j18 = l + this.random.nextInt(16) + 8;
-            final Structure worldgenerator = biomegenbase.getTree(this.random);
+            final Feature worldgenerator = biomegenbase.getRandomTreeFeature(this.random);
             worldgenerator.method_1143(1.0, 1.0, 1.0);
-            worldgenerator.generate(this.level, this.random, k3, this.level.getHeight(k3, j18), j18);
+            worldgenerator.generate(this.level, this.random, k3, this.level.getTopY(k3, j18), j18);
         }
 
         for (int k4 = 0; k4 < 50; ++k4)
@@ -418,13 +415,13 @@ public class AetherLevelSource implements LevelSource
             final int j19 = k + this.random.nextInt(16) + 8;
             final int l5 = this.random.nextInt(this.random.nextInt(120) + 8);
             final int l6 = l + this.random.nextInt(16) + 8;
-            new AetherGenLiquids(BlockBase.FLOWING_WATER.id).generate(this.level, this.random, j19, l5, l6);
+            new AetherGenLiquids(Block.FLOWING_WATER.id).generate(this.level, this.random, j19, l5, l6);
         }
-        Sand.fallInstantly = false;
+        SandBlock.field_375 = false;
     }
 
     @Override
-    public boolean deleteCacheCauseClientCantHandleThis(boolean iDontKnowWhy, ProgressListener listener)
+    public boolean method_1804(boolean iDontKnowWhy, class_62 listener)
     {
         return true;
     }
@@ -442,7 +439,7 @@ public class AetherLevelSource implements LevelSource
     }
 
     @Override
-    public String toString()
+    public String method_1808()
     {
         return "RandomLevelSource";
     }

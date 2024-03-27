@@ -1,20 +1,20 @@
 package com.gildedgames.aether.gui.container;
 
-import net.minecraft.client.ClientInventory;
-import net.minecraft.container.ContainerBase;
-import net.minecraft.container.slot.Slot;
-import net.minecraft.entity.player.PlayerBase;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryBase;
-import net.minecraft.item.ItemInstance;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerLore extends ContainerBase
+public class ContainerLore extends ScreenHandler
 {
-    public InventoryBase loreSlot;
+    public Inventory loreSlot;
 
     public ContainerLore(final PlayerInventory inventoryplayer)
     {
-        this.loreSlot = new ClientInventory("Lore Item", 1);
+        this.loreSlot = new SimpleInventory("Lore Item", 1);
         this.addSlot(new Slot(this.loreSlot, 0, 82, 66));
         for (int i1 = 0; i1 < 3; ++i1)
         {
@@ -30,15 +30,15 @@ public class ContainerLore extends ContainerBase
     }
 
     @Override
-    protected void insertItem(final ItemInstance itemstack, final int i, final int j, final boolean flag)
+    protected void method_2081(final ItemStack itemstack, final int i, final int j, final boolean flag)
     {
     }
 
     @Override
-    public void onClosed(final PlayerBase player)
+    public void onClosed(final PlayerEntity player)
     {
         super.onClosed(player);
-        final ItemInstance itemstack = this.loreSlot.getInventoryItem(0);
+        final ItemStack itemstack = this.loreSlot.getStack(0);
         if (itemstack != null)
         {
             player.dropItem(itemstack);
@@ -46,35 +46,35 @@ public class ContainerLore extends ContainerBase
     }
 
     @Override
-    public boolean canUse(final PlayerBase player)
+    public boolean canUse(final PlayerEntity player)
     {
         return true;
     }
 
     @Override
-    public ItemInstance transferSlot(final int slotIndex)
+    public ItemStack getStackInSlot(final int slotIndex)
     {
-        ItemInstance itemstack = null;
+        ItemStack itemstack = null;
         final Slot slot = (Slot) this.slots.get(slotIndex);
-        if (slot != null && slot.hasItem())
+        if (slot != null && slot.hasStack())
         {
-            final ItemInstance itemstack2 = slot.getItem();
+            final ItemStack itemstack2 = slot.getStack();
             itemstack = itemstack2.copy();
             if (slotIndex == 0)
             {
-                this.insertItem(itemstack2, 10, 46, true);
+                this.method_2081(itemstack2, 10, 46, true);
             }
             else if (slotIndex >= 10 && slotIndex < 37)
             {
-                this.insertItem(itemstack2, 37, 46, false);
+                this.method_2081(itemstack2, 37, 46, false);
             }
             else if (slotIndex >= 37 && slotIndex < 46)
             {
-                this.insertItem(itemstack2, 10, 37, false);
+                this.method_2081(itemstack2, 10, 37, false);
             }
             else
             {
-                this.insertItem(itemstack2, 10, 46, false);
+                this.method_2081(itemstack2, 10, 46, false);
             }
             if (itemstack2.count == 0)
             {

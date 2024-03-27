@@ -1,14 +1,14 @@
 package com.gildedgames.aether.utils;
 
-import net.minecraft.item.ItemInstance;
+import net.minecraft.item.ItemStack;
 
 public class Enchantment
 {
-    public ItemInstance enchantFrom;
-    public ItemInstance enchantTo;
+    public ItemStack enchantFrom;
+    public ItemStack enchantTo;
     public int enchantPowerNeeded;
 
-    public Enchantment(final ItemInstance from, final ItemInstance to, final int i)
+    public Enchantment(final ItemStack from, final ItemStack to, final int i)
     {
         this.enchantFrom = from;
         this.enchantTo = to;

@@ -2,27 +2,27 @@ package com.gildedgames.aether.entity.projectile;
 
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.Living;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class EntityDartEnchanted extends EntityDartGolden
 {
-    public Living victim;
+    public LivingEntity victim;
     public static int texfxindex;
 
-    public EntityDartEnchanted(final Level level)
+    public EntityDartEnchanted(final World level)
     {
         super(level);
     }
 
-    public EntityDartEnchanted(final Level world, final double x, final double y, final double z)
+    public EntityDartEnchanted(final World world, final double x, final double y, final double z)
     {
         super(world, x, y, z);
     }
 
-    public EntityDartEnchanted(final Level world, final Living ent)
+    public EntityDartEnchanted(final World world, final LivingEntity ent)
     {
         super(world, ent);
     }
@@ -31,7 +31,7 @@ public class EntityDartEnchanted extends EntityDartGolden
     public void initDataTracker()
     {
         super.initDataTracker();
-        this.item = new ItemInstance(AetherItems.Dart, 1, 2);
+        this.item = new ItemStack(AetherItems.Dart, 1, 2);
         this.dmg = 6;
     }
 

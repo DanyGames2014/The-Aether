@@ -4,11 +4,11 @@ import com.gildedgames.aether.block.BlockTreasureChest;
 import com.gildedgames.aether.entity.boss.EntitySlider;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.block.BlockBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import java.util.Random;
 
@@ -43,7 +43,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         this.replaceAir = true;
         this.replaceSolid = true;
@@ -56,9 +56,9 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         this.addHollowBox(level, rand, x, y, z, 16, 12, 16);
         this.addHollowBox(level, rand, x + 6, y - 2, z + 6, 4, 4, 4);
         final EntitySlider slider = new EntitySlider(level);
-        slider.setPosition(x + 8, y + 2, z + 8);
+        slider.method_1340(x + 8, y + 2, z + 8);
         slider.setDungeon(x, y, z);
-        level.spawnEntity(slider);
+        level.method_210(slider);
         int x2 = x + 7 + rand.nextInt(2);
         int y2 = y - 1;
         int z2 = z + 7 + rand.nextInt(2);
@@ -79,7 +79,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         {
             for (int q = z2 + 2; q < z2 + 10; q += 3)
             {
-                level.setTileWithMetadata(p, y, q, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 0);
+                level.method_154(p, y, q, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 0);
             }
         }
         ++this.n;
@@ -93,7 +93,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         return true;
     }
 
-    public boolean generateNextRoom(final Level world, final Random random, final int i, final int j, final int k)
+    public boolean generateNextRoom(final World world, final Random random, final int i, final int j, final int k)
     {
         if (this.n > this.numRooms && !this.finished)
         {
@@ -137,9 +137,9 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
             {
                 for (int r = z; r < z + 12; ++r)
                 {
-                    if (world.getTileId(p, q, r) == this.wallBlockID1 && random.nextInt(100) == 0)
+                    if (world.getBlockId(p, q, r) == this.wallBlockID1 && random.nextInt(100) == 0)
                     {
-                        world.setTileInChunk(p, q, r, AetherBlocks.TRAPPED_DUNGEON_STONE.id);
+                        world.method_200(p, q, r, AetherBlocks.TRAPPED_DUNGEON_STONE.id);
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         {
             for (int q = z + 2; q < z + 10; q += 7)
             {
-                world.setTileWithMetadata(p, j, q, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 0);
+                world.method_154(p, j, q, AetherBlocks.TRAPPED_DUNGEON_STONE.id, 0);
             }
         }
         this.addPlaneY(world, random, x + 4, y + 1, z + 4, 4, 4);
@@ -159,19 +159,19 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         {
             case 0:
             {
-                world.setTile(p2, y + 2, q2, AetherBlocks.CHEST_MIMIC.id);
+                world.setBlock(p2, y + 2, q2, AetherBlocks.CHEST_MIMIC.id);
                 break;
             }
             case 1:
             {
-                if (world.getTileId(p2, y + 2, q2) == 0)
+                if (world.getBlockId(p2, y + 2, q2) == 0)
                 {
-                    world.setTile(p2, y + 2, q2, BlockBase.CHEST.id);
-                    final TileEntityChest chest = (TileEntityChest) world.getTileEntity(p2, y + 2, q2);
+                    world.setBlock(p2, y + 2, q2, Block.CHEST.id);
+                    final ChestBlockEntity chest = (ChestBlockEntity) world.method_1777(p2, y + 2, q2);
                     for (p2 = 0; p2 < 3 + random.nextInt(3); ++p2)
                     {
-                        final ItemInstance item = this.getNormalLoot(random);
-                        chest.setInventoryItem(random.nextInt(chest.getInventorySize()), item);
+                        final ItemStack item = this.getNormalLoot(random);
+                        chest.setStack(random.nextInt(chest.size()), item);
                     }
                     break;
                 }
@@ -207,7 +207,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         return this.generateNextRoom(world, random, x, y, z) && this.generateNextRoom(world, random, x, y, z);
     }
 
-    public void endCorridor(final Level world, final Random random, final int i, final int j, final int k)
+    public void endCorridor(final World world, final Random random, final int i, final int j, final int k)
     {
         this.replaceAir = false;
         boolean tunnelling = true;
@@ -226,9 +226,9 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
                     tunnelling = false;
                 }
                 boolean flag = true;
-                while (flag && (world.getTileId(x, y, z) == this.wallBlockID1 || world.getTileId(x, y, z) == this.wallBlockID2 || world.getTileId(x, y, z) == this.lockedBlockID1 || world.getTileId(x, y, z) == this.lockedBlockID2))
+                while (flag && (world.getBlockId(x, y, z) == this.wallBlockID1 || world.getBlockId(x, y, z) == this.wallBlockID2 || world.getBlockId(x, y, z) == this.lockedBlockID1 || world.getBlockId(x, y, z) == this.lockedBlockID2))
                 {
-                    if (world.getTileId(x + 1, y, z) == this.wallBlockID1 || world.getTileId(x + 1, y, z) == this.wallBlockID2 || world.getTileId(x + 1, y, z) == this.lockedBlockID1 || world.getTileId(x + 1, y, z) == this.lockedBlockID2)
+                    if (world.getBlockId(x + 1, y, z) == this.wallBlockID1 || world.getBlockId(x + 1, y, z) == this.wallBlockID2 || world.getBlockId(x + 1, y, z) == this.lockedBlockID1 || world.getBlockId(x + 1, y, z) == this.lockedBlockID2)
                     {
                         ++x;
                     }
@@ -256,9 +256,9 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
                     tunnelling = false;
                 }
                 boolean flag = true;
-                while (flag && (world.getTileId(x, y, z) == this.wallBlockID1 || world.getTileId(x, y, z) == this.wallBlockID2 || world.getTileId(x, y, z) == this.lockedBlockID1 || world.getTileId(x, y, z) == this.lockedBlockID2))
+                while (flag && (world.getBlockId(x, y, z) == this.wallBlockID1 || world.getBlockId(x, y, z) == this.wallBlockID2 || world.getBlockId(x, y, z) == this.lockedBlockID1 || world.getBlockId(x, y, z) == this.lockedBlockID2))
                 {
-                    if (world.getTileId(x, y, z + 1) == this.wallBlockID1 || world.getTileId(x, y, z + 1) == this.wallBlockID2 || world.getTileId(x, y, z + 1) == this.lockedBlockID1 || world.getTileId(x, y, z + 1) == this.lockedBlockID2)
+                    if (world.getBlockId(x, y, z + 1) == this.wallBlockID1 || world.getBlockId(x, y, z + 1) == this.wallBlockID2 || world.getBlockId(x, y, z + 1) == this.lockedBlockID1 || world.getBlockId(x, y, z + 1) == this.lockedBlockID2)
                     {
                         ++z;
                     }
@@ -286,9 +286,9 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
                     tunnelling = false;
                 }
                 boolean flag = true;
-                while (flag && (world.getTileId(x, y, z) == this.wallBlockID1 || world.getTileId(x, y, z) == this.wallBlockID2 || world.getTileId(x, y, z) == this.lockedBlockID1 || world.getTileId(x, y, z) == this.lockedBlockID2))
+                while (flag && (world.getBlockId(x, y, z) == this.wallBlockID1 || world.getBlockId(x, y, z) == this.wallBlockID2 || world.getBlockId(x, y, z) == this.lockedBlockID1 || world.getBlockId(x, y, z) == this.lockedBlockID2))
                 {
-                    if (world.getTileId(x, y, z - 1) == this.wallBlockID1 || world.getTileId(x, y, z - 1) == this.wallBlockID2 || world.getTileId(x, y, z - 1) == this.lockedBlockID1 || world.getTileId(x, y, z - 1) == this.lockedBlockID2)
+                    if (world.getBlockId(x, y, z - 1) == this.wallBlockID1 || world.getBlockId(x, y, z - 1) == this.wallBlockID2 || world.getBlockId(x, y, z - 1) == this.lockedBlockID1 || world.getBlockId(x, y, z - 1) == this.lockedBlockID2)
                     {
                         --z;
                     }
@@ -308,64 +308,64 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
         this.finished = true;
     }
 
-    private ItemInstance getNormalLoot(final Random random)
+    private ItemStack getNormalLoot(final Random random)
     {
         final int item = random.nextInt(14);
         switch (item)
         {
             case 0:
             {
-                return new ItemInstance(AetherItems.PickZanite);
+                return new ItemStack(AetherItems.PickZanite);
             }
             case 1:
             {
-                return new ItemInstance(AetherItems.AxeZanite);
+                return new ItemStack(AetherItems.AxeZanite);
             }
             case 2:
             {
-                return new ItemInstance(AetherItems.SwordZanite);
+                return new ItemStack(AetherItems.SwordZanite);
             }
             case 3:
             {
-                return new ItemInstance(AetherItems.ShovelZanite);
+                return new ItemStack(AetherItems.ShovelZanite);
             }
             case 4:
             {
-                return new ItemInstance(AetherItems.AgilityCape);
+                return new ItemStack(AetherItems.AgilityCape);
             }
             case 5:
             {
-                return new ItemInstance(AetherItems.AmbrosiumShard, random.nextInt(10) + 1);
+                return new ItemStack(AetherItems.AmbrosiumShard, random.nextInt(10) + 1);
             }
             case 6:
             {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(5) + 1, 0);
+                return new ItemStack(AetherItems.Dart, random.nextInt(5) + 1, 0);
             }
             case 7:
             {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(3) + 1, 1);
+                return new ItemStack(AetherItems.Dart, random.nextInt(3) + 1, 1);
             }
             case 8:
             {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(3) + 1, 2);
+                return new ItemStack(AetherItems.Dart, random.nextInt(3) + 1, 2);
             }
             case 9:
             {
                 if (random.nextInt(20) == 0)
                 {
-                    return new ItemInstance(AetherItems.BlueMusicDisk);
+                    return new ItemStack(AetherItems.BlueMusicDisk);
                 }
                 break;
             }
             case 10:
             {
-                return new ItemInstance(AetherItems.Bucket);
+                return new ItemStack(AetherItems.Bucket);
             }
             case 11:
             {
                 if (random.nextInt(10) == 0)
                 {
-                    return new ItemInstance(ItemBase.byId[ItemBase.record13.id + random.nextInt(2)]);
+                    return new ItemStack(Item.ITEMS[Item.RECORD_THIRTEEN.id + random.nextInt(2)]);
                 }
                 break;
             }
@@ -373,7 +373,7 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
             {
                 if (random.nextInt(4) == 0)
                 {
-                    return new ItemInstance(AetherItems.IronRing);
+                    return new ItemStack(AetherItems.IronRing);
                 }
                 break;
             }
@@ -381,50 +381,50 @@ public class AetherGenDungeonBronze extends AetherGenBuildings
             {
                 if (random.nextInt(10) == 0)
                 {
-                    return new ItemInstance(AetherItems.GoldRing);
+                    return new ItemStack(AetherItems.GoldRing);
                 }
                 break;
             }
         }
-        return new ItemInstance(AetherBlocks.AMBROSIUM_TORCH);
+        return new ItemStack(AetherBlocks.AMBROSIUM_TORCH);
     }
 
-    private ItemInstance getBronzeLoot(final Random random)
+    private ItemStack getBronzeLoot(final Random random)
     {
         final int item = random.nextInt(7);
         switch (item)
         {
             case 0:
             {
-                return new ItemInstance(AetherItems.GummieSwet, random.nextInt(8), random.nextInt(2));
+                return new ItemStack(AetherItems.GummieSwet, random.nextInt(8), random.nextInt(2));
             }
             case 1:
             {
-                return new ItemInstance(AetherItems.PhoenixBow);
+                return new ItemStack(AetherItems.PhoenixBow);
             }
             case 2:
             {
-                return new ItemInstance(AetherItems.SwordFire);
+                return new ItemStack(AetherItems.SwordFire);
             }
             case 3:
             {
-                return new ItemInstance(AetherItems.HammerNotch);
+                return new ItemStack(AetherItems.HammerNotch);
             }
             case 4:
             {
-                return new ItemInstance(AetherItems.LightningKnife, random.nextInt(16));
+                return new ItemStack(AetherItems.LightningKnife, random.nextInt(16));
             }
             case 5:
             {
-                return new ItemInstance(AetherItems.Lance);
+                return new ItemStack(AetherItems.Lance);
             }
             case 6:
             {
-                return new ItemInstance(AetherItems.AgilityCape);
+                return new ItemStack(AetherItems.AgilityCape);
             }
             default:
             {
-                return new ItemInstance(AetherItems.Stick);
+                return new ItemStack(AetherItems.Stick);
             }
         }
     }

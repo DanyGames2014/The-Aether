@@ -3,7 +3,7 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.client.render.model.ModelZephyr;
 import com.gildedgames.aether.entity.mobs.EntityZephyr;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.entity.Living;
+import net.minecraft.entity.LivingEntity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderZephyr extends LivingEntityRenderer
@@ -34,7 +34,7 @@ public class RenderZephyr extends LivingEntityRenderer
     }
 
     @Override
-    protected void method_823(final Living entityliving, final float f)
+    protected void method_823(final LivingEntity entityliving, final float f)
     {
         this.func_4014_a((EntityZephyr) entityliving, f);
     }

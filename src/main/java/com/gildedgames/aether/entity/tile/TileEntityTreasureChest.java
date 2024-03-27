@@ -1,9 +1,9 @@
 package com.gildedgames.aether.entity.tile;
 
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.io.CompoundTag;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.nbt.NbtCompound;
 
-public class TileEntityTreasureChest extends TileEntityChest
+public class TileEntityTreasureChest extends ChestBlockEntity
 {
     public int rarity = 0;
 
@@ -12,15 +12,15 @@ public class TileEntityTreasureChest extends TileEntityChest
         rarity = r;
     }
 
-    public void readIdentifyingData(CompoundTag arg)
+    public void readNbt(NbtCompound arg)
     {
-        super.readIdentifyingData(arg);
+        super.readNbt(arg);
         rarity = arg.getInt("rarity");
     }
 
-    public void writeIdentifyingData(CompoundTag arg)
+    public void writeNbt(NbtCompound arg)
     {
-        super.writeIdentifyingData(arg);
-        arg.put("rarity", rarity);
+        super.writeNbt(arg);
+        arg.putInt("rarity", rarity);
     }
 }

@@ -6,40 +6,40 @@ import com.gildedgames.aether.registry.AetherAchievements;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
 import com.gildedgames.aether.utils.MoaColour;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.inventory.InventoryBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.tileentity.TileEntityBase;
-import net.minecraft.util.io.AbstractTag;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.io.ListTag;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 
-public class TileEntityIncubator extends TileEntityBase implements InventoryBase
+public class TileEntityIncubator extends BlockEntity implements Inventory
 {
-    private ItemInstance[] IncubatorItemStacks;
+    private ItemStack[] IncubatorItemStacks;
     public int torchPower;
     public int progress;
 
     public TileEntityIncubator()
     {
-        this.IncubatorItemStacks = new ItemInstance[2];
+        this.IncubatorItemStacks = new ItemStack[2];
         this.progress = 0;
     }
 
     @Override
-    public int getInventorySize()
+    public int size()
     {
         return this.IncubatorItemStacks.length;
     }
 
     @Override
-    public ItemInstance getInventoryItem(final int index)
+    public ItemStack getStack(final int index)
     {
         return this.IncubatorItemStacks[index];
     }
 
     @Override
-    public ItemInstance takeInventoryItem(final int index, final int count)
+    public ItemStack removeStack(final int index, final int count)
     {
         if (this.IncubatorItemStacks[index] == null)
         {
@@ -47,11 +47,11 @@ public class TileEntityIncubator extends TileEntityBase implements InventoryBase
         }
         if (this.IncubatorItemStacks[index].count <= count)
         {
-            final ItemInstance itemstack = this.IncubatorItemStacks[index];
+            final ItemStack itemstack = this.IncubatorItemStacks[index];
             this.IncubatorItemStacks[index] = null;
             return itemstack;
         }
-        final ItemInstance itemstack2 = this.IncubatorItemStacks[index].split(count);
+        final ItemStack itemstack2 = this.IncubatorItemStacks[index].split(count);
         if (this.IncubatorItemStacks[index].count == 0)
         {
             this.IncubatorItemStacks[index] = null;
@@ -60,60 +60,60 @@ public class TileEntityIncubator extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void setInventoryItem(final int slot, final ItemInstance stack)
+    public void setStack(final int slot, final ItemStack stack)
     {
         this.IncubatorItemStacks[slot] = stack;
-        if (stack != null && stack.count > this.getMaxItemCount())
+        if (stack != null && stack.count > this.getMaxCountPerStack())
         {
-            stack.count = this.getMaxItemCount();
+            stack.count = this.getMaxCountPerStack();
         }
     }
 
     @Override
-    public String getContainerName()
+    public String getName()
     {
         return "Incubator";
     }
 
     @Override
-    public void readIdentifyingData(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readIdentifyingData(tag);
-        final ListTag nbttaglist = tag.getListTag("Items");
-        this.IncubatorItemStacks = new ItemInstance[this.getInventorySize()];
+        super.readNbt(tag);
+        final NbtList nbttaglist = tag.getList("Items");
+        this.IncubatorItemStacks = new ItemStack[this.size()];
         for (int i = 0; i < nbttaglist.size(); ++i)
         {
-            final CompoundTag nbttagcompound1 = (CompoundTag) nbttaglist.get(i);
+            final NbtCompound nbttagcompound1 = (NbtCompound) nbttaglist.get(i);
             final byte byte0 = nbttagcompound1.getByte("Slot");
             if (byte0 >= 0 && byte0 < this.IncubatorItemStacks.length)
             {
-                this.IncubatorItemStacks[byte0] = new ItemInstance(nbttagcompound1);
+                this.IncubatorItemStacks[byte0] = new ItemStack(nbttagcompound1);
             }
         }
         this.progress = tag.getShort("BurnTime");
     }
 
     @Override
-    public void writeIdentifyingData(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeIdentifyingData(tag);
-        tag.put("BurnTime", (short) this.progress);
-        final ListTag nbttaglist = new ListTag();
+        super.writeNbt(tag);
+        tag.putShort("BurnTime", (short) this.progress);
+        final NbtList nbttaglist = new NbtList();
         for (int i = 0; i < this.IncubatorItemStacks.length; ++i)
         {
             if (this.IncubatorItemStacks[i] != null)
             {
-                final CompoundTag nbttagcompound1 = new CompoundTag();
-                nbttagcompound1.put("Slot", (byte) i);
-                this.IncubatorItemStacks[i].toTag(nbttagcompound1);
+                final NbtCompound nbttagcompound1 = new NbtCompound();
+                nbttagcompound1.putByte("Slot", (byte) i);
+                this.IncubatorItemStacks[i].writeNbt(nbttagcompound1);
                 nbttaglist.add(nbttagcompound1);
             }
         }
-        tag.put("Items", (AbstractTag) nbttaglist);
+        tag.put("Items", (NbtElement) nbttaglist);
     }
 
     @Override
-    public int getMaxItemCount()
+    public int getMaxCountPerStack()
     {
         return 64;
     }
@@ -134,12 +134,12 @@ public class TileEntityIncubator extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void tick()
+    public void method_1076()
     {
         if (this.torchPower > 0)
         {
             --this.torchPower;
-            if (this.getInventoryItem(1) != null)
+            if (this.getStack(1) != null)
             {
                 ++this.progress;
             }
@@ -152,25 +152,25 @@ public class TileEntityIncubator extends TileEntityBase implements InventoryBase
         {
             if (this.IncubatorItemStacks[1] != null)
             {
-                final EntityMoa moa = new EntityMoa(this.level, true, false, false, MoaColour.getColour(this.IncubatorItemStacks[1].getDamage()));
-                moa.setPosition(this.x + 0.5, this.y + 1.5, this.z + 0.5);
-                this.level.spawnEntity(moa);
+                final EntityMoa moa = new EntityMoa(this.world, true, false, false, MoaColour.getColour(this.IncubatorItemStacks[1].getDamage()));
+                moa.method_1340(this.x + 0.5, this.y + 1.5, this.z + 0.5);
+                this.world.method_210(moa);
             }
             TODO:
             AetherMod.giveAchievement(AetherAchievements.incubator);
-            this.takeInventoryItem(1, 1);
+            this.removeStack(1, 1);
             this.progress = 0;
         }
-        if (this.torchPower <= 0 && this.IncubatorItemStacks[1] != null && this.IncubatorItemStacks[1].itemId == AetherItems.MoaEgg.id && this.getInventoryItem(0) != null && this.getInventoryItem(0).itemId == AetherBlocks.AMBROSIUM_TORCH.id)
+        if (this.torchPower <= 0 && this.IncubatorItemStacks[1] != null && this.IncubatorItemStacks[1].itemId == AetherItems.MoaEgg.id && this.getStack(0) != null && this.getStack(0).itemId == AetherBlocks.AMBROSIUM_TORCH.id)
         {
             this.torchPower += 1000;
-            this.takeInventoryItem(0, 1);
+            this.removeStack(0, 1);
         }
     }
 
     @Override
-    public boolean canPlayerUse(final PlayerBase player)
+    public boolean canPlayerUse(final PlayerEntity player)
     {
-        return this.level.getTileEntity(this.x, this.y, this.z) == this && player.squaredDistanceTo(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
+        return this.world.method_1777(this.x, this.y, this.z) == this && player.method_1347(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
     }
 }

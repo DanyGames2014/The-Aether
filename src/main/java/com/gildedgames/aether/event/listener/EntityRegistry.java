@@ -13,7 +13,7 @@ import net.modificationstation.stationapi.api.event.registry.MobHandlerRegistryE
 import net.modificationstation.stationapi.api.registry.Registry;
 
 import static com.gildedgames.aether.AetherMod.MODID;
-import static net.modificationstation.stationapi.api.registry.Identifier.of;
+import static net.modificationstation.stationapi.api.util.Identifier.of;
 
 public class EntityRegistry
 {

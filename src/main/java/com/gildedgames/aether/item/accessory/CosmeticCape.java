@@ -7,14 +7,14 @@ import com.matthewperiut.accessoryapi.api.render.builtin.CapeRenderer;
 import com.matthewperiut.accessoryapi.api.render.builtin.ConfigurableRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.util.Identifier;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
 
 import java.awt.*;
 import java.util.Optional;
 
-public class CosmeticCape extends TemplateItemBase implements Accessory, HasCustomRenderer
+public class CosmeticCape extends TemplateItem implements Accessory, HasCustomRenderer
 {
     public String texture;
     public int color;
@@ -26,8 +26,8 @@ public class CosmeticCape extends TemplateItemBase implements Accessory, HasCust
         super(identifier);
         this.texture = texture;
         this.color = color;
-        this.setMaxStackSize(1);
-        this.setDurability(500);
+        this.setMaxCount(1);
+        this.setMaxDamage(500);
     }
 
     public CosmeticCape(Identifier identifier, String texture)
@@ -42,7 +42,7 @@ public class CosmeticCape extends TemplateItemBase implements Accessory, HasCust
     }
 
     @Override
-    public String[] getAccessoryTypes(ItemInstance item)
+    public String[] getAccessoryTypes(ItemStack item)
     {
         return new String[]{"cape"};
     }

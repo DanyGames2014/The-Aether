@@ -1,13 +1,13 @@
 package com.gildedgames.aether.generator;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Structure;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenMinable extends Structure
+public class AetherGenMinable extends Feature
 {
     private int minableBlockId;
     private int numberOfBlocks;
@@ -19,7 +19,7 @@ public class AetherGenMinable extends Structure
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         final float f = rand.nextFloat() * 3.141593f;
         final double d = x + 8 + MathHelper.sin(f) * this.numberOfBlocks / 8.0f;
@@ -55,9 +55,9 @@ public class AetherGenMinable extends Structure
                             for (int i3 = k1; i3 <= j2; ++i3)
                             {
                                 final double d15 = (i3 + 0.5 - d9) / (d11 / 2.0);
-                                if (d13 * d13 + d14 * d14 + d15 * d15 < 1.0 && level.getTileId(k2, l3, i3) == AetherBlocks.HOLYSTONE.id && level.getTileMeta(k2, l3, i3) <= 1)
+                                if (d13 * d13 + d14 * d14 + d15 * d15 < 1.0 && level.getBlockId(k2, l3, i3) == AetherBlocks.HOLYSTONE.id && level.getBlockMeta(k2, l3, i3) <= 1)
                                 {
-                                    level.setTileInChunk(k2, l3, i3, this.minableBlockId);
+                                    level.method_200(k2, l3, i3, this.minableBlockId);
                                 }
                             }
                         }

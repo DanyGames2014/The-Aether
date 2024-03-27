@@ -3,18 +3,18 @@ package com.gildedgames.aether.entity.mobs;
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.entity.projectile.EntityZephyrSnowball;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.living.FlyingBase;
-import net.minecraft.entity.monster.MonsterEntityType;
-import net.minecraft.level.Level;
-import net.minecraft.util.maths.Box;
-import net.minecraft.util.maths.MathHelper;
-import net.minecraft.util.maths.Vec3f;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.class_65;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.FlyingEntity;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 /*That mob is terrible*/
-public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSpawnDataProvider
+public class EntityZephyr extends FlyingEntity implements class_65, MobSpawnDataProvider
 {
     private long checkTime;
     private final long checkTimeInterval = 3000L;
@@ -27,12 +27,12 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
     public double waypointX;
     public double waypointY;
     public double waypointZ;
-    private EntityBase targetedEntity;
+    private Entity targetedEntity;
     private int aggroCooldown;
     public int prevAttackCounter;
     public int attackCounter;
 
-    public EntityZephyr(final Level level)
+    public EntityZephyr(final World level)
     {
         super(level);
         this.checkTime = 0L;
@@ -46,11 +46,11 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
         this.prevAttackCounter = 0;
         this.attackCounter = 0;
         this.texture = "aether:textures/entity/Zephyr.png";
-        this.setSize(4.0f, 4.0f);
+        this.setBoundingBoxSpacing(4.0f, 4.0f);
     }
 
     @Override
-    protected void tickHandSwing()
+    protected void method_910()
     {
         if (this.y < -2.0 || this.y > 130.0)
         {
@@ -63,13 +63,13 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
         final double d4 = MathHelper.sqrt(d * d + d2 * d2 + d3 * d3);
         if (d4 < 1.0 || d4 > 60.0)
         {
-            this.waypointX = this.x + (this.rand.nextFloat() * 2.0f - 1.0f) * 16.0f;
-            this.waypointY = this.y + (this.rand.nextFloat() * 2.0f - 1.0f) * 16.0f;
-            this.waypointZ = this.z + (this.rand.nextFloat() * 2.0f - 1.0f) * 16.0f;
+            this.waypointX = this.x + (this.random.nextFloat() * 2.0f - 1.0f) * 16.0f;
+            this.waypointY = this.y + (this.random.nextFloat() * 2.0f - 1.0f) * 16.0f;
+            this.waypointZ = this.z + (this.random.nextFloat() * 2.0f - 1.0f) * 16.0f;
         }
         if (this.courseChangeCooldown-- <= 0)
         {
-            this.courseChangeCooldown += this.rand.nextInt(5) + 2;
+            this.courseChangeCooldown += this.random.nextInt(5) + 2;
             if (this.isCourseTraversable(this.waypointX, this.waypointY, this.waypointZ, d4))
             {
                 this.velocityX += d / d4 * 0.1;
@@ -83,13 +83,13 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
                 this.waypointZ = this.z;
             }
         }
-        if (this.targetedEntity != null && this.targetedEntity.removed)
+        if (this.targetedEntity != null && this.targetedEntity.dead)
         {
             this.targetedEntity = null;
         }
         if (this.targetedEntity == null || this.aggroCooldown-- <= 0)
         {
-            this.targetedEntity = this.level.getClosestPlayerTo(this, 100.0);
+            this.targetedEntity = this.world.method_186(this, 100.0);
             if (this.targetedEntity != null)
             {
                 this.aggroCooldown = 20;
@@ -99,7 +99,7 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
         if (this.targetedEntity != null && this.targetedEntity.method_1352(this) < d5 * d5)
         {
             final double d6 = this.targetedEntity.x - this.x;
-            final double d7 = this.targetedEntity.boundingBox.minY + this.targetedEntity.height / 2.0f - (this.y + this.height / 2.0f);
+            final double d7 = this.targetedEntity.boundingBox.minY + this.targetedEntity.spacingY / 2.0f - (this.y + this.spacingY / 2.0f);
             final double d8 = this.targetedEntity.z - this.z;
             final float n = -(float) Math.atan2(d6, d8) * 180.0f / 3.141593f;
             this.yaw = n;
@@ -108,19 +108,19 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
             {
                 if (this.attackCounter == 10)
                 {
-                    this.level.playSound((EntityBase) this, "aether:aether.sound.mobs.zephyr.zephyrcall", this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+                    this.world.playSound((Entity) this, "aether:aether.sound.mobs.zephyr.zephyrcall", this.method_915(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
                 }
                 ++this.attackCounter;
                 if (this.attackCounter == 20)
                 {
-                    this.level.playSound((EntityBase) this, "aether:aether.sound.mobs.zephyr.zephyrshoot", this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
-                    final EntityZephyrSnowball entitysnowball = new EntityZephyrSnowball(this.level, this, d6, d7, d8);
+                    this.world.playSound((Entity) this, "aether:aether.sound.mobs.zephyr.zephyrshoot", this.method_915(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
+                    final EntityZephyrSnowball entitysnowball = new EntityZephyrSnowball(this.world, this, d6, d7, d8);
                     final double d9 = 4.0;
-                    final Vec3f vec3d = this.method_926(1.0f);
+                    final Vec3d vec3d = this.method_926(1.0f);
                     entitysnowball.x = this.x + vec3d.x * d9;
-                    entitysnowball.y = this.y + this.height / 2.0f + 0.5;
+                    entitysnowball.y = this.y + this.spacingY / 2.0f + 0.5;
                     entitysnowball.z = this.z + vec3d.z * d9;
-                    this.level.spawnEntity(entitysnowball);
+                    this.world.method_210(entitysnowball);
                     this.attackCounter = -40;
                 }
             }
@@ -151,11 +151,11 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
         final double d4 = (this.waypointX - this.x) / d3;
         final double d5 = (this.waypointY - this.y) / d3;
         final double d6 = (this.waypointZ - this.z) / d3;
-        final Box axisalignedbb = this.boundingBox.method_92();
+        final Box axisalignedbb = this.boundingBox.copy();
         for (int i = 1; i < d3; ++i)
         {
-            axisalignedbb.method_102(d4, d5, d6);
-            if (this.level.method_190(this, axisalignedbb).size() > 0)
+            axisalignedbb.translate(d4, d5, d6);
+            if (this.world.method_190(this, axisalignedbb).size() > 0)
             {
                 return false;
             }
@@ -164,25 +164,25 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "aether:aether.sound.mobs.zephyr.zephyrcall";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "aether:aether.sound.mobs.zephyr.zephyrcall";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "aether:aether.sound.mobs.zephyr.zephyrcall";
     }
 
     @Override
-    protected int getMobDrops()
+    protected int method_914()
     {
         return AetherBlocks.AERCLOUD.id;
     }
@@ -193,7 +193,7 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
     }
 
     @Override
-    protected float getSoundVolume()
+    protected float method_915()
     {
         return 3.0f;
     }
@@ -215,7 +215,7 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
                 }
                 else
                 {
-                    this.remove();
+                    this.markDead();
                 }
             }
             this.checkX = this.x;
@@ -231,17 +231,17 @@ public class EntityZephyr extends FlyingBase implements MonsterEntityType, MobSp
         final int i = MathHelper.floor(this.x);
         final int j = MathHelper.floor(this.boundingBox.minY);
         final int k = MathHelper.floor(this.z);
-        boolean flag = this.rand.nextInt(85) == 0 && this.level.canSpawnEntity(this.boundingBox) && this.level.method_190(this, this.boundingBox).size() == 0
-                && !this.level.method_218(this.boundingBox) && this.level.getTileId(i, j - 1, k) != /*AetherBlocks.DUNGEON_STONE.id*/ 0 &&
-                this.level.getTileId(i, j - 1, k) != /*AetherBlocks.LIGHT_DUNGEON_STONE.id*/ 0 && this.level.getTileId(i, j - 1, k) != /*AetherBlocks.LOCKED_DUNGEON_STONE.id*/ 0 &&
-                this.level.getTileId(i, j - 1, k) != /*AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id*/ 0 && this.level.getTileId(i, j - 1, k) != AetherBlocks.HOLYSTONE.id &&
-                this.level.difficulty > 0;
+        boolean flag = this.random.nextInt(85) == 0 && this.world.canSpawnEntity(this.boundingBox) && this.world.method_190(this, this.boundingBox).size() == 0
+                && !this.world.method_218(this.boundingBox) && this.world.getBlockId(i, j - 1, k) != /*AetherBlocks.DUNGEON_STONE.id*/ 0 &&
+                this.world.getBlockId(i, j - 1, k) != /*AetherBlocks.LIGHT_DUNGEON_STONE.id*/ 0 && this.world.getBlockId(i, j - 1, k) != /*AetherBlocks.LOCKED_DUNGEON_STONE.id*/ 0 &&
+                this.world.getBlockId(i, j - 1, k) != /*AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id*/ 0 && this.world.getBlockId(i, j - 1, k) != AetherBlocks.HOLYSTONE.id &&
+                this.world.field_213 > 0;
         if (flag) System.out.println("XYZ: " + i + " " + j + " " + k + ", " + flag);
         return flag;
     }
 
     @Override
-    public int getLimitPerChunk()
+    public int method_916()
     {
         return 1;
     }

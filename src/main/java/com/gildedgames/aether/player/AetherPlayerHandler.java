@@ -7,10 +7,10 @@ import com.gildedgames.aether.item.accessory.GoldenFeather;
 import com.gildedgames.aether.level.dimension.BareAetherTravelAgent;
 import com.gildedgames.aether.registry.AetherAchievements;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.util.io.CompoundTag;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.modificationstation.stationapi.api.entity.player.PlayerHandler;
 import net.modificationstation.stationapi.api.world.dimension.DimensionHelper;
 import net.modificationstation.stationapi.api.world.dimension.VanillaDimensions;
@@ -18,9 +18,9 @@ import net.modificationstation.stationapi.impl.entity.player.PlayerAPI;
 
 public class AetherPlayerHandler implements PlayerHandler
 {
-    private PlayerBase player;
+    private PlayerEntity player;
 
-    public AetherPlayerHandler(PlayerBase playerBase)
+    public AetherPlayerHandler(PlayerEntity playerBase)
     {
         player = playerBase;
     }
@@ -35,7 +35,7 @@ public class AetherPlayerHandler implements PlayerHandler
         if (this.maxHealth <= 40 - i)
         {
             this.maxHealth += i;
-            final PlayerBase player = (PlayerBase) this.player;
+            final PlayerEntity player = (PlayerEntity) this.player;
             player.health += i;
             return true;
         }
@@ -46,11 +46,11 @@ public class AetherPlayerHandler implements PlayerHandler
     }
 
     @Override
-    public boolean writeEntityBaseToNBT(CompoundTag tag)
+    public boolean writeEntityBaseToNBT(NbtCompound tag)
     {
-        tag.put("MaxHealth", (byte) this.maxHealth);
-        tag.put("visited_aether", visited_aether);
-        tag.put("visible", visible);
+        tag.putByte("MaxHealth", (byte) this.maxHealth);
+        tag.putBoolean("visited_aether", visited_aether);
+        tag.putBoolean("visible", visible);
         return false;
     }
 
@@ -61,7 +61,7 @@ public class AetherPlayerHandler implements PlayerHandler
         {
             return false;
         }
-        final PlayerBase player = (PlayerBase) this.player;
+        final PlayerEntity player = (PlayerEntity) this.player;
         player.health += i;
         if (this.player.health > this.maxHealth)
         {
@@ -78,13 +78,13 @@ public class AetherPlayerHandler implements PlayerHandler
         {
             if (player.y < 0)
             {
-                player.setPosition(player.x, 150, player.z);
+                player.method_1340(player.x, 150, player.z);
                 DimensionHelper.switchDimension(player, VanillaDimensions.OVERWORLD, 1, new BareAetherTravelAgent());
             }
         }
 
         // todo: move this into aerbunny somehow
-        if (player.passenger instanceof EntityAerbunny && player.velocityY < 0.f) GoldenFeather.slowFall(player);
+        if (player.field_1594 instanceof EntityAerbunny && player.velocityY < 0.f) GoldenFeather.slowFall(player);
 
         if (player.dimensionId == 2)
         {
@@ -92,9 +92,9 @@ public class AetherPlayerHandler implements PlayerHandler
             {
                 visited_aether = true;
                 AetherMod.giveAchievement(AetherAchievements.enterAether, player);
-                player.inventory.addStack(new ItemInstance(AetherItems.LoreBook, 1, 2));
-                player.inventory.addStack(new ItemInstance(AetherItems.CloudParachute, 1));
-                player.level.playSound((EntityBase) player, "random.pop", 0.2f, 1.0f);
+                player.inventory.method_671(new ItemStack(AetherItems.LoreBook, 1, 2));
+                player.inventory.method_671(new ItemStack(AetherItems.CloudParachute, 1));
+                player.world.playSound((Entity) player, "random.pop", 0.2f, 1.0f);
             }
         }
 
@@ -106,7 +106,7 @@ public class AetherPlayerHandler implements PlayerHandler
     }
 
     @Override
-    public boolean readEntityBaseFromNBT(CompoundTag tag)
+    public boolean readEntityBaseFromNBT(NbtCompound tag)
     {
         maxHealth = tag.getByte("MaxHealth");
         visible = tag.getBoolean("visible");
@@ -114,7 +114,7 @@ public class AetherPlayerHandler implements PlayerHandler
         return false;
     }
 
-    public static AetherPlayerHandler get(PlayerBase player)
+    public static AetherPlayerHandler get(PlayerEntity player)
     {
         return (AetherPlayerHandler) PlayerAPI.getPlayerHandler(player, AetherPlayerHandler.class);
     }

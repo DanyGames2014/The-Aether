@@ -1,13 +1,13 @@
 package com.gildedgames.aether.item.misc;
 
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemAmbrosium extends TemplateItemBase
+public class ItemAmbrosium extends TemplateItem
 {
     private int healAmount;
 
@@ -15,14 +15,14 @@ public class ItemAmbrosium extends TemplateItemBase
     {
         super(identifier);
         this.healAmount = j;
-        this.maxStackSize = 64;
+        this.maxCount = 64;
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
         --item.count;
-        player.addHealth(this.healAmount);
+        player.method_939(this.healAmount);
         return item;
     }
 

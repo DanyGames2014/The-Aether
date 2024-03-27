@@ -6,16 +6,16 @@ import com.gildedgames.aether.mixin.access.EntityBaseAccessor;
 import com.gildedgames.aether.mixin.access.LivingAccessor;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.monster.MonsterBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MonsterEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class EntitySwet extends EntityAetherAnimal
     public boolean kickoff;
     public boolean friendly;
 
-    public EntitySwet(final Level level, int textureNum)
+    public EntitySwet(final World level, int textureNum)
     {
         super(level);
         this.textureNum = textureNum;
@@ -38,7 +38,7 @@ public class EntitySwet extends EntityAetherAnimal
         setStartVariables();
     }
 
-    public EntitySwet(final Level level)
+    public EntitySwet(final World level)
     {
         super(level);
         setStartVariables();
@@ -49,7 +49,7 @@ public class EntitySwet extends EntityAetherAnimal
         health = 25;
         if (!textureSet)
         {
-            if (rand.nextInt(2) == 0)
+            if (random.nextInt(2) == 0)
             {
                 textureNum = 2;
                 textureSet = true;
@@ -70,8 +70,8 @@ public class EntitySwet extends EntityAetherAnimal
             texture = "aether:textures/entity/goldswets.png";
             movementSpeed = 3.0f;
         }
-        setSize(0.8f, 0.8f);
-        setPosition(x, y, z);
+        setBoundingBoxSpacing(0.8f, 0.8f);
+        method_1340(x, y, z);
         hops = 0;
         gotrider = false;
         flutter = 0;
@@ -79,12 +79,12 @@ public class EntitySwet extends EntityAetherAnimal
     }
 
     @Override
-    public void tickRiding()
+    public void method_1384()
     {
-        super.tickRiding();
-        if (passenger != null && kickoff)
+        super.method_1384();
+        if (field_1594 != null && kickoff)
         {
-            passenger.startRiding(this);
+            field_1594.method_1376(this);
             kickoff = false;
         }
     }
@@ -92,40 +92,40 @@ public class EntitySwet extends EntityAetherAnimal
     @Override
     public void method_1382()
     {
-        passenger.setPosition(x, boundingBox.minY - 0.30000001192092896 + passenger.standingEyeHeight, z);
+        field_1594.method_1340(x, boundingBox.minY - 0.30000001192092896 + field_1594.eyeHeight, z);
     }
 
     @Override
     public void tick()
     {
-        if (entity != null)
+        if (target != null)
         {
             for (int i = 0; i < 3; ++i)
             {
                 final float f = 0.01745278f;
-                final double d = (float) x + (rand.nextFloat() - rand.nextFloat()) * 0.3f;
-                final double d2 = (float) y + height;
-                final double d3 = (float) z + (rand.nextFloat() - rand.nextFloat()) * 0.3f;
-                level.addParticle("splash", d, d2 - 0.25, d3, 0.0, 0.0, 0.0);
+                final double d = (float) x + (random.nextFloat() - random.nextFloat()) * 0.3f;
+                final double d2 = (float) y + spacingY;
+                final double d3 = (float) z + (random.nextFloat() - random.nextFloat()) * 0.3f;
+                world.addParticle("splash", d, d2 - 0.25, d3, 0.0, 0.0, 0.0);
             }
         }
         super.tick();
         if (gotrider)
         {
-            if (passenger != null)
+            if (field_1594 != null)
             {
                 return;
             }
-            final List list = level.getEntities(this, boundingBox.expand(0.5, 0.75, 0.5));
+            final List list = world.getEntities(this, boundingBox.expand(0.5, 0.75, 0.5));
             final int j = 0;
             if (j < list.size())
             {
-                final EntityBase entity = (EntityBase) list.get(j);
+                final Entity entity = (Entity) list.get(j);
                 capturePrey(entity);
             }
             gotrider = false;
         }
-        if (method_1393())
+        if (isSubmergedInWater())
         {
             dissolve();
         }
@@ -137,13 +137,13 @@ public class EntitySwet extends EntityAetherAnimal
         return true;
     }
 
-    public void handleFallDamage(final float height)
+    public void method_1389(final float height)
     {
         if (friendly)
         {
             return;
         }
-        super.handleFallDamage(height);
+        super.method_1389(height);
         if (hops >= 3 && health > 0)
         {
             dissolve();
@@ -151,9 +151,9 @@ public class EntitySwet extends EntityAetherAnimal
     }
 
     @Override
-    public void method_925(final EntityBase entity, final int i, final double d, final double d1)
+    public void method_925(final Entity entity, final int i, final double d, final double d1)
     {
-        if (passenger != null && entity == passenger)
+        if (field_1594 != null && entity == field_1594)
         {
             return;
         }
@@ -164,22 +164,22 @@ public class EntitySwet extends EntityAetherAnimal
     {
         for (int i = 0; i < 50; ++i)
         {
-            final float f = rand.nextFloat() * 3.141593f * 2.0f;
-            final float f2 = rand.nextFloat() * 0.5f + 0.25f;
+            final float f = random.nextFloat() * 3.141593f * 2.0f;
+            final float f2 = random.nextFloat() * 0.5f + 0.25f;
             final float f3 = MathHelper.sin(f) * f2;
             final float f4 = MathHelper.cos(f) * f2;
-            level.addParticle("splash", x + f3, boundingBox.minY + 1.25, z + f4, f3 * 1.5 + velocityX, 4.0, f4 * 1.5 + velocityZ);
+            world.addParticle("splash", x + f3, boundingBox.minY + 1.25, z + f4, f3 * 1.5 + velocityX, 4.0, f4 * 1.5 + velocityZ);
         }
-        if (passenger != null)
+        if (field_1594 != null)
         {
-            final EntityBase passenger = this.passenger;
-            passenger.y += this.passenger.standingEyeHeight - 0.3f;
-            this.passenger.startRiding(this);
+            final Entity passenger = this.field_1594;
+            passenger.y += this.field_1594.eyeHeight - 0.3f;
+            this.field_1594.method_1376(this);
         }
-        this.remove();
+        this.markDead();
     }
 
-    public void capturePrey(final EntityBase entity)
+    public void capturePrey(final Entity entity)
     {
         this.splorch();
         final double x = entity.x;
@@ -200,32 +200,32 @@ public class EntitySwet extends EntityAetherAnimal
         this.velocityX = entity.velocityX;
         this.velocityY = entity.velocityY;
         this.velocityZ = entity.velocityZ;
-        this.setSize(entity.width, entity.height);
-        this.setPosition(this.x, this.y, this.z);
-        entity.startRiding(this);
-        this.yaw = this.rand.nextFloat() * 360.0f;
+        this.setBoundingBoxSpacing(entity.spacingXZ, entity.spacingY);
+        this.method_1340(this.x, this.y, this.z);
+        entity.method_1376(this);
+        this.yaw = this.random.nextFloat() * 360.0f;
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
         if (this.hops == 3 && target == null && this.health > 1)
         {
             this.health = 1;
         }
         final boolean flag = super.damage(target, amount);
-        if (flag && this.passenger != null && this.passenger instanceof Living)
+        if (flag && this.field_1594 != null && this.field_1594 instanceof LivingEntity)
         {
-            if (target != null && this.passenger == target)
+            if (target != null && this.field_1594 == target)
             {
-                if (this.rand.nextInt(3) == 0)
+                if (this.random.nextInt(3) == 0)
                 {
                     this.kickoff = true;
                 }
             }
             else
             {
-                this.passenger.damage(null, amount);
+                this.field_1594.damage(null, amount);
                 if (this.health <= 0)
                 {
                     this.kickoff = true;
@@ -236,68 +236,68 @@ public class EntitySwet extends EntityAetherAnimal
         {
             this.dissolve();
         }
-        else if (flag && target instanceof Living)
+        else if (flag && target instanceof LivingEntity)
         {
-            final Living entityliving = (Living) target;
-            if (entityliving.health > 0 && (this.passenger == null || entityliving != this.passenger))
+            final LivingEntity entityliving = (LivingEntity) target;
+            if (entityliving.health > 0 && (this.field_1594 == null || entityliving != this.field_1594))
             {
-                this.method_924(this.entity = target, 180.0f, 180.0f);
+                this.method_924(this.target = target, 180.0f, 180.0f);
                 this.kickoff = true;
             }
         }
-        if (this.friendly && this.entity instanceof PlayerBase)
+        if (this.friendly && this.target instanceof PlayerEntity)
         {
-            this.entity = null;
+            this.target = null;
         }
         return flag;
     }
 
     public void d_2()
     {
-        if (this.passenger != null && this.passenger instanceof Living)
+        if (this.field_1594 != null && this.field_1594 instanceof LivingEntity)
         {
             this.field_1029 = 0.0f;
             this.field_1060 = 0.0f;
             this.jumping = false;
-            ((EntityBaseAccessor) this.passenger).setFallDistance(0.0f);
-            final float yaw = this.passenger.yaw;
+            ((EntityBaseAccessor) this.field_1594).setFallDistance(0.0f);
+            final float yaw = this.field_1594.yaw;
             this.yaw = yaw;
             this.prevYaw = yaw;
             final float n = 0.0f;
             this.pitch = n;
             this.prevPitch = n;
-            final Living entityliving = (Living) this.passenger;
+            final LivingEntity entityliving = (LivingEntity) this.field_1594;
             final float f = 3.141593f;
             final float f2 = f / 180.0f;
             final float f3 = entityliving.yaw * f2;
-            if (this.onGround)
+            if (this.field_1623)
             {
                 if (((LivingAccessor) entityliving).getJumping())
                 {
                     if (this.hops == 0)
                     {
-                        this.onGround = false;
+                        this.field_1623 = false;
                         this.velocityY = 0.8500000238418579;
                         this.hops = 1;
                         this.flutter = 5;
                     }
                     else if (this.hops == 1)
                     {
-                        this.onGround = false;
+                        this.field_1623 = false;
                         this.velocityY = 1.0499999523162842;
                         this.hops = 2;
                         this.flutter = 5;
                     }
                     else if (this.hops == 2)
                     {
-                        this.onGround = false;
+                        this.field_1623 = false;
                         this.velocityY = 1.25;
                         this.flutter = 5;
                     }
                 }
                 else if (((LivingAccessor) entityliving).get1029() > 0.125f || ((LivingAccessor) entityliving).get1029() < -0.125f || ((LivingAccessor) entityliving).get1060() > 0.125f || ((LivingAccessor) entityliving).get1060() < -0.125f)
                 {
-                    this.onGround = false;
+                    this.field_1623 = false;
                     this.velocityY = 0.3499999940395355;
                     this.hops = 0;
                     this.flutter = 0;
@@ -379,20 +379,20 @@ public class EntitySwet extends EntityAetherAnimal
         }
     }
 
-    public void tickHandSwing()
+    public void method_910()
     {
-        ++this.despawnCounter;
+        ++this.field_1059;
         this.method_920();
-        if (this.friendly && this.passenger != null)
+        if (this.friendly && this.field_1594 != null)
         {
             this.d_2();
             return;
         }
-        if (!this.onGround && this.jumping)
+        if (!this.field_1623 && this.jumping)
         {
             this.jumping = false;
         }
-        else if (this.onGround)
+        else if (this.field_1623)
         {
             if (this.field_1029 > 0.05f)
             {
@@ -403,15 +403,15 @@ public class EntitySwet extends EntityAetherAnimal
                 this.field_1029 = 0.0f;
             }
         }
-        if (this.entity != null && this.passenger == null && this.health > 0)
+        if (this.target != null && this.field_1594 == null && this.health > 0)
         {
-            this.method_924(this.entity, 10.0f, 10.0f);
+            this.method_924(this.target, 10.0f, 10.0f);
         }
-        if (this.entity != null && this.entity.removed)
+        if (this.target != null && this.target.dead)
         {
-            this.entity = null;
+            this.target = null;
         }
-        if (!this.onGround && this.velocityY < 0.05000000074505806 && this.flutter > 0)
+        if (!this.field_1623 && this.velocityY < 0.05000000074505806 && this.flutter > 0)
         {
             this.velocityY += 0.07000000029802322;
             --this.flutter;
@@ -422,99 +422,99 @@ public class EntitySwet extends EntityAetherAnimal
         }
         else
         {
-            if (this.onGround && this.passenger == null && this.hops != 0 && this.hops != 3)
+            if (this.field_1623 && this.field_1594 == null && this.hops != 0 && this.hops != 3)
             {
                 this.hops = 0;
             }
-            if (this.entity == null && this.passenger == null)
+            if (this.target == null && this.field_1594 == null)
             {
-                final EntityBase entity = this.getPrey();
+                final Entity entity = this.getPrey();
                 if (entity != null)
                 {
-                    this.entity = entity;
+                    this.target = entity;
                 }
             }
-            else if (this.entity != null && this.passenger == null)
+            else if (this.target != null && this.field_1594 == null)
             {
-                if (this.distanceTo(this.entity) <= 9.0f)
+                if (this.method_1351(this.target) <= 9.0f)
                 {
-                    if (this.onGround && this.method_928(this.entity))
+                    if (this.field_1623 && this.method_928(this.target))
                     {
                         this.splotch();
                         this.flutter = 10;
                         this.jumping = true;
                         this.field_1029 = 1.0f;
-                        this.yaw += 5.0f * (this.rand.nextFloat() - this.rand.nextFloat());
+                        this.yaw += 5.0f * (this.random.nextFloat() - this.random.nextFloat());
                     }
                 }
                 else
                 {
-                    this.entity = null;
+                    this.target = null;
                     this.jumping = false;
                     this.field_1029 = 0.0f;
                 }
             }
-            else if (this.passenger != null && this.onGround)
+            else if (this.field_1594 != null && this.field_1623)
             {
                 if (this.hops == 0)
                 {
                     this.splotch();
-                    this.onGround = false;
+                    this.field_1623 = false;
                     this.velocityY = 0.3499999940395355;
                     this.field_1029 = 0.8f;
                     this.hops = 1;
                     this.flutter = 5;
-                    this.yaw += 20.0f * (this.rand.nextFloat() - this.rand.nextFloat());
+                    this.yaw += 20.0f * (this.random.nextFloat() - this.random.nextFloat());
                 }
                 else if (this.hops == 1)
                 {
                     this.splotch();
-                    this.onGround = false;
+                    this.field_1623 = false;
                     this.velocityY = 0.44999998807907104;
                     this.field_1029 = 0.9f;
                     this.hops = 2;
                     this.flutter = 5;
-                    this.yaw += 20.0f * (this.rand.nextFloat() - this.rand.nextFloat());
+                    this.yaw += 20.0f * (this.random.nextFloat() - this.random.nextFloat());
                 }
                 else if (this.hops == 2)
                 {
                     this.splotch();
-                    this.onGround = false;
+                    this.field_1623 = false;
                     this.velocityY = 1.25;
                     this.field_1029 = 1.25f;
                     this.hops = 3;
                     this.flutter = 5;
-                    this.yaw += 20.0f * (this.rand.nextFloat() - this.rand.nextFloat());
+                    this.yaw += 20.0f * (this.random.nextFloat() - this.random.nextFloat());
                 }
             }
             this.ticker = 0;
         }
-        if (this.onGround && this.hops >= 3)
+        if (this.field_1623 && this.hops >= 3)
         {
             this.dissolve();
         }
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Hops", (short) this.hops);
-        tag.put("Flutter", (short) this.flutter);
-        if (this.passenger != null)
+        super.writeNbt(tag);
+        tag.putShort("Hops", (short) this.hops);
+        tag.putShort("Flutter", (short) this.flutter);
+        if (this.field_1594 != null)
         {
             this.gotrider = true;
         }
-        tag.put("GotRider", this.gotrider);
-        tag.put("Friendly", this.friendly);
-        tag.put("textureSet", this.textureSet);
-        tag.put("textureNum", (short) this.textureNum);
+        tag.putBoolean("GotRider", this.gotrider);
+        tag.putBoolean("Friendly", this.friendly);
+        tag.putBoolean("textureSet", this.textureSet);
+        tag.putShort("textureNum", (short) this.textureNum);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.hops = tag.getShort("Hops");
         this.flutter = tag.getShort("Flutter");
         this.gotrider = tag.getBoolean("GotRider");
@@ -535,34 +535,34 @@ public class EntitySwet extends EntityAetherAnimal
 
     public void splorch()
     {
-        this.level.playSound((EntityBase) this, "mob.slimeattack", 1.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+        this.world.playSound((Entity) this, "mob.slimeattack", 1.0f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
     }
 
     public void splotch()
     {
-        this.level.playSound((EntityBase) this, "mob.slime", 0.5f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+        this.world.playSound((Entity) this, "mob.slime", 0.5f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.slime";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.slime";
     }
 
     @Override
-    public void method_1353(final EntityBase entity)
+    public void method_1353(final Entity entity)
     {
-        if (this.hops == 0 && this.passenger == null && this.entity != null && entity != null && entity == this.entity && (entity.vehicle == null || !(entity.vehicle instanceof EntitySwet)))
+        if (this.hops == 0 && this.field_1594 == null && this.target != null && entity != null && entity == this.target && (entity.field_1595 == null || !(entity.field_1595 instanceof EntitySwet)))
         {
-            if (entity.passenger != null)
+            if (entity.field_1594 != null)
             {
-                entity.passenger.startRiding(entity);
+                entity.field_1594.method_1376(entity);
             }
             this.capturePrey(entity);
         }
@@ -570,17 +570,17 @@ public class EntitySwet extends EntityAetherAnimal
     }
 
     @Override
-    public boolean interact(final PlayerBase entityplayer)
+    public boolean method_1323(final PlayerEntity entityplayer)
     {
-        if (!this.level.isServerSide)
+        if (!this.world.isRemote)
         {
             if (!this.friendly)
             {
                 this.friendly = true;
-                this.entity = null;
+                this.target = null;
                 return true;
             }
-            if ((this.friendly && this.passenger == null) || this.passenger == entityplayer)
+            if ((this.friendly && this.field_1594 == null) || this.field_1594 == entityplayer)
             {
                 this.capturePrey(entityplayer);
             }
@@ -588,22 +588,22 @@ public class EntitySwet extends EntityAetherAnimal
         return true;
     }
 
-    protected EntityBase getPrey()
+    protected Entity getPrey()
     {
-        final List list = this.level.getEntities(this, this.boundingBox.expand(6.0, 6.0, 6.0));
+        final List list = this.world.getEntities(this, this.boundingBox.expand(6.0, 6.0, 6.0));
         for (int i = 0; i < list.size(); ++i)
         {
-            final EntityBase entity = (EntityBase) list.get(i);
-            if (entity instanceof Living && !(entity instanceof EntitySwet))
+            final Entity entity = (Entity) list.get(i);
+            if (entity instanceof LivingEntity && !(entity instanceof EntitySwet))
             {
                 if (this.friendly)
                 {
-                    if (entity instanceof PlayerBase)
+                    if (entity instanceof PlayerEntity)
                     {
                         continue;
                     }
                 }
-                else if (entity instanceof MonsterBase)
+                else if (entity instanceof MonsterEntity)
                 {
                     continue;
                 }
@@ -614,16 +614,16 @@ public class EntitySwet extends EntityAetherAnimal
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        final ItemInstance stack = new ItemInstance((this.textureNum == 1) ? AetherBlocks.AERCLOUD.id : BlockBase.GLOWSTONE.id, 3, (this.textureNum == 1) ? 1 : 0);
+        final ItemStack stack = new ItemStack((this.textureNum == 1) ? AetherBlocks.AERCLOUD.id : Block.GLOWSTONE.id, 3, (this.textureNum == 1) ? 1 : 0);
 
-        PlayerBase player = this.level.getClosestPlayerTo(this, 10);
+        PlayerEntity player = this.world.method_186(this, 10);
         if (player != null)
-            if (player.getHeldItem() != null)
-                if (player.getHeldItem().getType() == AetherItems.SwordSkyroot)
+            if (player.getHand() != null)
+                if (player.getHand().getItem() == AetherItems.SwordSkyroot)
                     stack.count *= 2;
-        this.dropItem(stack, 0.0f);
+        this.method_1327(stack, 0.0f);
     }
 
     @Override

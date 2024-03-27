@@ -1,8 +1,8 @@
 package com.gildedgames.aether.client.render.model;
 
-import net.minecraft.client.render.entity.model.AnimalQuadrupedModelBase;
+import net.minecraft.client.render.entity.model.QuadrupedEntityModel;
 
-public class ModelFlyingPig1 extends AnimalQuadrupedModelBase
+public class ModelFlyingPig1 extends QuadrupedEntityModel
 {
     public ModelFlyingPig1()
     {

@@ -6,14 +6,14 @@ import com.matthewperiut.accessoryapi.api.render.HasCustomRenderer;
 import com.matthewperiut.accessoryapi.api.render.builtin.GloveRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 import java.awt.*;
 import java.util.Optional;
 
-public class Glove extends TemplateItemBase implements Accessory, HasCustomRenderer
+public class Glove extends TemplateItem implements Accessory, HasCustomRenderer
 {
     public final int strength;
     private final int color;
@@ -25,8 +25,8 @@ public class Glove extends TemplateItemBase implements Accessory, HasCustomRende
         this.texture = texture;
         this.color = color;
         this.strength = strength;
-        this.setMaxStackSize(1);
-        this.setDurability(500);
+        this.setMaxCount(1);
+        this.setMaxDamage(500);
     }
 
     public Glove(Identifier identifier, int strength, String texture)
@@ -35,7 +35,7 @@ public class Glove extends TemplateItemBase implements Accessory, HasCustomRende
     }
 
     @Override
-    public String[] getAccessoryTypes(ItemInstance item)
+    public String[] getAccessoryTypes(ItemStack item)
     {
         return new String[]{"gloves"};
     }

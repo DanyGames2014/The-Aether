@@ -5,12 +5,12 @@ import com.gildedgames.aether.level.source.AetherLevelSource;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvironmentInterface;
-import net.minecraft.block.BlockBase;
-import net.minecraft.level.dimension.Dimension;
-import net.minecraft.level.source.LevelSource;
-import net.minecraft.util.maths.MathHelper;
-import net.minecraft.util.maths.Vec3f;
-import net.modificationstation.stationapi.api.client.level.dimension.TravelMessageProvider;
+import net.minecraft.block.Block;
+import net.minecraft.class_51;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.Dimension;
+import net.modificationstation.stationapi.api.client.world.dimension.TravelMessageProvider;
 
 import static com.gildedgames.aether.AetherMod.of;
 
@@ -30,19 +30,19 @@ public class AetherDimension extends Dimension implements TravelMessageProvider
     }
 
     @Override
-    protected void initBiomeSource()
+    protected void method_1769()
     {
-        biomeSource = new AetherBiomeSource(1);
+        field_2174 = new AetherBiomeSource(1);
     }
 
     @Override
-    public LevelSource createLevelSource()
+    public class_51 method_1772()
     {
-        return new AetherLevelSource(level, level.getSeed());
+        return new AetherLevelSource(world, world.getSeed());
     }
 
     @Override
-    public float getSunPosition(final long time, final float delta)
+    public float method_1771(final long time, final float delta)
     {
         /* todo: sun pos
         final boolean hasKilledGold = MinecraftClientAccessor.getMCinstance().statFileWriter.isAchievementUnlocked(AetherAchievements.defeatGold);
@@ -68,7 +68,7 @@ public class AetherDimension extends Dimension implements TravelMessageProvider
     }
 
     @Override
-    public float[] getSunsetDawnColour(float time, float delta)
+    public float[] method_1761(float time, float delta)
     {
         float f2 = 0.4F;
         float f3 = MathHelper.cos(time * 3.141593F * 2.0F) - 0.0F;
@@ -89,7 +89,7 @@ public class AetherDimension extends Dimension implements TravelMessageProvider
     }
 
     @Override
-    public Vec3f getSkyColour(float time, float delta)
+    public Vec3d method_1762(float time, float delta)
     {
         int i = 0x8080a0;
         float f2 = MathHelper.cos(time * 3.141593F * 2.0F) * 2.0F + 0.5F;
@@ -103,30 +103,30 @@ public class AetherDimension extends Dimension implements TravelMessageProvider
         f3 *= f2 * 0.94F + 0.06F;
         f4 *= f2 * 0.94F + 0.06F;
         f5 *= f2 * 0.91F + 0.09F;
-        return Vec3f.from(f3, f4, f5);
+        return Vec3d.createCached(f3, f4, f5);
     }
 
     @Override
-    public boolean hasPaleSky()
+    public boolean method_1763()
     {
         return false;
     }
 
     @Override
-    public float getCloudHeight()
+    public float method_1764()
     {
         return 8;
     }
 
     @Override
-    public boolean canSpawnOn(int x, int y)
+    public boolean method_1770(int x, int y)
     {
-        int var3 = this.level.getTopBlockAboveSeaLevel(x, y);
-        return var3 != 0 && BlockBase.BY_ID[var3].material.blocksMovement();
+        int var3 = this.world.method_152(x, y);
+        return var3 != 0 && Block.BLOCKS[var3].material.method_907();
     }
 
     @Override
-    public boolean canPlayerSleep()
+    public boolean method_1766()
     {
         return false;
     }

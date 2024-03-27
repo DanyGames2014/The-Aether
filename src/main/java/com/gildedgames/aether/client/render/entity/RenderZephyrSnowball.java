@@ -3,8 +3,8 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.entity.projectile.EntityZephyrSnowball;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.item.ItemBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import org.lwjgl.opengl.GL11;
 
 public class RenderZephyrSnowball extends EntityRenderer
@@ -16,7 +16,7 @@ public class RenderZephyrSnowball extends EntityRenderer
         GL11.glEnable(32826);
         final float f2 = 2.0f;
         GL11.glScalef(f2 / 1.0f, f2 / 1.0f, f2 / 1.0f);
-        final int i = ItemBase.snowball.getTexturePosition(0);
+        final int i = Item.SNOWBALL.getTextureId(0);
         this.bindTexture("/gui/items.png");
         final Tessellator tessellator = Tessellator.INSTANCE;
         final float f3 = (i % 16 * 16 + 0) / 256.0f;
@@ -28,8 +28,8 @@ public class RenderZephyrSnowball extends EntityRenderer
         final float f9 = 0.25f;
         GL11.glRotatef(180.0f - this.dispatcher.field_2497, 0.0f, 1.0f, 0.0f);
         GL11.glRotatef(-this.dispatcher.field_2498, 1.0f, 0.0f, 0.0f);
-        tessellator.start();
-        tessellator.setNormal(0.0f, 1.0f, 0.0f);
+        tessellator.startQuads();
+        tessellator.normal(0.0f, 1.0f, 0.0f);
         tessellator.vertex(0.0f - f8, 0.0f - f9, 0.0, f3, f6);
         tessellator.vertex(f7 - f8, 0.0f - f9, 0.0, f4, f6);
         tessellator.vertex(f7 - f8, 1.0f - f9, 0.0, f4, f5);
@@ -40,7 +40,7 @@ public class RenderZephyrSnowball extends EntityRenderer
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.func_4012_a((EntityZephyrSnowball) entity, x, y, z, f, f1);
     }

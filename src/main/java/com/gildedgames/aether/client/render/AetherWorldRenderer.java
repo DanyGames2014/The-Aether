@@ -1,34 +1,34 @@
 package com.gildedgames.aether.client.render;
 
 import com.gildedgames.aether.client.render.particle.AetherPortal;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_59;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.level.Level;
-import net.minecraft.sortme.LevelListener;
-import net.minecraft.tileentity.TileEntityBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
 
 import static com.gildedgames.aether.AetherMod.of;
 
 //@RequiredArgsConstructor
-public class AetherWorldRenderer implements LevelListener
+public class AetherWorldRenderer implements class_59
 {
 
     private final Minecraft client;
-    public Level level;
+    public World level;
 
     public AetherWorldRenderer(Minecraft gameInstance)
     {
         client = gameInstance;
     }
 
-    public void updateLevel(Level level)
+    public void updateLevel(World level)
     {
         if (this.level != null)
-            this.level.removeLevelListener(this);
+            this.level.method_281(this);
         this.level = level;
         if (level != null)
-            level.addLevelListener(this);
+            level.method_183(this);
     }
 
     @Override
@@ -50,32 +50,32 @@ public class AetherWorldRenderer implements LevelListener
     }
 
     @Override
-    public void addParticle(String particleId, double x, double y, double z, double xTo, double yTo, double zTo)
+    public void method_1153(String particleId, double x, double y, double z, double xTo, double yTo, double zTo)
     {
-        if (client != null && client.viewEntity != null && client.particleManager != null)
+        if (client != null && client.field_2807 != null && client.field_2808 != null)
         {
-            double var14 = client.viewEntity.x - x;
-            double var16 = client.viewEntity.y - y;
-            double var18 = client.viewEntity.z - z;
+            double var14 = client.field_2807.x - x;
+            double var16 = client.field_2807.y - y;
+            double var18 = client.field_2807.z - z;
             double var20 = 16;
             if (!(var14 * var14 + var16 * var16 + var18 * var18 > var20 * var20))
             {
                 if (particleId.equals(of("aether_portal").toString()))
                 {
-                    client.particleManager.addParticle(new AetherPortal(level, x, y, z, xTo, yTo, zTo));
+                    client.field_2808.method_325(new AetherPortal(level, x, y, z, xTo, yTo, zTo));
                 }
             }
         }
     }
 
     @Override
-    public void drawCloak(EntityBase arg)
+    public void loadEntitySkin(Entity arg)
     {
 
     }
 
     @Override
-    public void method_1157(EntityBase arg)
+    public void unloadEntitySkin(Entity arg)
     {
 
     }
@@ -93,13 +93,13 @@ public class AetherWorldRenderer implements LevelListener
     }
 
     @Override
-    public void method_1151(int i, int j, int k, TileEntityBase arg)
+    public void method_1151(int i, int j, int k, BlockEntity arg)
     {
 
     }
 
     @Override
-    public void playLevelEvent(PlayerBase arg, int i, int j, int k, int i1, int j1)
+    public void method_1152(PlayerEntity arg, int i, int j, int k, int i1, int j1)
     {
 
     }

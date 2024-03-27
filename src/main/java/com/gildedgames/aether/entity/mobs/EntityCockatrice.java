@@ -6,20 +6,20 @@ import com.gildedgames.aether.mixin.access.EntityBaseAccessor;
 import com.gildedgames.aether.mixin.access.LivingAccessor;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.monster.MonsterBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.MonsterEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 import java.util.List;
 
-public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvider
+public class EntityCockatrice extends MonsterEntity implements MobSpawnDataProvider
 {
     public float field_752_b;
     public float destPos;
@@ -32,7 +32,7 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
     public boolean jpress;
     public boolean gotrider;
 
-    public EntityCockatrice(final Level level)
+    public EntityCockatrice(final World level)
     {
         super(level);
         this.destPos = 0.0f;
@@ -41,9 +41,9 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
         this.jrem = 0;
         this.jumps = 3;
         this.texture = "aether:textures/entity/Cockatrice.png";
-        this.setSize(1.0f, 2.0f);
+        this.setBoundingBoxSpacing(1.0f, 2.0f);
         this.health = 20;
-        this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
+        this.timeUntilNextEgg = this.random.nextInt(6000) + 6000;
     }
 
     @Override
@@ -52,54 +52,54 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
         final int i = MathHelper.floor(this.x);
         final int j = MathHelper.floor(this.boundingBox.minY);
         final int k = MathHelper.floor(this.z);
-        return this.rand.nextInt(25) == 0 && this.getPathfindingFavour(i, j, k) >= 0.0f && this.level.canSpawnEntity(this.boundingBox) && this.level.method_190(this, this.boundingBox).size() == 0 && !this.level.method_218(this.boundingBox) && this.level.getTileId(i, j - 1, k) != AetherBlocks.DUNGEON_STONE.id && this.level.getTileId(i, j - 1, k) != AetherBlocks.LIGHT_DUNGEON_STONE.id
-                && this.level.getTileId(i, j - 1, k) != AetherBlocks.LOCKED_DUNGEON_STONE.id && this.level.getTileId(i, j - 1, k) != AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id && this.level.getTileId(i, j - 1, k) != AetherBlocks.HOLYSTONE.id && this.level.difficulty > 0;
+        return this.random.nextInt(25) == 0 && this.method_641(i, j, k) >= 0.0f && this.world.canSpawnEntity(this.boundingBox) && this.world.method_190(this, this.boundingBox).size() == 0 && !this.world.method_218(this.boundingBox) && this.world.getBlockId(i, j - 1, k) != AetherBlocks.DUNGEON_STONE.id && this.world.getBlockId(i, j - 1, k) != AetherBlocks.LIGHT_DUNGEON_STONE.id
+                && this.world.getBlockId(i, j - 1, k) != AetherBlocks.LOCKED_DUNGEON_STONE.id && this.world.getBlockId(i, j - 1, k) != AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id && this.world.getBlockId(i, j - 1, k) != AetherBlocks.HOLYSTONE.id && this.world.field_213 > 0;
     }
 
     @Override
     public void tick()
     {
         super.tick();
-        this.field_1622 = (this.passenger instanceof PlayerBase); // todo: make local player
-        if (!this.level.isServerSide && this.gotrider)
+        this.field_1622 = (this.field_1594 instanceof PlayerEntity); // todo: make local player
+        if (!this.world.isRemote && this.gotrider)
         {
-            if (this.passenger != null)
+            if (this.field_1594 != null)
             {
                 return;
             }
-            final List list = this.level.getEntities(this, this.boundingBox.expand(0.5, 0.75, 0.5));
+            final List list = this.world.getEntities(this, this.boundingBox.expand(0.5, 0.75, 0.5));
             final int i = 0;
             if (i < list.size())
             {
-                final EntityBase entity = (EntityBase) list.get(i);
-                entity.startRiding(this);
+                final Entity entity = (Entity) list.get(i);
+                entity.method_1376(this);
             }
             this.gotrider = false;
         }
-        if (!this.level.isServerSide && this.level.difficulty == 0)
+        if (!this.world.isRemote && this.world.field_213 == 0)
         {
-            this.remove();
+            this.markDead();
         }
     }
 
     @Override
-    protected void tryAttack(final EntityBase target, final float f)
+    protected void method_637(final Entity target, final float f)
     {
         if (f < 10.0f)
         {
             final double d = target.x - this.x;
             final double d2 = target.z - this.z;
-            if (this.attackTime == 0)
+            if (this.field_1042 == 0)
             {
                 final EntityPoisonNeedle entityPoisonNeedle;
-                final EntityPoisonNeedle entityarrow = entityPoisonNeedle = new EntityPoisonNeedle(this.level, this);
+                final EntityPoisonNeedle entityarrow = entityPoisonNeedle = new EntityPoisonNeedle(this.world, this);
                 entityPoisonNeedle.y += 1.399999976158142;
-                final double d3 = target.y + target.getStandingEyeHeight() - 0.20000000298023224 - entityarrow.y;
+                final double d3 = target.y + target.method_1378() - 0.20000000298023224 - entityarrow.y;
                 final float f2 = MathHelper.sqrt(d * d + d2 * d2) * 0.2f;
-                this.level.playSound((EntityBase) this, "aether:aether.sound.other.dartshooter.shootdart", 1.0f, 1.0f / (this.rand.nextFloat() * 0.4f + 0.8f));
-                this.level.spawnEntity(entityarrow);
+                this.world.playSound((Entity) this, "aether:aether.sound.other.dartshooter.shootdart", 1.0f, 1.0f / (this.random.nextFloat() * 0.4f + 0.8f));
+                this.world.method_210(entityarrow);
                 entityarrow.setArrowHeading(d, d3 + f2, d2, 0.6f, 12.0f);
-                this.attackTime = 30;
+                this.field_1042 = 30;
             }
             this.yaw = (float) (Math.atan2(d2, d) * 180.0 / 3.1415927410125732) - 90.0f;
             this.field_663 = true;
@@ -107,12 +107,12 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
     }
 
     @Override
-    public void updateDespawnCounter()
+    public void method_937()
     {
-        super.updateDespawnCounter();
+        super.method_937();
         this.field_756_e = this.field_752_b;
         this.field_757_d = this.destPos;
-        this.destPos += (float) ((this.onGround ? -1 : 4) * 0.05);
+        this.destPos += (float) ((this.field_1623 ? -1 : 4) * 0.05);
         if (this.destPos < 0.01f)
         {
             this.destPos = 0.01f;
@@ -121,20 +121,20 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
         {
             this.destPos = 1.0f;
         }
-        if (this.onGround)
+        if (this.field_1623)
         {
             this.destPos = 0.0f;
             this.jpress = false;
             this.jrem = this.jumps;
         }
-        if (!this.onGround && this.field_755_h < 1.0f)
+        if (!this.field_1623 && this.field_755_h < 1.0f)
         {
             this.field_755_h = 1.0f;
         }
         this.field_755_h *= (float) 0.9;
-        if (!this.onGround && this.velocityY < 0.0)
+        if (!this.field_1623 && this.velocityY < 0.0)
         {
-            if (this.passenger == null)
+            if (this.field_1594 == null)
             {
                 this.velocityY *= 0.6;
             }
@@ -144,51 +144,51 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
             }
         }
         this.field_752_b += this.field_755_h * 2.0f;
-        if (!this.level.isServerSide && --this.timeUntilNextEgg <= 0)
+        if (!this.world.isRemote && --this.timeUntilNextEgg <= 0)
         {
-            this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
+            this.timeUntilNextEgg = this.random.nextInt(6000) + 6000;
         }
     }
 
     @Override
-    protected void handleFallDamage(final float height)
+    protected void method_1389(final float height)
     {
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
-        if (target != null && this.passenger != null && target == this.passenger)
+        if (target != null && this.field_1594 != null && target == this.field_1594)
         {
             return false;
         }
         final boolean flag = super.damage(target, amount);
-        if (flag && this.passenger != null && (this.health <= 0 || this.rand.nextInt(3) == 0))
+        if (flag && this.field_1594 != null && (this.health <= 0 || this.random.nextInt(3) == 0))
         {
-            this.passenger.startRiding(this);
+            this.field_1594.method_1376(this);
         }
         return flag;
     }
 
-    public void tickHandSwing()
+    public void method_910()
     {
-        if (this.level.isServerSide)
+        if (this.world.isRemote)
         {
             return;
         }
-        if (this.passenger != null && this.passenger instanceof Living)
+        if (this.field_1594 != null && this.field_1594 instanceof LivingEntity)
         {
             this.field_1029 = 0.0f;
             this.field_1060 = 0.0f;
             this.jumping = false;
-            ((EntityBaseAccessor) this.passenger).setFallDistance(0.0f);
-            final float yaw = this.passenger.yaw;
+            ((EntityBaseAccessor) this.field_1594).setFallDistance(0.0f);
+            final float yaw = this.field_1594.yaw;
             this.yaw = yaw;
             this.prevYaw = yaw;
-            final float pitch = this.passenger.pitch;
+            final float pitch = this.field_1594.pitch;
             this.pitch = pitch;
             this.prevPitch = pitch;
-            final Living entityliving = (Living) this.passenger;
+            final LivingEntity entityliving = (LivingEntity) this.field_1594;
             final float f = 3.141593f;
             final float f2 = f / 180.0f;
             if (((LivingAccessor) entityliving).get1029() > 0.1f)
@@ -215,14 +215,14 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
                 this.velocityX += ((LivingAccessor) entityliving).get1060() * Math.cos((double) f6) * 0.17499999701976776;
                 this.velocityZ += ((LivingAccessor) entityliving).get1060() * Math.sin((double) f6) * 0.17499999701976776;
             }
-            if (this.onGround && ((LivingAccessor) entityliving).getJumping())
+            if (this.field_1623 && ((LivingAccessor) entityliving).getJumping())
             {
-                this.onGround = false;
+                this.field_1623 = false;
                 this.velocityY = 0.875;
                 this.jpress = true;
                 --this.jrem;
             }
-            else if (this.method_1393() && ((LivingAccessor) entityliving).getJumping())
+            else if (this.isSubmergedInWater() && ((LivingAccessor) entityliving).getJumping())
             {
                 this.velocityY = 0.5;
                 this.jpress = true;
@@ -247,64 +247,64 @@ public class EntityCockatrice extends MonsterBase implements MobSpawnDataProvide
             }
             return;
         }
-        super.tickHandSwing();
+        super.method_910();
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Jumps", (short) this.jumps);
-        tag.put("Remaining", (short) this.jrem);
-        if (this.passenger != null)
+        super.writeNbt(tag);
+        tag.putShort("Jumps", (short) this.jumps);
+        tag.putShort("Remaining", (short) this.jrem);
+        if (this.field_1594 != null)
         {
             this.gotrider = true;
         }
-        tag.put("GotRider", this.gotrider);
+        tag.putBoolean("GotRider", this.gotrider);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.jumps = tag.getShort("Jumps");
         this.jrem = tag.getShort("Remaining");
         this.gotrider = tag.getBoolean("GotRider");
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "aether:aether.sound.mobs.moa.idlecall";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "aether:aether.sound.mobs.moa.idlecall";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "aether:aether.sound.mobs.moa.idlecall";
     }
 
-    public boolean interact(final PlayerBase entityplayer)
+    public boolean method_1323(final PlayerEntity entityplayer)
     {
         return true;
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        PlayerBase player = this.level.getClosestPlayerTo(this, 10);
+        PlayerEntity player = this.world.method_186(this, 10);
         int count = 3;
         if (player != null)
-            if (player.getHeldItem() != null)
-                if (player.getHeldItem().getType() == AetherItems.SwordSkyroot)
+            if (player.getHand() != null)
+                if (player.getHand().getItem() == AetherItems.SwordSkyroot)
                     count *= 2;
-        this.dropItem(ItemBase.feather.id, count);
+        this.method_1339(Item.FEATHER.id, count);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.gildedgames.aether.mixin.access;
 
-import net.minecraft.entity.EntityBase;
+import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Random;
 
-@Mixin(EntityBase.class)
+@Mixin(Entity.class)
 public interface EntityBaseAccessor
 {
 
@@ -14,31 +14,31 @@ public interface EntityBaseAccessor
     @Accessor("field_1612")
     boolean get1612();
 
-    @Accessor("fallDistance")
+    @Accessor("field_1636")
     float getFallDistance();
 
     @Accessor("field_1611")
     int getNextStepDistance();
 
-    @Accessor("rand")
+    @Accessor("random")
     public Random getRand();
 
-    @Accessor("immuneToFire")
+    @Accessor("fireImmune")
     public boolean getImmunityToFire();
 
     /*SETTERS*/
-    @Accessor("height")
+    @Accessor("spacingY")
     void setHeight(float f);
 
-    @Accessor("width")
+    @Accessor("spacingXZ")
     void setWidth(float f);
 
-    @Accessor("fallDistance")
+    @Accessor("field_1636")
     void setFallDistance(float f);
 
     @Accessor("field_1611")
     void setNextStepDistance(int i);
 
-    @Accessor("immuneToFire")
+    @Accessor("fireImmune")
     public void setImmunityToFire(boolean b); //did i spell it correctly?
 }

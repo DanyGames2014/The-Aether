@@ -1,29 +1,29 @@
 package com.gildedgames.aether.gui;
 
 import com.gildedgames.aether.entity.tile.TileEntityTreasureChest;
-import net.minecraft.client.gui.screen.container.ContainerBase;
-import net.minecraft.container.Chest;
-import net.minecraft.inventory.InventoryBase;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import org.lwjgl.opengl.GL11;
 
-public class GuiTreasureChest extends ContainerBase
+public class GuiTreasureChest extends HandledScreen
 {
-    private InventoryBase upperChestInventory;
-    private InventoryBase lowerChestInventory;
+    private Inventory upperChestInventory;
+    private Inventory lowerChestInventory;
     private int inventoryRows;
     private String name;
 
-    public GuiTreasureChest(final InventoryBase iinventory, final TileEntityTreasureChest iinventory1)
+    public GuiTreasureChest(final Inventory iinventory, final TileEntityTreasureChest iinventory1)
     {
-        super(new Chest(iinventory, iinventory1));
+        super(new GenericContainerScreenHandler(iinventory, iinventory1));
         this.inventoryRows = 0;
         this.upperChestInventory = iinventory;
         this.lowerChestInventory = iinventory1;
-        this.passEvents = false;
+        this.field_155 = false;
         final char c = '\u00de';
         final int i = c - 'l';
-        this.inventoryRows = iinventory1.getInventorySize() / 9;
-        this.containerHeight = i + this.inventoryRows * 18;
+        this.inventoryRows = iinventory1.size() / 9;
+        this.backgroundHeight = i + this.inventoryRows * 18;
 
         switch (iinventory1.rarity)
         {
@@ -50,21 +50,21 @@ public class GuiTreasureChest extends ContainerBase
     }
 
     @Override
-    protected void renderForeground()
+    protected void drawForeground()
     {
-        this.textManager.drawText(this.name, 8, 6, 4210752);
-        this.textManager.drawText(this.upperChestInventory.getContainerName(), 8, this.containerHeight - 96 + 2, 4210752);
+        this.textRenderer.draw(this.name, 8, 6, 4210752);
+        this.textRenderer.draw(this.upperChestInventory.getName(), 8, this.backgroundHeight - 96 + 2, 4210752);
     }
 
     @Override
-    protected void renderContainerBackground(final float tickDelta)
+    protected void drawBackground(final float tickDelta)
     {
         final int i = this.minecraft.textureManager.getTextureId("/gui/container.png");
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.minecraft.textureManager.bindTexture(i);
-        final int j = (this.width - this.containerWidth) / 2;
-        final int k = (this.height - this.containerHeight) / 2;
-        this.blit(j, k, 0, 0, this.containerWidth, this.inventoryRows * 18 + 17);
-        this.blit(j, k + this.inventoryRows * 18 + 17, 0, 126, this.containerWidth, 96);
+        final int j = (this.width - this.backgroundWidth) / 2;
+        final int k = (this.height - this.backgroundHeight) / 2;
+        this.drawTexture(j, k, 0, 0, this.backgroundWidth, this.inventoryRows * 18 + 17);
+        this.drawTexture(j, k + this.inventoryRows * 18 + 17, 0, 126, this.backgroundWidth, 96);
     }
 }

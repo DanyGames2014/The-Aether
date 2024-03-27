@@ -2,9 +2,9 @@ package com.gildedgames.aether.item.accessory;
 
 import com.gildedgames.aether.mixin.access.EntityBaseAccessor;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class PhoenixGlove extends Glove
 {
@@ -14,19 +14,19 @@ public class PhoenixGlove extends Glove
     }
 
     @Override
-    public ItemInstance tickWhileWorn(PlayerBase player, ItemInstance itemInstance)
+    public ItemStack tickWhileWorn(PlayerEntity player, ItemStack itemInstance)
     {
-        if (player.inventory.armour[3] != null && player.inventory.armour[3].itemId == AetherItems.PhoenixHelm.id && player.inventory.armour[2] != null && player.inventory.armour[2].itemId == AetherItems.PhoenixBody.id && player.inventory.armour[1] != null && player.inventory.armour[1].itemId == AetherItems.PhoenixLegs.id && player.inventory.armour[0] != null && player.inventory.armour[0].itemId == AetherItems.PhoenixBoots.id)
+        if (player.inventory.armor[3] != null && player.inventory.armor[3].itemId == AetherItems.PhoenixHelm.id && player.inventory.armor[2] != null && player.inventory.armor[2].itemId == AetherItems.PhoenixBody.id && player.inventory.armor[1] != null && player.inventory.armor[1].itemId == AetherItems.PhoenixLegs.id && player.inventory.armor[0] != null && player.inventory.armor[0].itemId == AetherItems.PhoenixBoots.id)
         {
             ((EntityBaseAccessor) player).setImmunityToFire(true);
             player.fire = 0;
-            player.level.addParticle("flame", player.x + ((EntityBaseAccessor) player).getRand().nextGaussian() / 5.0, player.y - 0.5 + ((EntityBaseAccessor) player).getRand().nextGaussian() / 5.0, player.z + ((EntityBaseAccessor) player).getRand().nextGaussian() / 3.0, 0.0, 0.0, 0.0);
+            player.world.addParticle("flame", player.x + ((EntityBaseAccessor) player).getRand().nextGaussian() / 5.0, player.y - 0.5 + ((EntityBaseAccessor) player).getRand().nextGaussian() / 5.0, player.z + ((EntityBaseAccessor) player).getRand().nextGaussian() / 3.0, 0.0, 0.0, 0.0);
         }
         return itemInstance;
     }
 
     @Override
-    public void onAccessoryRemoved(PlayerBase player, ItemInstance itemInstance)
+    public void onAccessoryRemoved(PlayerEntity player, ItemStack itemInstance)
     {
         ((EntityBaseAccessor) player).setImmunityToFire(false);
     }

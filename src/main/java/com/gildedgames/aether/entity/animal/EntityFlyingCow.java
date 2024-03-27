@@ -5,12 +5,12 @@ import com.gildedgames.aether.entity.base.EntityAetherAnimal;
 import com.gildedgames.aether.mixin.access.EntityBaseAccessor;
 import com.gildedgames.aether.mixin.access.LivingAccessor;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class EntityFlyingCow extends EntityAetherAnimal
 {
@@ -23,12 +23,12 @@ public class EntityFlyingCow extends EntityAetherAnimal
     private boolean jpress;
     private int ticks;
 
-    public EntityFlyingCow(Level level)
+    public EntityFlyingCow(World level)
     {
         super(level);
         this.getSaddled = false;
         this.texture = "aether:textures/entity/Mob_FlyingCowBase.png";
-        this.setSize(0.9f, 1.3f);
+        this.setBoundingBoxSpacing(0.9f, 1.3f);
         this.jrem = 0;
         this.jumps = 1;
         this.ticks = 0;
@@ -43,9 +43,9 @@ public class EntityFlyingCow extends EntityAetherAnimal
     }
 
     @Override
-    protected boolean canClimb()
+    protected boolean bypassesSteppingEffects()
     {
-        return this.onGround;
+        return this.field_1623;
     }
 
     @Override
@@ -55,18 +55,18 @@ public class EntityFlyingCow extends EntityAetherAnimal
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag tag)
+    public void writeNbt(NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Jumps", (short) this.jumps);
-        tag.put("Remaining", (short) this.jrem);
-        tag.put("getSaddled", this.getSaddled);
+        super.writeNbt(tag);
+        tag.putShort("Jumps", (short) this.jumps);
+        tag.putShort("Remaining", (short) this.jrem);
+        tag.putBoolean("getSaddled", this.getSaddled);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag tag)
+    public void readNbt(NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.jumps = tag.getShort("Jumps");
         this.jrem = tag.getShort("Remaining");
         this.getSaddled = tag.getBoolean("getSaddled");
@@ -77,7 +77,7 @@ public class EntityFlyingCow extends EntityAetherAnimal
     }
 
     @Override
-    protected void jump()
+    protected void method_944()
     {
         this.velocityY = 0.6;
     }
@@ -86,7 +86,7 @@ public class EntityFlyingCow extends EntityAetherAnimal
     public void tick()
     {
         super.tick();
-        if (this.onGround)
+        if (this.field_1623)
         {
             this.wingAngle *= 0.8f;
             this.aimingForFold = 0.1f;
@@ -100,31 +100,31 @@ public class EntityFlyingCow extends EntityAetherAnimal
         ++this.ticks;
         this.wingAngle = this.wingFold * (float) Math.sin(this.ticks / 31.830988f);
         this.wingFold += (this.aimingForFold - this.wingFold) / 5.0f;
-        this.fallDistance = 0.0f;
+        this.field_1636 = 0.0f;
         if (this.velocityY < -0.2)
         {
             this.velocityY = -0.2;
         }
     }
 
-    public void tickHandSwing()
+    public void method_910()
     {
         //if (this.level.isServerSide) {
         //   return;
         //}
-        if (this.passenger != null && this.passenger instanceof Living)
+        if (this.field_1594 != null && this.field_1594 instanceof LivingEntity)
         {
             this.field_1029 = 0.0f;
             this.field_1060 = 0.0f;
             this.jumping = false;
-            ((EntityBaseAccessor) this.passenger).setFallDistance(0.0f);
-            float field_1606 = this.passenger.yaw;
+            ((EntityBaseAccessor) this.field_1594).setFallDistance(0.0f);
+            float field_1606 = this.field_1594.yaw;
             this.yaw = field_1606;
             this.prevYaw = field_1606;
-            float field_1607 = this.passenger.pitch;
+            float field_1607 = this.field_1594.pitch;
             this.pitch = field_1607;
             this.prevPitch = field_1607;
-            Living living2 = (Living) this.passenger;
+            LivingEntity living2 = (LivingEntity) this.field_1594;
             float float3 = 3.141593f;
             float float4 = float3 / 180.0f;
             if (((LivingAccessor) living2).get1029() > 0.1f)
@@ -151,14 +151,14 @@ public class EntityFlyingCow extends EntityAetherAnimal
                 this.velocityX += ((LivingAccessor) living2).get1060() * Math.cos(float5) * 0.17499999701976776;
                 this.velocityZ += ((LivingAccessor) living2).get1060() * Math.sin(float5) * 0.17499999701976776;
             }
-            if (this.onGround && ((LivingAccessor) living2).getJumping())
+            if (this.field_1623 && ((LivingAccessor) living2).getJumping())
             {
-                this.onGround = false;
+                this.field_1623 = false;
                 this.velocityY = 1.4;
                 this.jpress = true;
                 --this.jrem;
             }
-            else if (this.method_1393() && ((LivingAccessor) living2).getJumping())
+            else if (this.isSubmergedInWater() && ((LivingAccessor) living2).getJumping())
             {
                 this.velocityY = 0.5;
                 this.jpress = true;
@@ -183,61 +183,61 @@ public class EntityFlyingCow extends EntityAetherAnimal
             }
             return;
         }
-        super.tickHandSwing();
+        super.method_910();
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "mob.cow";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.cowhurt";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.cowhurt";
     }
 
     @Override
-    protected float getSoundVolume()
+    protected float method_915()
     {
         return 0.4f;
     }
 
     @Override
-    public boolean interact(PlayerBase playerBase)
+    public boolean method_1323(PlayerEntity playerBase)
     {
-        if (!this.getSaddled && playerBase.inventory.getHeldItem() != null && playerBase.inventory.getHeldItem().itemId == ItemBase.saddle.id)
+        if (!this.getSaddled && playerBase.inventory.getSelectedItem() != null && playerBase.inventory.getSelectedItem().itemId == Item.SADDLE.id)
         {
-            playerBase.inventory.setInventoryItem(playerBase.inventory.selectedHotbarSlot, null);
+            playerBase.inventory.setStack(playerBase.inventory.selectedSlot, null);
             this.getSaddled = true;
             this.texture = "aether:textures/entity/Mob_FlyingCowSaddle.png";
             return true;
         }
-        if (this.getSaddled /*&& !this.level.isServerSide*/ && (this.passenger == null || this.passenger == playerBase))
+        if (this.getSaddled /*&& !this.level.isServerSide*/ && (this.field_1594 == null || this.field_1594 == playerBase))
         {
-            playerBase.startRiding(this);
+            playerBase.method_1376(this);
             return true;
         }
         return false;
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        PlayerBase player = this.level.getClosestPlayerTo(this, 10);
+        PlayerEntity player = this.world.method_186(this, 10);
         int count = 2;
         if (player != null)
-            if (player.getHeldItem() != null)
-                if (player.getHeldItem().getType() == AetherItems.SwordSkyroot)
+            if (player.getHand() != null)
+                if (player.getHand().getItem() == AetherItems.SwordSkyroot)
                     count *= 2;
-        this.dropItem(ItemBase.leather.id, count);
+        this.method_1339(Item.LEATHER.id, count);
     }
 
     @Override

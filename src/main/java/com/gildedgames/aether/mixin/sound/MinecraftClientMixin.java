@@ -15,7 +15,7 @@ public class MinecraftClientMixin
 {
     private static boolean soundsLoaded = false;
 
-    @Inject(method = "loadSoundFromDir", at = @At("TAIL"))
+    @Inject(method = "loadResource", at = @At("TAIL"))
     public void loadSoundFromDir(String string, File file, CallbackInfo ci)
     {
         if (!soundsLoaded)
@@ -23,9 +23,9 @@ public class MinecraftClientMixin
             getClass().getResourceAsStream("assets/matmos/resources/default_database.xml");
             try
             {
-                Minecraft.class.cast(this).soundHelper.addMusic("aether1.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether1.ogg"));
-                Minecraft.class.cast(this).soundHelper.addMusic("aether2.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether2.ogg"));
-                Minecraft.class.cast(this).soundHelper.addMusic("aether3.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether3.ogg"));
+                Minecraft.class.cast(this).soundManager.loadMusic("aether1.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether1.ogg"));
+                Minecraft.class.cast(this).soundManager.loadMusic("aether2.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether2.ogg"));
+                Minecraft.class.cast(this).soundManager.loadMusic("aether3.ogg", SkiddedUtils.getFile("assets/aether/stationapi/sounds/sound/aether/music/aether3.ogg"));
             }
             catch (IOException e)
             {

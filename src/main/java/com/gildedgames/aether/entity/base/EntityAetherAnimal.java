@@ -1,39 +1,39 @@
 package com.gildedgames.aether.entity.base;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.entity.animal.AnimalBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
-public abstract class EntityAetherAnimal extends AnimalBase implements MobSpawnDataProvider
+public abstract class EntityAetherAnimal extends AnimalEntity implements MobSpawnDataProvider
 {
-    public EntityAetherAnimal(Level level)
+    public EntityAetherAnimal(World level)
     {
         super(level);
     }
 
     @Override
-    protected float getPathfindingFavour(int x, int y, int z)
+    protected float method_641(int x, int y, int z)
     {
-        if (this.level.getTileId(x, y - 1, z) == AetherBlocks.AETHER_GRASS_BLOCK.id)
+        if (this.world.getBlockId(x, y - 1, z) == AetherBlocks.AETHER_GRASS_BLOCK.id)
         {
             return 10.0f;
         }
-        return this.level.getBrightness(x, y, z) - 0.5f;
+        return this.world.method_1782(x, y, z) - 0.5f;
     }
 
     @Override
-    public void writeCustomDataToTag(CompoundTag tag)
+    public void writeNbt(NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
+        super.writeNbt(tag);
     }
 
     @Override
-    public void readCustomDataFromTag(CompoundTag tag)
+    public void readNbt(NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
     }
 
     @Override
@@ -42,11 +42,11 @@ public abstract class EntityAetherAnimal extends AnimalBase implements MobSpawnD
         int integer2 = MathHelper.floor(this.x);
         int integer3 = MathHelper.floor(this.boundingBox.minY);
         int integer4 = MathHelper.floor(this.z);
-        return this.level.canSpawnEntity(this.boundingBox) && this.level.method_190(this, this.boundingBox).size() == 0 && !this.level.method_218(this.boundingBox) && this.level.getTileId(integer2, integer3 - 1, integer4) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.level.getLightLevel(integer2, integer3, integer4) > 8 && this.getPathfindingFavour(integer2, integer3, integer4) >= 0.0f;
+        return this.world.canSpawnEntity(this.boundingBox) && this.world.method_190(this, this.boundingBox).size() == 0 && !this.world.method_218(this.boundingBox) && this.world.getBlockId(integer2, integer3 - 1, integer4) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.world.method_252(integer2, integer3, integer4) > 8 && this.method_641(integer2, integer3, integer4) >= 0.0f;
     }
 
     @Override
-    public int method_936()
+    public int getMinAmbientSoundDelay()
     {
         return 120;
     }

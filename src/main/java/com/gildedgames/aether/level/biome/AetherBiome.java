@@ -6,9 +6,10 @@ import com.gildedgames.aether.entity.mobs.EntityCockatrice;
 import com.gildedgames.aether.entity.mobs.EntityZephyr;
 import com.gildedgames.aether.generator.AetherGenGoldenOak;
 import com.gildedgames.aether.generator.AetherGenSkyroot;
-import net.minecraft.entity.EntityEntry;
-import net.minecraft.level.biome.Biome;
-import net.minecraft.level.structure.Structure;
+import net.minecraft.class_288;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.feature.Feature;
+import net.modificationstation.stationapi.api.worldgen.biome.BiomeColorProvider;
 
 import java.util.Random;
 
@@ -44,44 +45,44 @@ public class AetherBiome extends Biome
 
     public AetherBiome()
     {
-        monsters.clear();
-        creatures.clear();
-        waterCreatures.clear();
+        spawnableMonsters.clear();
+        spawnablePassive.clear();
+        spawnableWaterCreatures.clear();
         if (raritySwet != 0)
         {
-            this.creatures.add(new EntityEntry(EntitySwet.class, raritySwet));
+            this.spawnablePassive.add(new class_288(EntitySwet.class, raritySwet));
         }
         if (rarityAechorPlant != 0)
         {
-            this.creatures.add(new EntityEntry(EntityAechorPlant.class, rarityAechorPlant));
+            this.spawnablePassive.add(new class_288(EntityAechorPlant.class, rarityAechorPlant));
         }
         if (rarityCockatrice != 0)
         {
-            this.monsters.add(new EntityEntry(EntityCockatrice.class, rarityCockatrice));
+            this.spawnableMonsters.add(new class_288(EntityCockatrice.class, rarityCockatrice));
         }
         if (rarityAerwhale != 0)
         {
-            this.monsters.add(new EntityEntry(EntityAerwhale.class, rarityAerwhale));
+            this.spawnableMonsters.add(new class_288(EntityAerwhale.class, rarityAerwhale));
         }
         if (rarityZephyr != 0)
         {
-            this.monsters.add(new EntityEntry(EntityZephyr.class, rarityZephyr));
+            this.spawnableMonsters.add(new class_288(EntityZephyr.class, rarityZephyr));
         }
         if (raritySheepuff != 0)
         {
-            this.creatures.add(new EntityEntry(EntitySheepuff.class, raritySheepuff));
+            this.spawnablePassive.add(new class_288(EntitySheepuff.class, raritySheepuff));
         }
         if (rarityPhyg != 0)
         {
-            this.creatures.add(new EntityEntry(EntityPhyg.class, rarityPhyg));
+            this.spawnablePassive.add(new class_288(EntityPhyg.class, rarityPhyg));
         }
         if (rarityMoa != 0)
         {
-            this.creatures.add(new EntityEntry(EntityMoa.class, rarityMoa));
+            this.spawnablePassive.add(new class_288(EntityMoa.class, rarityMoa));
         }
         if (rarityFlyingCow != 0)
         {
-            this.creatures.add(new EntityEntry(EntityFlyingCow.class, rarityFlyingCow));
+            this.spawnablePassive.add(new class_288(EntityFlyingCow.class, rarityFlyingCow));
         }
         /* todo: particles fix
         if (rarityWhirlwind != 0) {
@@ -89,12 +90,12 @@ public class AetherBiome extends Biome
         }*/
         if (rarityAerbunny != 0)
         {
-            this.creatures.add(new EntityEntry(EntityAerbunny.class, rarityAerbunny));
+            this.spawnablePassive.add(new class_288(EntityAerbunny.class, rarityAerbunny));
         }
     }
 
     @Override
-    public Structure getTree(Random rand)
+    public Feature getRandomTreeFeature(Random rand)
     {
         if (rand.nextInt(100) == 0)
         {
@@ -104,8 +105,10 @@ public class AetherBiome extends Biome
     }
 
     @Override
-    public int getSkyColour(float temperature)
+    public int method_796(float temperature)
     {
         return 0xc0c0ff;
     }
+
+
 }

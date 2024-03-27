@@ -3,16 +3,16 @@ package com.gildedgames.aether.entity.animal;
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.entity.base.EntityAetherAnimal;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.block.BlockBase;
-import net.minecraft.block.Wool;
-import net.minecraft.entity.Item;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.block.Block;
+import net.minecraft.block.WoolBlock;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 import java.util.Random;
 
@@ -21,24 +21,24 @@ public class EntitySheepuff extends EntityAetherAnimal
     public static final float[][] fleeceColorTable;
     private int amountEaten;
 
-    public EntitySheepuff(final Level level, final int color)
+    public EntitySheepuff(final World level, final int color)
     {
         super(level);
         this.setFleeceColor(color);
         setStartVariables();
     }
 
-    public EntitySheepuff(final Level level)
+    public EntitySheepuff(final World level)
     {
         super(level);
-        this.setFleeceColor(getRandomFleeceColor(this.rand));
+        this.setFleeceColor(getRandomFleeceColor(this.random));
         setStartVariables();
     }
 
     private void setStartVariables()
     {
         this.texture = "aether:textures/entity/sheepuff.png";
-        this.setSize(0.9f, 1.3f);
+        this.setBoundingBoxSpacing(0.9f, 1.3f);
         this.amountEaten = 0;
     }
 
@@ -50,68 +50,68 @@ public class EntitySheepuff extends EntityAetherAnimal
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
         if (!this.getSheared())
         {
-            this.dropItem(new ItemInstance(BlockBase.WOOL.id, 1 + this.rand.nextInt(2), this.getFleeceColor()), 0.0f);
+            this.method_1327(new ItemStack(Block.WOOL.id, 1 + this.random.nextInt(2), this.getFleeceColor()), 0.0f);
         }
     }
 
     @Override
-    public boolean interact(final PlayerBase entityplayer)
+    public boolean method_1323(final PlayerEntity entityplayer)
     {
-        final ItemInstance itemstack = entityplayer.inventory.getHeldItem();
-        if (itemstack != null && itemstack.itemId == ItemBase.shears.id && !this.getSheared())
+        final ItemStack itemstack = entityplayer.inventory.getSelectedItem();
+        if (itemstack != null && itemstack.itemId == Item.SHEARS.id && !this.getSheared())
         {
-            if (!this.level.isServerSide)
+            if (!this.world.isRemote)
             {
                 if (this.getPuffed())
                 {
                     this.setPuffed(false);
-                    for (int i = 2 + this.rand.nextInt(3), j = 0; j < i; ++j)
+                    for (int i = 2 + this.random.nextInt(3), j = 0; j < i; ++j)
                     {
-                        final Item dropItem;
-                        final Item entityitem = dropItem = this.dropItem(new ItemInstance(BlockBase.WOOL.id, 1, this.getFleeceColor()), 1.0f);
-                        dropItem.velocityY += this.rand.nextFloat() * 0.05f;
-                        final Item item = entityitem;
-                        item.velocityX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
-                        final Item item2 = entityitem;
-                        item2.velocityZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
+                        final ItemEntity dropItem;
+                        final ItemEntity entityitem = dropItem = this.method_1327(new ItemStack(Block.WOOL.id, 1, this.getFleeceColor()), 1.0f);
+                        dropItem.velocityY += this.random.nextFloat() * 0.05f;
+                        final ItemEntity item = entityitem;
+                        item.velocityX += (this.random.nextFloat() - this.random.nextFloat()) * 0.1f;
+                        final ItemEntity item2 = entityitem;
+                        item2.velocityZ += (this.random.nextFloat() - this.random.nextFloat()) * 0.1f;
                     }
                 }
                 else
                 {
                     this.setSheared(true);
-                    for (int i = 2 + this.rand.nextInt(3), j = 0; j < i; ++j)
+                    for (int i = 2 + this.random.nextInt(3), j = 0; j < i; ++j)
                     {
-                        final Item dropItem2;
-                        final Item entityitem = dropItem2 = this.dropItem(new ItemInstance(BlockBase.WOOL.id, 1, this.getFleeceColor()), 1.0f);
-                        dropItem2.velocityY += this.rand.nextFloat() * 0.05f;
-                        final Item item3 = entityitem;
-                        item3.velocityX += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
-                        final Item item4 = entityitem;
-                        item4.velocityZ += (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1f;
+                        final ItemEntity dropItem2;
+                        final ItemEntity entityitem = dropItem2 = this.method_1327(new ItemStack(Block.WOOL.id, 1, this.getFleeceColor()), 1.0f);
+                        dropItem2.velocityY += this.random.nextFloat() * 0.05f;
+                        final ItemEntity item3 = entityitem;
+                        item3.velocityX += (this.random.nextFloat() - this.random.nextFloat()) * 0.1f;
+                        final ItemEntity item4 = entityitem;
+                        item4.velocityZ += (this.random.nextFloat() - this.random.nextFloat()) * 0.1f;
                     }
                 }
             }
-            itemstack.applyDamage(1, entityplayer);
+            itemstack.damage(1, entityplayer);
         }
-        if (itemstack != null && itemstack.itemId == ItemBase.dyePowder.id && !this.getSheared())
+        if (itemstack != null && itemstack.itemId == Item.DYE.id && !this.getSheared())
         {
-            final int colour = Wool.getColour(itemstack.getDamage());
+            final int colour = WoolBlock.method_1(itemstack.getDamage());
             if (this.getFleeceColor() != colour)
             {
                 if (this.getPuffed() && itemstack.count >= 2)
                 {
                     this.setFleeceColor(colour);
-                    final ItemInstance itemInstance = itemstack;
+                    final ItemStack itemInstance = itemstack;
                     itemInstance.count -= 2;
                 }
                 else if (!this.getPuffed())
                 {
                     this.setFleeceColor(colour);
-                    final ItemInstance itemInstance2 = itemstack;
+                    final ItemStack itemInstance2 = itemstack;
                     --itemInstance2.count;
                 }
             }
@@ -120,13 +120,13 @@ public class EntitySheepuff extends EntityAetherAnimal
     }
 
     @Override
-    protected void jump()
+    protected void method_944()
     {
         if (this.getPuffed())
         {
             this.velocityY = 1.8;
-            this.velocityX += this.rand.nextGaussian() * 0.5;
-            this.velocityZ += this.rand.nextGaussian() * 0.5;
+            this.velocityX += this.random.nextGaussian() * 0.5;
+            this.velocityZ += this.random.nextGaussian() * 0.5;
         }
         else
         {
@@ -140,20 +140,20 @@ public class EntitySheepuff extends EntityAetherAnimal
         super.tick();
         if (this.getPuffed())
         {
-            this.fallDistance = 0.0f;
+            this.field_1636 = 0.0f;
             if (this.velocityY < -0.05)
             {
                 this.velocityY = -0.05;
             }
         }
-        if (this.rand.nextInt(100) == 0)
+        if (this.random.nextInt(100) == 0)
         {
             final int x = MathHelper.floor(this.x);
             final int y = MathHelper.floor(this.y);
             final int z = MathHelper.floor(this.z);
-            if (this.level.getTileId(x, y - 1, z) == AetherBlocks.AETHER_GRASS_BLOCK.id)
+            if (this.world.getBlockId(x, y - 1, z) == AetherBlocks.AETHER_GRASS_BLOCK.id)
             {
-                this.level.setTile(x, y - 1, z, AetherBlocks.AETHER_DIRT.id);
+                this.world.setBlock(x, y - 1, z, AetherBlocks.AETHER_DIRT.id);
                 ++this.amountEaten;
             }
         }
@@ -171,37 +171,37 @@ public class EntitySheepuff extends EntityAetherAnimal
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Sheared", this.getSheared());
-        tag.put("Puffed", this.getPuffed());
-        tag.put("Color", (byte) this.getFleeceColor());
+        super.writeNbt(tag);
+        tag.putBoolean("Sheared", this.getSheared());
+        tag.putBoolean("Puffed", this.getPuffed());
+        tag.putByte("Color", (byte) this.getFleeceColor());
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.setSheared(tag.getBoolean("Sheared"));
         this.setPuffed(tag.getBoolean("Puffed"));
         this.setFleeceColor(tag.getByte("Color"));
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "mob.sheep";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.sheep";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.sheep";
     }
@@ -214,7 +214,7 @@ public class EntitySheepuff extends EntityAetherAnimal
     public void setFleeceColor(final int i)
     {
         final byte byte0 = this.dataTracker.getByte(16);
-        this.dataTracker.setInt(16, (byte) ((byte0 & 0xF0) | (i & 0xF)));
+        this.dataTracker.set(16, (byte) ((byte0 & 0xF0) | (i & 0xF)));
     }
 
     public boolean getSheared()
@@ -227,11 +227,11 @@ public class EntitySheepuff extends EntityAetherAnimal
         final byte byte0 = this.dataTracker.getByte(16);
         if (flag)
         {
-            this.dataTracker.setInt(16, (byte) (byte0 | 0x10));
+            this.dataTracker.set(16, (byte) (byte0 | 0x10));
         }
         else
         {
-            this.dataTracker.setInt(16, (byte) (byte0 & 0xFFFFFFEF));
+            this.dataTracker.set(16, (byte) (byte0 & 0xFFFFFFEF));
         }
     }
 
@@ -245,11 +245,11 @@ public class EntitySheepuff extends EntityAetherAnimal
         final byte byte0 = this.dataTracker.getByte(16);
         if (flag)
         {
-            this.dataTracker.setInt(16, (byte) (byte0 | 0x20));
+            this.dataTracker.set(16, (byte) (byte0 | 0x20));
         }
         else
         {
-            this.dataTracker.setInt(16, (byte) (byte0 & 0xFFFFFFDF));
+            this.dataTracker.set(16, (byte) (byte0 & 0xFFFFFFDF));
         }
     }
 

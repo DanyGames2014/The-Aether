@@ -1,24 +1,24 @@
 package com.gildedgames.aether.generator;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.block.BlockBase;
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Lake;
-import net.minecraft.level.structure.Mushroom;
-import net.minecraft.level.structure.Structure;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.block.Block;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.LakeFeature;
+import net.minecraft.world.gen.feature.PlantPatchFeature;
 
 import java.util.Random;
 
-public class AetherGenGumdrop extends Structure
+public class AetherGenGumdrop extends Feature
 {
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         return this.func_100009_a(level, rand, x, y, z, 24);
     }
 
-    public boolean func_100009_a(final Level world, final Random random, final int i, int j, final int k, final int l)
+    public boolean func_100009_a(final World world, final Random random, final int i, int j, final int k, final int l)
     {
         if (j - l <= 0)
         {
@@ -36,7 +36,7 @@ public class AetherGenGumdrop extends Structure
             {
                 for (int k3 = -j2; k3 <= j2; ++k3)
                 {
-                    if (!AetherBlocks.isGood(world.getTileId(k2 + i, l2 + j, k3 + k), world.getTileMeta(k2 + i, l2 + j, k3 + k)) && ++i2 > l / 2)
+                    if (!AetherBlocks.isGood(world.getBlockId(k2 + i, l2 + j, k3 + k), world.getBlockMeta(k2 + i, l2 + j, k3 + k)) && ++i2 > l / 2)
                     {
                         return false;
                     }
@@ -65,11 +65,11 @@ public class AetherGenGumdrop extends Structure
                     final int k5 = MathHelper.floor(i4 * (1.0 + l3 / (l * 10.0)) / f);
                     if (Math.sqrt((double) (k4 * k4 + i5 * i5 + k5 * k5)) <= l)
                     {
-                        if (AetherBlocks.isGood(world.getTileId(i3 + i, l3 + j + 1, i4 + k), world.getTileMeta(i3 + i, l3 + j + 1, i4 + k)) && l3 > (double) MathHelper.floor(l / 5.0))
+                        if (AetherBlocks.isGood(world.getBlockId(i3 + i, l3 + j + 1, i4 + k), world.getBlockMeta(i3 + i, l3 + j + 1, i4 + k)) && l3 > (double) MathHelper.floor(l / 5.0))
                         {
-                            world.setTileInChunk(i3 + i, l3 + j, i4 + k, AetherBlocks.AETHER_GRASS_BLOCK.id);
-                            world.setTileInChunk(i3 + i, l3 + j - 1, i4 + k, AetherBlocks.AETHER_DIRT.id);
-                            world.setTileInChunk(i3 + i, l3 + j - (1 + random.nextInt(2)), i4 + k, AetherBlocks.AETHER_DIRT.id);
+                            world.method_200(i3 + i, l3 + j, i4 + k, AetherBlocks.AETHER_GRASS_BLOCK.id);
+                            world.method_200(i3 + i, l3 + j - 1, i4 + k, AetherBlocks.AETHER_DIRT.id);
+                            world.method_200(i3 + i, l3 + j - (1 + random.nextInt(2)), i4 + k, AetherBlocks.AETHER_DIRT.id);
                             if (l3 >= l / 2)
                             {
                                 final int j3 = random.nextInt(48);
@@ -81,25 +81,25 @@ public class AetherGenGumdrop extends Structure
                                 {
                                     if (random.nextInt(2) == 0)
                                     {
-                                        new Lake(BlockBase.STILL_WATER.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j, i4 + k + random.nextInt(3) - random.nextInt(3));
+                                        new LakeFeature(Block.WATER.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j, i4 + k + random.nextInt(3) - random.nextInt(3));
                                     }
                                 }
                                 else if (j3 == 4)
                                 {
                                     if (random.nextInt(2) == 0)
                                     {
-                                        new Mushroom(BlockBase.DANDELION.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j + 1, i4 + k + random.nextInt(3) - random.nextInt(3));
+                                        new PlantPatchFeature(Block.DANDELION.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j + 1, i4 + k + random.nextInt(3) - random.nextInt(3));
                                     }
                                     else
                                     {
-                                        new Mushroom(BlockBase.ROSE.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j + 1, i4 + k + random.nextInt(3) - random.nextInt(3));
+                                        new PlantPatchFeature(Block.ROSE.id).generate(world, random, i3 + i + random.nextInt(3) - random.nextInt(3), l3 + j + 1, i4 + k + random.nextInt(3) - random.nextInt(3));
                                     }
                                 }
                             }
                         }
-                        else if (AetherBlocks.isGood(world.getTileId(i3 + i, l3 + j, i4 + k), world.getTileMeta(i3 + i, l3 + j, i4 + k)))
+                        else if (AetherBlocks.isGood(world.getBlockId(i3 + i, l3 + j, i4 + k), world.getBlockMeta(i3 + i, l3 + j, i4 + k)))
                         {
-                            world.setTileWithMetadata(i3 + i, l3 + j, i4 + k, AetherBlocks.HOLYSTONE.id, 0);
+                            world.method_154(i3 + i, l3 + j, i4 + k, AetherBlocks.HOLYSTONE.id, 0);
                         }
                     }
                 }
@@ -128,7 +128,7 @@ public class AetherGenGumdrop extends Structure
         return true;
     }
 
-    public boolean func_100008_b(final Level world, final Random random, final int i, int j, final int k, final int l, final boolean flag)
+    public boolean func_100008_b(final World world, final Random random, final int i, int j, final int k, final int l, final boolean flag)
     {
         if (j - l <= 0)
         {
@@ -160,11 +160,11 @@ public class AetherGenGumdrop extends Structure
                     final int k4 = MathHelper.floor(i3 / (double) f);
                     if (Math.sqrt((double) (k3 * k3 + i4 * i4 + k4 * k4)) <= l)
                     {
-                        if (AetherBlocks.isGood(world.getTileId(i2 + i, k2 + j + 1, i3 + k), world.getTileMeta(i2 + i, k2 + j + 1, i3 + k)) && k2 > (double) MathHelper.floor(l / 5.0))
+                        if (AetherBlocks.isGood(world.getBlockId(i2 + i, k2 + j + 1, i3 + k), world.getBlockMeta(i2 + i, k2 + j + 1, i3 + k)) && k2 > (double) MathHelper.floor(l / 5.0))
                         {
-                            world.setTileInChunk(i2 + i, k2 + j, i3 + k, AetherBlocks.AETHER_GRASS_BLOCK.id);
-                            world.setTileInChunk(i2 + i, k2 + j - 1, i3 + k, AetherBlocks.AETHER_DIRT.id);
-                            world.setTileInChunk(i2 + i, k2 + j - (1 + random.nextInt(2)), i3 + k, AetherBlocks.AETHER_DIRT.id);
+                            world.method_200(i2 + i, k2 + j, i3 + k, AetherBlocks.AETHER_GRASS_BLOCK.id);
+                            world.method_200(i2 + i, k2 + j - 1, i3 + k, AetherBlocks.AETHER_DIRT.id);
+                            world.method_200(i2 + i, k2 + j - (1 + random.nextInt(2)), i3 + k, AetherBlocks.AETHER_DIRT.id);
                             if (k2 >= l / 2)
                             {
                                 final int l2 = random.nextInt(64);
@@ -174,13 +174,13 @@ public class AetherGenGumdrop extends Structure
                                 }
                                 else if (l2 == 5 && random.nextInt(3) == 0)
                                 {
-                                    new Lake(BlockBase.STILL_WATER.id).generate(world, random, i2 + i + random.nextInt(3) - random.nextInt(3), k2 + j, i3 + k + random.nextInt(3) - random.nextInt(3));
+                                    new LakeFeature(Block.WATER.id).generate(world, random, i2 + i + random.nextInt(3) - random.nextInt(3), k2 + j, i3 + k + random.nextInt(3) - random.nextInt(3));
                                 }
                             }
                         }
-                        else if (AetherBlocks.isGood(world.getTileId(i2 + i, k2 + j, i3 + k), world.getTileMeta(i2 + i, k2 + j, i3 + k)))
+                        else if (AetherBlocks.isGood(world.getBlockId(i2 + i, k2 + j, i3 + k), world.getBlockMeta(i2 + i, k2 + j, i3 + k)))
                         {
-                            world.setTileWithMetadata(i2 + i, k2 + j, i3 + k, AetherBlocks.HOLYSTONE.id, 0);
+                            world.method_154(i2 + i, k2 + j, i3 + k, AetherBlocks.HOLYSTONE.id, 0);
                         }
                     }
                 }

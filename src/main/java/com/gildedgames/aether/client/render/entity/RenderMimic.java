@@ -3,7 +3,7 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.client.render.model.ModelMimic;
 import com.gildedgames.aether.entity.mobs.EntityMimic;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.EntityBase;
+import net.minecraft.entity.Entity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderMimic extends EntityRenderer
@@ -29,7 +29,7 @@ public class RenderMimic extends EntityRenderer
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.render((EntityMimic) entity, x, y, z, f, f1);
     }

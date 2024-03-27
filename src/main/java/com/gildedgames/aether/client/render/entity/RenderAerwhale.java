@@ -2,13 +2,13 @@ package com.gildedgames.aether.client.render.entity;
 
 import com.gildedgames.aether.client.render.model.ModelAerwhale;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelBase;
-import net.minecraft.entity.EntityBase;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.entity.Entity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderAerwhale extends EntityRenderer
 {
-    private EntityModelBase model;
+    private EntityModel model;
 
     public RenderAerwhale()
     {
@@ -16,7 +16,7 @@ public class RenderAerwhale extends EntityRenderer
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         GL11.glPushMatrix();
         this.bindTexture("aether:textures/entity/Aerwhale.png");

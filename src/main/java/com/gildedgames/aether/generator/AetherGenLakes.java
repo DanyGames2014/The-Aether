@@ -1,15 +1,15 @@
 package com.gildedgames.aether.generator;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.block.BlockBase;
-import net.minecraft.block.material.Material;
-import net.minecraft.level.Level;
-import net.minecraft.level.LightType;
-import net.minecraft.level.structure.Structure;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.world.LightType;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenLakes extends Structure
+public class AetherGenLakes extends Feature
 {
     private int field_15235_a;
 
@@ -19,9 +19,9 @@ public class AetherGenLakes extends Structure
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, int x, int y, int z)
+    public boolean generate(final World level, final Random rand, int x, int y, int z)
     {
-        for (x -= 8, z -= 8; y > 0 && level.isAir(x, y, z); --y)
+        for (x -= 8, z -= 8; y > 0 && level.method_234(x, y, z); --y)
         {
         }
         y -= 4;
@@ -61,12 +61,12 @@ public class AetherGenLakes extends Structure
                     final boolean flag = !aflag[(j5 * 16 + j6) * 8 + j7] && ((j5 < 15 && aflag[((j5 + 1) * 16 + j6) * 8 + j7]) || (j5 > 0 && aflag[((j5 - 1) * 16 + j6) * 8 + j7]) || (j6 < 15 && aflag[(j5 * 16 + (j6 + 1)) * 8 + j7]) || (j6 > 0 && aflag[(j5 * 16 + (j6 - 1)) * 8 + j7]) || (j7 < 7 && aflag[(j5 * 16 + j6) * 8 + (j7 + 1)]) || (j7 > 0 && aflag[(j5 * 16 + j6) * 8 + (j7 - 1)]));
                     if (flag)
                     {
-                        final Material material = level.getMaterial(x + j5, y + j7, z + j6);
-                        if (j7 >= 4 && material.isLiquid())
+                        final Material material = level.method_1779(x + j5, y + j7, z + j6);
+                        if (j7 >= 4 && material.method_893())
                         {
                             return false;
                         }
-                        if (j7 < 4 && !material.isSolid() && level.getTileId(x + j5, y + j7, z + j6) != this.field_15235_a)
+                        if (j7 < 4 && !material.method_905() && level.getBlockId(x + j5, y + j7, z + j6) != this.field_15235_a)
                         {
                             return false;
                         }
@@ -82,7 +82,7 @@ public class AetherGenLakes extends Structure
                 {
                     if (aflag[(k5 * 16 + k6) * 8 + k7])
                     {
-                        level.setTileInChunk(x + k5, y + k7, z + k6, (k7 < 4) ? this.field_15235_a : 0);
+                        level.method_200(x + k5, y + k7, z + k6, (k7 < 4) ? this.field_15235_a : 0);
                     }
                 }
             }
@@ -94,14 +94,14 @@ public class AetherGenLakes extends Structure
                 for (int l5 = 4; l5 < 8; ++l5)
                 {
                     // field_2757 is SKY
-                    if (aflag[(l3 * 16 + l4) * 8 + l5] && level.getTileId(x + l3, y + l5 - 1, z + l4) == AetherBlocks.AETHER_DIRT.id && level.method_164(LightType.field_2757, x + l3, y + l5, z + l4) > 0)
+                    if (aflag[(l3 * 16 + l4) * 8 + l5] && level.getBlockId(x + l3, y + l5 - 1, z + l4) == AetherBlocks.AETHER_DIRT.id && level.method_164(LightType.SKY, x + l3, y + l5, z + l4) > 0)
                     {
-                        level.setTileInChunk(x + l3, y + l5 - 1, z + l4, AetherBlocks.AETHER_GRASS_BLOCK.id);
+                        level.method_200(x + l3, y + l5 - 1, z + l4, AetherBlocks.AETHER_GRASS_BLOCK.id);
                     }
                 }
             }
         }
-        if (BlockBase.BY_ID[this.field_15235_a].material == Material.LAVA)
+        if (Block.BLOCKS[this.field_15235_a].material == Material.LAVA)
         {
             for (int i2 = 0; i2 < 16; ++i2)
             {
@@ -110,9 +110,9 @@ public class AetherGenLakes extends Structure
                     for (int i4 = 0; i4 < 8; ++i4)
                     {
                         final boolean flag2 = !aflag[(i2 * 16 + i3) * 8 + i4] && ((i2 < 15 && aflag[((i2 + 1) * 16 + i3) * 8 + i4]) || (i2 > 0 && aflag[((i2 - 1) * 16 + i3) * 8 + i4]) || (i3 < 15 && aflag[(i2 * 16 + (i3 + 1)) * 8 + i4]) || (i3 > 0 && aflag[(i2 * 16 + (i3 - 1)) * 8 + i4]) || (i4 < 7 && aflag[(i2 * 16 + i3) * 8 + (i4 + 1)]) || (i4 > 0 && aflag[(i2 * 16 + i3) * 8 + (i4 - 1)]));
-                        if (flag2 && (i4 < 4 || rand.nextInt(2) != 0) && level.getMaterial(x + i2, y + i4, z + i3).isSolid())
+                        if (flag2 && (i4 < 4 || rand.nextInt(2) != 0) && level.method_1779(x + i2, y + i4, z + i3).method_905())
                         {
-                            level.setTileWithMetadata(x + i2, y + i4, z + i3, AetherBlocks.HOLYSTONE.id, 0);
+                            level.method_154(x + i2, y + i4, z + i3, AetherBlocks.HOLYSTONE.id, 0);
                         }
                     }
                 }

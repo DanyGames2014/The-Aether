@@ -5,28 +5,28 @@ import com.gildedgames.aether.entity.projectile.EntityDartGolden;
 import com.gildedgames.aether.entity.projectile.EntityDartPoison;
 import com.gildedgames.aether.event.listener.TextureListener;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.inventory.InventoryBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemDartShooter extends TemplateItemBase
+public class ItemDartShooter extends TemplateItem
 {
 
 
     public ItemDartShooter(final @NotNull Identifier identifier)
     {
         super(identifier);
-        this.setHasSubItems(true);
-        this.maxStackSize = 1;
+        this.setHasSubtypes(true);
+        this.maxCount = 1;
     }
 
     @Override
-    public int getTexturePosition(final int damage)
+    public int getTextureId(final int damage)
     {
         if (damage == 0)
         {
@@ -44,7 +44,7 @@ public class ItemDartShooter extends TemplateItemBase
     }
 
     @Override
-    public String getTranslationKey(final ItemInstance item)
+    public String getTranslationKey(final ItemStack item)
     {
         int i = item.getDamage();
         if (i > 2)
@@ -55,13 +55,13 @@ public class ItemDartShooter extends TemplateItemBase
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
         final int consume = this.consumeItem(player, AetherItems.Dart.id, item.getDamage());
         if (consume != -1)
         {
-            level.playSound((EntityBase) player, "aether:aether.sound.other.dartshooter.shootdart", 2.0f, 1.0f / (ItemDartShooter.rand.nextFloat() * 0.4f + 0.8f));
-            if (!level.isServerSide)
+            level.playSound((Entity) player, "aether:aether.sound.other.dartshooter.shootdart", 2.0f, 1.0f / (ItemDartShooter.random.nextFloat() * 0.4f + 0.8f));
+            if (!level.isRemote)
             {
                 EntityDartGolden dart = null;
                 switch (consume)
@@ -73,30 +73,30 @@ public class ItemDartShooter extends TemplateItemBase
                     default:
                         dart = new EntityDartGolden(level, player);
                 }
-                level.spawnEntity(dart);
+                level.method_210(dart);
             }
         }
         return item;
     }
 
-    private int consumeItem(final PlayerBase player, final int itemID, final int maxDamage)
+    private int consumeItem(final PlayerEntity player, final int itemID, final int maxDamage)
     {
-        final InventoryBase inv = player.inventory;
-        for (int i = 0; i < inv.getInventorySize(); ++i)
+        final Inventory inv = player.inventory;
+        for (int i = 0; i < inv.size(); ++i)
         {
-            ItemInstance stack = inv.getInventoryItem(i);
+            ItemStack stack = inv.getStack(i);
             if (stack != null)
             {
                 final int damage = stack.getDamage();
                 if (stack.itemId == itemID && stack.getDamage() == maxDamage)
                 {
-                    final ItemInstance itemInstance = stack;
+                    final ItemStack itemInstance = stack;
                     --itemInstance.count;
                     if (stack.count == 0)
                     {
                         stack = null;
                     }
-                    inv.setInventoryItem(i, stack);
+                    inv.setStack(i, stack);
                     return damage;
                 }
             }

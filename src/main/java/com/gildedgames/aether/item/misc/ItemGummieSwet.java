@@ -1,9 +1,9 @@
 package com.gildedgames.aether.item.misc;
 
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemGummieSwet extends ItemAether
@@ -15,18 +15,18 @@ public class ItemGummieSwet extends ItemAether
     public ItemGummieSwet(final @NotNull Identifier identifier)
     {
         super(identifier);
-        this.maxStackSize = 64;
+        this.maxCount = 64;
         this.damZero = false;
         this.damOne = false;
         this.healAmount = 20;
-        this.setHasSubItems(true);
+        this.setHasSubtypes(true);
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
         --item.count;
-        player.addHealth(this.healAmount);
+        player.method_939(this.healAmount);
         return item;
     }
 
@@ -36,7 +36,7 @@ public class ItemGummieSwet extends ItemAether
     }
 
     @Override
-    public int getColourMultiplier(final int damage)
+    public int method_440(final int damage)
     {
         if (damage == 1)
         {
@@ -46,7 +46,7 @@ public class ItemGummieSwet extends ItemAether
     }
 
     @Override
-    public String getTranslationKey(final ItemInstance item)
+    public String getTranslationKey(final ItemStack item)
     {
         int i = item.getDamage();
         if (i > 1)

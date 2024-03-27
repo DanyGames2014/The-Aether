@@ -3,38 +3,38 @@ package com.gildedgames.aether.entity.projectile;
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.block.BlockFloating;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.FallingBlock;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 import java.util.List;
 
-public class EntityFloatingBlock extends EntityBase implements MobSpawnDataProvider
+public class EntityFloatingBlock extends Entity implements MobSpawnDataProvider
 {
     public int blockID;
     public int metadata;
     public int flytime;
 
-    public EntityFloatingBlock(final Level level)
+    public EntityFloatingBlock(final World level)
     {
         super(level);
         this.flytime = 0;
     }
 
-    public EntityFloatingBlock(final Level world, final double d, final double d1, final double d2, final int i, final int j)
+    public EntityFloatingBlock(final World world, final double d, final double d1, final double d2, final int i, final int j)
     {
         super(world);
         this.flytime = 0;
         this.blockID = i;
         this.metadata = j;
         this.field_1593 = true;
-        this.setSize(0.98f, 0.98f);
-        this.standingEyeHeight = this.height / 2.0f;
-        this.setPosition(d, d1, d2);
+        this.setBoundingBoxSpacing(0.98f, 0.98f);
+        this.eyeHeight = this.spacingY / 2.0f;
+        this.method_1340(d, d1, d2);
         this.velocityX = 0.0;
         this.velocityY = 0.0;
         this.velocityZ = 0.0;
@@ -43,13 +43,13 @@ public class EntityFloatingBlock extends EntityBase implements MobSpawnDataProvi
         this.prevZ = d2;
     }
 
-    public EntityFloatingBlock(final Level world, final double d, final double d1, final double d2, final int i)
+    public EntityFloatingBlock(final World world, final double d, final double d1, final double d2, final int i)
     {
         this(world, d, d1, d2, i, 0);
     }
 
     @Override
-    protected boolean canClimb()
+    protected boolean bypassesSteppingEffects()
     {
         return false;
     }
@@ -62,7 +62,7 @@ public class EntityFloatingBlock extends EntityBase implements MobSpawnDataProvi
     @Override
     public boolean method_1356()
     {
-        return !this.removed;
+        return !this.dead;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class EntityFloatingBlock extends EntityBase implements MobSpawnDataProvi
     {
         if (this.blockID == 0)
         {
-            this.remove();
+            this.markDead();
             return;
         }
         this.prevX = this.x;
@@ -85,56 +85,56 @@ public class EntityFloatingBlock extends EntityBase implements MobSpawnDataProvi
         final int i = MathHelper.floor(this.x);
         final int j = MathHelper.floor(this.y);
         final int k = MathHelper.floor(this.z);
-        if (this.level.getTileId(i, j, k) == this.blockID || (this.level.getTileId(i, j, k) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.blockID == AetherBlocks.AETHER_DIRT.id))
+        if (this.world.getBlockId(i, j, k) == this.blockID || (this.world.getBlockId(i, j, k) == AetherBlocks.AETHER_GRASS_BLOCK.id && this.blockID == AetherBlocks.AETHER_DIRT.id))
         {
-            this.level.setTile(i, j, k, 0);
+            this.world.setBlock(i, j, k, 0);
         }
-        final List list = this.level.getEntities(this, this.boundingBox.expand(0.0, 1.0, 0.0));
+        final List list = this.world.getEntities(this, this.boundingBox.expand(0.0, 1.0, 0.0));
         for (int n = 0; n < list.size(); ++n)
         {
-            if (list.get(n) instanceof FallingBlock && this.level.canPlaceTile(this.blockID, i, j, k, true, 1))
+            if (list.get(n) instanceof FallingBlockEntity && this.world.method_156(this.blockID, i, j, k, true, 1))
             {
-                this.level.placeBlockWithMetaData(i, j, k, this.blockID, this.metadata);
-                this.remove();
+                this.world.method_201(i, j, k, this.blockID, this.metadata);
+                this.markDead();
             }
         }
-        if (this.field_1625 && !this.onGround)
+        if (this.field_1625 && !this.field_1623)
         {
             this.velocityX *= 0.699999988079071;
             this.velocityZ *= 0.699999988079071;
             this.velocityY *= -0.5;
-            this.remove();
-            if ((!this.level.canPlaceTile(this.blockID, i, j, k, true, 1) || BlockFloating.canFallAbove(this.level, i, j + 1, k) || !this.level.placeBlockWithMetaData(i, j, k, this.blockID, this.metadata)) && !this.level.isServerSide)
+            this.markDead();
+            if ((!this.world.method_156(this.blockID, i, j, k, true, 1) || BlockFloating.canFallAbove(this.world, i, j + 1, k) || !this.world.method_201(i, j, k, this.blockID, this.metadata)) && !this.world.isRemote)
             {
             }
         }
-        else if (this.flytime > 100 && !this.level.isServerSide)
+        else if (this.flytime > 100 && !this.world.isRemote)
         {
-            this.remove();
+            this.markDead();
         }
     }
 
     @Override
-    protected void writeCustomDataToTag(final CompoundTag tag)
+    protected void writeNbt(final NbtCompound tag)
     {
-        tag.put("Tile", (byte) this.blockID);
+        tag.putByte("Tile", (byte) this.blockID);
     }
 
     @Override
-    protected void readCustomDataFromTag(final CompoundTag tag)
+    protected void readNbt(final NbtCompound tag)
     {
         this.blockID = (tag.getByte("Tile") & 0xFF);
     }
 
     @Override
-    public float getEyeHeight()
+    public float method_1366()
     {
         return 0.0f;
     }
 
-    public Level getWorld()
+    public World getWorld()
     {
-        return this.level;
+        return this.world;
     }
 
     @Override

@@ -2,12 +2,12 @@ package com.gildedgames.aether;
 
 import com.gildedgames.aether.player.AetherPlayerHandler;
 import net.minecraft.achievement.Achievement;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
 import net.modificationstation.stationapi.api.mod.entrypoint.EventBusPolicy;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.registry.ModID;
+import net.modificationstation.stationapi.api.util.Identifier;
+import net.modificationstation.stationapi.api.util.Namespace;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.impl.entity.player.PlayerAPI;
 
@@ -15,27 +15,27 @@ import net.modificationstation.stationapi.impl.entity.player.PlayerAPI;
 public class AetherMod
 {
 
-    @Entrypoint.ModID
-    public static final ModID MODID = Null.get();
+    @Entrypoint.Namespace
+    public static final Namespace MODID = Null.get();
 
     public static Identifier of(String id)
     {
         return Identifier.of(MODID, id);
     }
 
-    public static AetherPlayerHandler getPlayerHandler(PlayerBase player)
+    public static AetherPlayerHandler getPlayerHandler(PlayerEntity player)
     {
         return (AetherPlayerHandler) PlayerAPI.getPlayerHandler(player, com.gildedgames.aether.player.AetherPlayerHandler.class);
     }
 
-    public static EntityBase currentBoss;
+    public static Entity currentBoss;
 
     public static void giveAchievement(final Achievement a)
     {
         //giveAchievement(a, MinecraftClientAccessor.getMCinstance().player);
     }
 
-    public static void giveAchievement(final Achievement a, final PlayerBase p)
+    public static void giveAchievement(final Achievement a, final PlayerEntity p)
     {
         /* todo: play sound
         if (MinecraftClientAccessor.getMCinstance().statFileWriter.isAchievementUnlocked(a)) {

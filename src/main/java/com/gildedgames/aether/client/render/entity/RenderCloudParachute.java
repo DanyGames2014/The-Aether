@@ -2,19 +2,19 @@ package com.gildedgames.aether.client.render.entity;
 
 import com.gildedgames.aether.entity.EntityCloudParachute;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.client.render.block.BlockRenderer;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 public class RenderCloudParachute extends EntityRenderer
 {
-    private BlockRenderer renderBlocks;
+    private BlockRenderManager renderBlocks;
 
     public RenderCloudParachute()
     {
-        this.renderBlocks = new BlockRenderer();
+        this.renderBlocks = new BlockRenderManager();
         this.field_2678 = 0.5f;
     }
 
@@ -31,7 +31,7 @@ public class RenderCloudParachute extends EntityRenderer
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.renderCloud((EntityCloudParachute) entity, x, y, z, f, f1);
     }

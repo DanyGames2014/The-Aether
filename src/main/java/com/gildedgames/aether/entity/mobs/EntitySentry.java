@@ -3,12 +3,12 @@ package com.gildedgames.aether.entity.mobs;
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.entity.base.EntityDungeonMob;
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class EntitySentry extends EntityDungeonMob
 {
@@ -20,56 +20,56 @@ public class EntitySentry extends EntityDungeonMob
     public int lostyou;
     public boolean active;
 
-    public EntitySentry(final Level level)
+    public EntitySentry(final World level)
     {
         super(level);
         this.texture = "aether:textures/entity/Sentry.png";
         this.size = 2;
-        this.standingEyeHeight = 0.0f;
+        this.eyeHeight = 0.0f;
         this.movementSpeed = 1.0f;
         this.field_100021_a = 1.0f;
         this.field_100020_b = 1.0f;
-        this.jcount = this.rand.nextInt(20) + 10;
+        this.jcount = this.random.nextInt(20) + 10;
         this.func_100019_e(this.size);
     }
 
-    public EntitySentry(final Level world, final double x, final double y, final double z)
+    public EntitySentry(final World world, final double x, final double y, final double z)
     {
         super(world);
         this.texture = "aether:textures/entity/Sentry.png";
         this.size = 2;
-        this.standingEyeHeight = 0.0f;
+        this.eyeHeight = 0.0f;
         this.movementSpeed = 1.0f;
         this.field_100021_a = 1.0f;
         this.field_100020_b = 1.0f;
-        this.jcount = this.rand.nextInt(20) + 10;
+        this.jcount = this.random.nextInt(20) + 10;
         this.func_100019_e(this.size);
-        this.yaw = this.rand.nextInt(4) * 1.5707965f;
-        this.setPosition(x, y, z);
+        this.yaw = this.random.nextInt(4) * 1.5707965f;
+        this.method_1340(x, y, z);
     }
 
     public void func_100019_e(final int i)
     {
         this.health = 10;
-        this.width = 0.85f;
-        this.height = 0.85f;
-        this.setPosition(this.x, this.y, this.z);
+        this.spacingXZ = 0.85f;
+        this.spacingY = 0.85f;
+        this.method_1340(this.x, this.y, this.z);
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Size", this.size - 1);
-        tag.put("LostYou", this.lostyou);
-        tag.put("Counter", this.counter);
-        tag.put("Active", this.active);
+        super.writeNbt(tag);
+        tag.putInt("Size", this.size - 1);
+        tag.putInt("LostYou", this.lostyou);
+        tag.putInt("Counter", this.counter);
+        tag.putBoolean("Active", this.active);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.size = tag.getInt("Size") + 1;
         this.lostyou = tag.getInt("LostYou");
         this.counter = tag.getInt("Counter");
@@ -79,40 +79,40 @@ public class EntitySentry extends EntityDungeonMob
     @Override
     public void tick()
     {
-        final boolean flag = this.onGround;
+        final boolean flag = this.field_1623;
         super.tick();
-        if (this.onGround && !flag)
+        if (this.field_1623 && !flag)
         {
-            this.level.playSound((EntityBase) this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) / 0.8f);
+            this.world.playSound((Entity) this, "mob.slime", this.method_915(), ((this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f) / 0.8f);
         }
-        else if (!this.onGround && flag && this.entity != null)
+        else if (!this.field_1623 && flag && this.target != null)
         {
             this.velocityX *= 3.0;
             this.velocityZ *= 3.0;
         }
-        if (this.entity != null && this.entity.removed)
+        if (this.target != null && this.target.dead)
         {
-            this.entity = null;
+            this.target = null;
         }
     }
 
-    public void remove()
+    public void markDead()
     {
-        if (this.health <= 0 || this.removed)
+        if (this.health <= 0 || this.dead)
         {
-            super.remove();
+            super.markDead();
         }
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
         final boolean flag = super.damage(target, amount);
-        if (flag && target instanceof Living)
+        if (flag && target instanceof LivingEntity)
         {
             this.active = true;
             this.lostyou = 0;
-            this.entity = target;
+            this.target = target;
             this.texture = "aether:textures/entity/SentryLit.png";
         }
         return flag;
@@ -122,9 +122,9 @@ public class EntitySentry extends EntityDungeonMob
     {
         this.counter = -64;
         this.active = false;
-        this.entity = null;
+        this.target = null;
         this.texture = "aether:textures/entity/Sentry.png";
-        this.setTarget(null);
+        this.method_635(null);
         this.field_1060 = 0.0f;
         this.field_1029 = 0.0f;
         this.jumping = false;
@@ -132,13 +132,13 @@ public class EntitySentry extends EntityDungeonMob
         this.velocityZ = 0.0;
     }
 
-    public void method_1353(final EntityBase entity)
+    public void method_1353(final Entity entity)
     {
-        if (!this.removed && this.entity != null && entity != null && this.entity == entity)
+        if (!this.dead && this.target != null && entity != null && this.target == entity)
         {
-            this.level.createExplosion(this, this.x, this.y, this.z, 0.1f);
+            this.world.method_187(this, this.x, this.y, this.z, 0.1f);
             entity.damage(null, 2);
-            if (entity instanceof Living entityliving)
+            if (entity instanceof LivingEntity entityliving)
             {
                 double d;
                 double d2;
@@ -153,27 +153,27 @@ public class EntitySentry extends EntityDungeonMob
             final float f = 0.01745329f;
             for (int i = 0; i < 40; ++i)
             {
-                final double d3 = (float) this.x + this.rand.nextFloat() * 0.25f;
+                final double d3 = (float) this.x + this.random.nextFloat() * 0.25f;
                 final double d4 = (float) this.y + 0.5f;
-                final double d5 = (float) this.z + this.rand.nextFloat() * 0.25f;
-                final float f2 = this.rand.nextFloat() * 360.0f;
-                this.level.addParticle("explode", d3, d4, d5, -Math.sin(f * f2) * 0.75, 0.125, Math.cos(f * f2) * 0.75);
+                final double d5 = (float) this.z + this.random.nextFloat() * 0.25f;
+                final float f2 = this.random.nextFloat() * 360.0f;
+                this.world.addParticle("explode", d3, d4, d5, -Math.sin(f * f2) * 0.75, 0.125, Math.cos(f * f2) * 0.75);
             }
             this.health = 0;
-            this.remove();
+            this.markDead();
         }
     }
 
     @Override
-    protected void tickHandSwing()
+    protected void method_910()
     {
-        final PlayerBase entityplayer = this.level.getClosestPlayerTo(this, 8.0);
+        final PlayerEntity entityplayer = this.world.method_186(this, 8.0);
         if (!this.active && this.counter >= 8)
         {
             if (entityplayer != null && this.method_928(entityplayer))
             {
                 this.method_924(entityplayer, 10.0f, 10.0f);
-                this.entity = entityplayer;
+                this.target = entityplayer;
                 this.active = true;
                 this.lostyou = 0;
                 this.texture = "aether:textures/entity/SentryLit.png";
@@ -182,11 +182,11 @@ public class EntitySentry extends EntityDungeonMob
         }
         else if (this.active && this.counter >= 8)
         {
-            if (this.entity == null)
+            if (this.target == null)
             {
                 if (entityplayer != null && this.method_928(entityplayer))
                 {
-                    this.entity = entityplayer;
+                    this.target = entityplayer;
                     this.active = true;
                     this.lostyou = 0;
                 }
@@ -199,7 +199,7 @@ public class EntitySentry extends EntityDungeonMob
                     }
                 }
             }
-            else if (!this.method_928(this.entity) || this.distanceTo(this.entity) >= 16.0f)
+            else if (!this.method_928(this.target) || this.method_1351(this.target) >= 16.0f)
             {
                 ++this.lostyou;
                 if (this.lostyou >= 4)
@@ -221,18 +221,18 @@ public class EntitySentry extends EntityDungeonMob
         {
             return;
         }
-        if (this.entity != null)
+        if (this.target != null)
         {
-            this.method_924(this.entity, 10.0f, 10.0f);
+            this.method_924(this.target, 10.0f, 10.0f);
         }
-        if (this.onGround && this.jcount-- <= 0)
+        if (this.field_1623 && this.jcount-- <= 0)
         {
-            this.jcount = this.rand.nextInt(20) + 10;
+            this.jcount = this.random.nextInt(20) + 10;
             this.jumping = true;
-            this.field_1060 = 0.5f - this.rand.nextFloat();
+            this.field_1060 = 0.5f - this.random.nextFloat();
             this.field_1029 = 1.0f;
-            this.level.playSound(this, "mob.slime", this.getSoundVolume(), ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f) * 0.8f);
-            if (this.entity != null)
+            this.world.playSound(this, "mob.slime", this.method_915(), ((this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f) * 0.8f);
+            if (this.target != null)
             {
                 this.jcount /= 2;
                 this.field_1029 = 1.0f;
@@ -241,7 +241,7 @@ public class EntitySentry extends EntityDungeonMob
         else
         {
             this.jumping = false;
-            if (this.onGround)
+            if (this.field_1623)
             {
                 final float n = 0.0f;
                 this.field_1029 = n;
@@ -251,13 +251,13 @@ public class EntitySentry extends EntityDungeonMob
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.slime";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.slime";
     }
@@ -269,15 +269,15 @@ public class EntitySentry extends EntityDungeonMob
     }
 
     @Override
-    protected float getSoundVolume()
+    protected float method_915()
     {
         return 0.6f;
     }
 
     @Override
-    protected int getMobDrops()
+    protected int method_914()
     {
-        if (this.rand.nextInt(5) == 0)
+        if (this.random.nextInt(5) == 0)
         {
             return AetherBlocks.LIGHT_DUNGEON_STONE.id;
         }

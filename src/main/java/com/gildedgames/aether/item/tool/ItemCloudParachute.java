@@ -2,26 +2,26 @@ package com.gildedgames.aether.item.tool;
 
 import com.gildedgames.aether.entity.EntityCloudParachute;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemCloudParachute extends TemplateItemBase
+public class ItemCloudParachute extends TemplateItem
 {
 
     public ItemCloudParachute(final @NotNull Identifier identifier, boolean isGolden)
     {
         super(identifier);
-        this.maxStackSize = 1;
-        this.setDurability(isGolden ? 20 : 0);
+        this.maxCount = 1;
+        this.setMaxDamage(isGolden ? 20 : 0);
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
         if (EntityCloudParachute.entityHasRoomForCloud(level, player))
         {
@@ -31,23 +31,23 @@ public class ItemCloudParachute extends TemplateItemBase
             }
             if (this.id == AetherItems.CloudParachuteGold.id)
             {
-                item.applyDamage(1, player);
+                item.damage(1, player);
             }
             else
             {
                 --item.count;
             }
-            level.playSound((EntityBase) player, "cloud", 1.0f, 1.0f / (ItemCloudParachute.rand.nextFloat() * 0.1f + 0.95f));
-            if (!level.isServerSide)
+            level.playSound((Entity) player, "cloud", 1.0f, 1.0f / (ItemCloudParachute.random.nextFloat() * 0.1f + 0.95f));
+            if (!level.isRemote)
             {
-                level.spawnEntity(new EntityCloudParachute(level, player, this.id == AetherItems.CloudParachuteGold.id));
+                level.method_210(new EntityCloudParachute(level, player, this.id == AetherItems.CloudParachuteGold.id));
             }
         }
         return item;
     }
 
     @Override
-    public int getColourMultiplier(final int i)
+    public int method_440(final int i)
     {
         if (this.id == AetherItems.CloudParachuteGold.id)
         {

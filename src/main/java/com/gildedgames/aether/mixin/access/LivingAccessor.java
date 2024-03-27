@@ -1,11 +1,11 @@
 package com.gildedgames.aether.mixin.access;
 
-import net.minecraft.entity.Living;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(Living.class)
+@Mixin(LivingEntity.class)
 public interface LivingAccessor
 {
     @Accessor("field_1029")
@@ -26,7 +26,8 @@ public interface LivingAccessor
     @Accessor("field_1060")
     void set1060(float f);
 
-    @Invoker("getDrops")
+    // TODO : Not sure about this one, getDrops ???
+    @Invoker("method_933")
     void invokeGetDrops();
     //@Invoker("setSize")
     //void setSize(float f, float f1);

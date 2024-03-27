@@ -8,60 +8,60 @@ import com.matthewperiut.accessoryapi.api.render.AccessoryRenderer;
 import com.matthewperiut.accessoryapi.api.render.HasCustomRenderer;
 import com.matthewperiut.accessoryapi.impl.mixin.client.LivingEntityRendererAccessor;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.class_564;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.entity.PlayerRenderer;
-import net.minecraft.client.render.entity.model.Biped;
-import net.minecraft.client.util.ScreenScaler;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.entity.projectile.Arrow;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 import java.util.Optional;
 
-public class EnergyShield extends TemplateItemBase implements Accessory, HasCustomRenderer
+public class EnergyShield extends TemplateItem implements Accessory, HasCustomRenderer
 {
     public EnergyShield(Identifier identifier)
     {
         super(identifier);
-        this.setMaxStackSize(1);
-        this.setDurability(500);
+        this.setMaxCount(1);
+        this.setMaxDamage(500);
     }
 
     @Override
-    public String[] getAccessoryTypes(ItemInstance item)
+    public String[] getAccessoryTypes(ItemStack item)
     {
         return new String[]{"shield"};
     }
 
     @Override
-    public ItemInstance tickWhileWorn(PlayerBase playerBase, ItemInstance itemInstance)
+    public ItemStack tickWhileWorn(PlayerEntity playerBase, ItemStack itemInstance)
     {
-        final Level world = playerBase.level;
-        if (world != null && !world.isServerSide)
+        final World world = playerBase.world;
+        if (world != null && !world.isRemote)
         {
-            final List list1 = world.players;
+            final List list1 = world.field_200;
             if (list1 != null && list1.size() > 0)
             {
                 for (int i = 0; i < list1.size(); ++i)
                 {
-                    final PlayerBase player = (PlayerBase) list1.get(i);
+                    final PlayerEntity player = (PlayerEntity) list1.get(i);
                     boolean flag = false;
                     final net.minecraft.entity.player.PlayerInventory inv = player.inventory;
-                    ItemInstance shieldItem = null;
-                    if (inv.armour.length > 4)
+                    ItemStack shieldItem = null;
+                    if (inv.armor.length > 4)
                     {
                         //flag = (inv != null && inv.armour[6] != null && inv.armour[6].itemId == AetherItems.RepShield.id);
-                        shieldItem = inv.armour[6];
+                        shieldItem = inv.armor[6];
                     }
-                    if (flag && (player.onGround || (player.vehicle != null && player.vehicle.onGround)) && ((LivingAccessor) player).get1029() == 0.0f && ((LivingAccessor) player).get1060() == 0.0f)
+                    if (flag && (player.field_1623 || (player.field_1595 != null && player.field_1595.field_1623)) && ((LivingAccessor) player).get1029() == 0.0f && ((LivingAccessor) player).get1060() == 0.0f)
                     {
                         /*if (!game.options.thirdPerson && player == game.player) {
                             this.renderShieldEffect(game);
@@ -69,14 +69,14 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                         final List list2 = world.getEntities(player, player.boundingBox.expand(4.0, 4.0, 4.0));
                         for (int j = 0; j < list2.size() && shieldItem != null && shieldItem.getDamage() < 500; ++j)
                         {
-                            final EntityBase entity = (EntityBase) list2.get(j);
+                            final Entity entity = (Entity) list2.get(j);
                             boolean flag2 = false;
-                            if (entity instanceof EntityProjectileBase && entity.distanceTo(player) < 2.5f && (entity.prevX != entity.x || entity.prevY != entity.y || entity.prevZ != entity.z))
+                            if (entity instanceof EntityProjectileBase && entity.method_1351(player) < 2.5f && (entity.prevX != entity.x || entity.prevY != entity.y || entity.prevZ != entity.z))
                             {
                                 final EntityProjectileBase proj = (EntityProjectileBase) entity;
                                 if (proj.shooter == null || proj.shooter != player)
                                 {
-                                    final EntityBase dick = proj.shooter;
+                                    final Entity dick = proj.shooter;
                                     proj.shooter = player;
                                     flag2 = true;
                                     double a;
@@ -102,12 +102,12 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                                     proj.velocityY = b * 0.75 + 0.05;
                                     proj.velocityZ = c * 0.75;
                                     proj.setArrowHeading(proj.velocityX, proj.velocityY, proj.velocityZ, 0.8f, 0.5f);
-                                    world.playSound((EntityBase) proj, "note.snare", 1.0f, (rand.nextFloat() - rand.nextFloat() * 0.4f + 0.8f) * 1.1f);
+                                    world.playSound((Entity) proj, "note.snare", 1.0f, (random.nextFloat() - random.nextFloat() * 0.4f + 0.8f) * 1.1f);
                                     for (int k = 0; k < 12; ++k)
                                     {
-                                        double d2 = -proj.velocityX * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
-                                        double e1 = -proj.velocityY * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
-                                        double f1 = -proj.velocityZ * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
+                                        double d2 = -proj.velocityX * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
+                                        double e1 = -proj.velocityY * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
+                                        double f1 = -proj.velocityZ * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
                                         d2 *= 0.625;
                                         e1 *= 0.625;
                                         f1 *= 0.625;
@@ -115,13 +115,13 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                                     }
                                 }
                             }
-                            else if (entity instanceof Arrow && entity.distanceTo(player) < 2.5f && (entity.prevX != entity.x || entity.prevY != entity.y || entity.prevZ != entity.z))
+                            else if (entity instanceof ArrowEntity && entity.method_1351(player) < 2.5f && (entity.prevX != entity.x || entity.prevY != entity.y || entity.prevZ != entity.z))
                             {
-                                final Arrow proj2 = (Arrow) entity;
-                                if (proj2.owner == null || proj2.owner != player)
+                                final ArrowEntity proj2 = (ArrowEntity) entity;
+                                if (proj2.field_1576 == null || proj2.field_1576 != player)
                                 {
-                                    final EntityBase dick = proj2.owner;
-                                    proj2.owner = player;
+                                    final Entity dick = proj2.field_1576;
+                                    proj2.field_1576 = player;
                                     flag2 = true;
                                     double a;
                                     double b;
@@ -146,12 +146,12 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                                     proj2.velocityY = b * 0.75 + 0.15;
                                     proj2.velocityZ = c * 0.75;
                                     proj2.method_1291(proj2.velocityX, proj2.velocityY, proj2.velocityZ, 0.8f, 0.5f);
-                                    world.playSound((EntityBase) proj2, "note.snare", 1.0f, (rand.nextFloat() - rand.nextFloat() * 0.4f + 0.8f) * 1.1f);
+                                    world.playSound((Entity) proj2, "note.snare", 1.0f, (random.nextFloat() - random.nextFloat() * 0.4f + 0.8f) * 1.1f);
                                     for (int k = 0; k < 12; ++k)
                                     {
-                                        double d2 = -proj2.velocityX * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
-                                        double e1 = -proj2.velocityY * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
-                                        double f1 = -proj2.velocityZ * 0.15000000596046448 + (rand.nextFloat() - 0.5f) * 0.05f;
+                                        double d2 = -proj2.velocityX * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
+                                        double e1 = -proj2.velocityY * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
+                                        double f1 = -proj2.velocityZ * 0.15000000596046448 + (random.nextFloat() - 0.5f) * 0.05f;
                                         d2 *= 0.625;
                                         e1 *= 0.625;
                                         f1 *= 0.625;
@@ -161,10 +161,10 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                             }
                             if (flag2 && shieldItem != null)
                             {
-                                shieldItem.applyDamage(1, null);
+                                shieldItem.damage(1, null);
                                 if (shieldItem.getDamage() >= 500)
                                 {
-                                    player.inventory.armour[6] = null;
+                                    player.inventory.armor[6] = null;
                                 }
                             }
                         }
@@ -191,39 +191,39 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
 
     private static class EnergyShieldRenderer implements AccessoryRenderer
     {
-        Biped modelEnergyShield = new Biped(1.25F);
+        BipedEntityModel modelEnergyShield = new BipedEntityModel(1.25F);
 
-        public void renderThirdPerson(PlayerBase player, PlayerRenderer renderer, ItemInstance itemInstance, double x, double y, double z, float h, float v)
+        public void renderThirdPerson(PlayerEntity player, PlayerEntityRenderer renderer, ItemStack itemInstance, double x, double y, double z, float h, float v)
         {
-            final ItemInstance itemstack = player.inventory.getHeldItem();
-            modelEnergyShield.field_629 = (itemstack != null);
-            modelEnergyShield.field_630 = player.method_1373();
-            double d3 = y - player.standingEyeHeight;
-            if (player.method_1373() && !(player instanceof PlayerBase))
+            final ItemStack itemstack = player.inventory.getSelectedItem();
+            modelEnergyShield.rightArmPose = (itemstack != null);
+            modelEnergyShield.sneaking = player.method_1373();
+            double d3 = y - player.eyeHeight;
+            if (player.method_1373() && !(player instanceof PlayerEntity))
             {
                 d3 -= 0.125;
             }
             doRenderEnergyShield(player, renderer, modelEnergyShield, x, d3, z, h, v);
-            modelEnergyShield.field_630 = false;
-            modelEnergyShield.field_629 = false;
+            modelEnergyShield.sneaking = false;
+            modelEnergyShield.rightArmPose = false;
         }
 
-        public void renderFirstPerson(PlayerBase player, PlayerRenderer renderer, ItemInstance itemInstance)
+        public void renderFirstPerson(PlayerEntity player, PlayerEntityRenderer renderer, ItemStack itemInstance)
         {
             // todo: make this work
 
             Minecraft minecraft = (Minecraft) FabricLoader.getInstance().getGameInstance();
 
-            if (!(player.onGround || (player.vehicle != null && player.vehicle.onGround)))
+            if (!(player.field_1623 || (player.field_1595 != null && player.field_1595.field_1623)))
                 return;
             if (!(((LivingAccessor) player).get1029() == 0.0f && ((LivingAccessor) player).get1060() == 0.0f))
                 return;
             if (minecraft.options.thirdPerson)
                 return;
 
-            final ScreenScaler scaledresolution = new ScreenScaler(minecraft.options, minecraft.actualWidth, minecraft.actualHeight);
-            final int i = scaledresolution.getScaledWidth();
-            final int j = scaledresolution.getScaledHeight();
+            final class_564 scaledresolution = new class_564(minecraft.options, minecraft.displayWidth, minecraft.displayHeight);
+            final int i = scaledresolution.method_1857();
+            final int j = scaledresolution.method_1858();
             GL11.glDisable(2929);
             GL11.glDepthMask(false);
             GL11.glBlendFunc(770, 771);
@@ -234,7 +234,7 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
             System.out.println("step 3");
             GL11.glBindTexture(3553, minecraft.textureManager.getTextureId("aether:textures/capes/shieldEffect.png"));
             final Tessellator tessellator = Tessellator.INSTANCE;
-            tessellator.start();
+            tessellator.startQuads();
             tessellator.vertex(0.0, j, -90.0, 0.0, 1.0);
             tessellator.vertex(i, j, -90.0, 1.0, 1.0);
             tessellator.vertex(i, 0.0, -90.0, 1.0, 0.0);
@@ -248,12 +248,12 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
             GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         }
 
-        private void doRenderEnergyShield(final Living entityliving, PlayerRenderer playerRenderer, Biped modelEnergyShield, final double d, final double d1, final double d2, final float f, final float f1)
+        private void doRenderEnergyShield(final LivingEntity entityliving, PlayerEntityRenderer playerRenderer, BipedEntityModel modelEnergyShield, final double d, final double d1, final double d2, final float f, final float f1)
         {
             GL11.glPushMatrix();
             GL11.glEnable(2884);
-            modelEnergyShield.handSwingProgress = ((LivingEntityRendererAccessor) playerRenderer).invoke820(entityliving, f1);
-            modelEnergyShield.isRiding = entityliving.method_1360();
+            modelEnergyShield.handWingProgress = ((LivingEntityRendererAccessor) playerRenderer).invoke820(entityliving, f1);
+            modelEnergyShield.riding = entityliving.method_1360();
             try
             {
                 final float f2 = entityliving.field_1013 + (entityliving.field_1012 - entityliving.field_1013) * f1;
@@ -267,14 +267,14 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
                 GL11.glScalef(-1.0f, -1.0f, 1.0f);
                 ((LivingEntityRendererAccessor) playerRenderer).invoke823(entityliving, f1);
                 GL11.glTranslatef(0.0f, -24.0f * f6 - 0.0078125f, 0.0f);
-                float f7 = entityliving.field_1048 + (entityliving.limbDistance - entityliving.field_1048) * f1;
-                final float f8 = entityliving.field_1050 - entityliving.limbDistance * (1.0f - f1);
+                float f7 = entityliving.field_1048 + (entityliving.field_1049 - entityliving.field_1048) * f1;
+                final float f8 = entityliving.field_1050 - entityliving.field_1049 * (1.0f - f1);
                 if (f7 > 1.0f)
                 {
                     f7 = 1.0f;
                 }
                 GL11.glEnable(3008);
-                if (setEnergyShieldBrightness((PlayerBase) entityliving, playerRenderer, 0, f1))
+                if (setEnergyShieldBrightness((PlayerEntity) entityliving, playerRenderer, 0, f1))
                 {
                     modelEnergyShield.render(f8, f7, f5, f3 - f2, f4, f6);
                     GL11.glDisable(3042);
@@ -290,10 +290,10 @@ public class EnergyShield extends TemplateItemBase implements Accessory, HasCust
             GL11.glPopMatrix();
         }
 
-        protected boolean setEnergyShieldBrightness(final PlayerBase player, PlayerRenderer playerRenderer, final int i, final float f)
+        protected boolean setEnergyShieldBrightness(final PlayerEntity player, PlayerEntityRenderer playerRenderer, final int i, final float f)
         {
             if (i != 0) return false;
-            if ((player.onGround || (player.vehicle != null && player.vehicle.onGround)) && ((LivingAccessor) player).get1029() == 0.0f && ((LivingAccessor) player).get1060() == 0.0f)
+            if ((player.field_1623 || (player.field_1595 != null && player.field_1595.field_1623)) && ((LivingAccessor) player).get1029() == 0.0f && ((LivingAccessor) player).get1060() == 0.0f)
             {
                 ((EntityRenderAccessor) playerRenderer).invokeBindTexture("aether:textures/entity/energyGlow.png");
                 GL11.glEnable(2977);

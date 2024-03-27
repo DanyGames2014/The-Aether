@@ -11,23 +11,23 @@ import com.gildedgames.aether.registry.AetherItems;
 import com.gildedgames.aether.utils.NameGen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockBase;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.living.FlyingBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.FlyingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 import java.util.List;
 
-public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpawnDataProvider
+public class EntityFireMonster extends FlyingEntity implements IAetherBoss, MobSpawnDataProvider
 {
     public int wideness;
     public int orgX;
@@ -43,16 +43,16 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
     public int direction;
     public double rotary;
     public double speedness;
-    public EntityBase target;
+    public Entity target;
     public boolean gotTarget;
     public String bossName;
     public static final float jimz = 57.295773f;
 
-    public EntityFireMonster(final Level level)
+    public EntityFireMonster(final World level)
     {
         super(level);
         this.texture = "aether:textures/entity/firemonster.png";
-        this.setSize(2.25f, 2.5f);
+        this.setBoundingBoxSpacing(2.25f, 2.5f);
         this.field_1642 = true;
         this.orgX = MathHelper.floor(this.x);
         this.orgY = MathHelper.floor(this.boundingBox.minY) + 1;
@@ -61,26 +61,26 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         this.health = 50;
         this.speedness = 0.5 - this.health / 70.0 * 0.2;
         this.direction = 0;
-        this.entCount = this.rand.nextInt(6);
+        this.entCount = this.random.nextInt(6);
         this.bossName = NameGen.gen();
     }
 
-    public EntityFireMonster(final Level world, final int x, final int y, final int z, final int rad, final int dir)
+    public EntityFireMonster(final World world, final int x, final int y, final int z, final int rad, final int dir)
     {
         super(world);
         this.texture = "aether:textures/entity/firemonster.png";
-        this.setSize(2.25f, 2.5f);
-        this.setPosition(x + 0.5, y, z + 0.5);
+        this.setBoundingBoxSpacing(2.25f, 2.5f);
+        this.method_1340(x + 0.5, y, z + 0.5);
         this.wideness = rad - 2;
         this.orgX = x;
         this.orgY = y;
         this.orgZ = z;
         this.field_1642 = true;
-        this.rotary = this.rand.nextFloat() * 360.0;
+        this.rotary = this.random.nextFloat() * 360.0;
         this.health = 50;
         this.speedness = 0.5 - this.health / 70.0 * 0.2;
         this.direction = dir;
-        this.entCount = this.rand.nextInt(6);
+        this.entCount = this.random.nextInt(6);
         this.bossName = NameGen.gen();
     }
 
@@ -95,13 +95,13 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         super.tick();
         if (this.health > 0)
         {
-            final double a = this.rand.nextFloat() - 0.5f;
-            final double b = this.rand.nextFloat();
-            final double c = this.rand.nextFloat() - 0.5f;
+            final double a = this.random.nextFloat() - 0.5f;
+            final double b = this.random.nextFloat();
+            final double c = this.random.nextFloat() - 0.5f;
             final double d = this.x + a * b;
             final double e = this.boundingBox.minY + b - 0.5;
             final double f = this.z + c * b;
-            this.level.addParticle("flame", d, e, f, 0.0, -0.07500000298023224, 0.0);
+            this.world.addParticle("flame", d, e, f, 0.0, -0.07500000298023224, 0.0);
             ++this.entCount;
             if (this.entCount >= 3)
             {
@@ -124,9 +124,9 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         }
     }
 
-    protected EntityBase findPlayerToAttack()
+    protected Entity findPlayerToAttack()
     {
-        final PlayerBase entityplayer = this.level.getClosestPlayerTo(this, 32.0);
+        final PlayerEntity entityplayer = this.world.method_186(this, 32.0);
         if (entityplayer != null && this.method_928(entityplayer))
         {
             return entityplayer;
@@ -134,9 +134,9 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         return null;
     }
 
-    public void tickHandSwing()
+    public void method_910()
     {
-        super.tickHandSwing();
+        super.method_910();
         if (this.gotTarget && this.target == null)
         {
             this.target = this.findPlayerToAttack();
@@ -144,12 +144,12 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         }
         if (this.target == null)
         {
-            this.setPosition(this.orgX + 0.5, this.orgY, this.orgZ + 0.5);
+            this.method_1340(this.orgX + 0.5, this.orgY, this.orgZ + 0.5);
             this.setDoor(0);
             return;
         }
         this.field_1012 = this.yaw;
-        this.setPosition(this.x, this.orgY, this.z);
+        this.method_1340(this.x, this.orgY, this.z);
         this.velocityY = 0.0;
         boolean pool = false;
         if (this.velocityX > 0.0 && (int) Math.floor(this.x) > this.orgX + this.wideness)
@@ -191,24 +191,24 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         if (this.motionTimer >= 20 || pool)
         {
             this.motionTimer = 0;
-            if (this.rand.nextInt(3) == 0)
+            if (this.random.nextInt(3) == 0)
             {
-                this.rotary += (this.rand.nextFloat() - this.rand.nextFloat()) * 60.0;
+                this.rotary += (this.random.nextFloat() - this.random.nextFloat()) * 60.0;
             }
         }
         ++this.flameCount;
-        if (this.flameCount == 40 && this.rand.nextInt(2) == 0)
+        if (this.flameCount == 40 && this.random.nextInt(2) == 0)
         {
             this.poopFire();
         }
-        else if (this.flameCount >= 55 + this.health / 2 && this.target != null && this.target instanceof Living)
+        else if (this.flameCount >= 55 + this.health / 2 && this.target != null && this.target instanceof LivingEntity)
         {
             this.makeFireBall(1);
             this.flameCount = 0;
         }
-        if (this.target != null && this.target.removed)
+        if (this.target != null && this.target.dead)
         {
-            this.setPosition(this.orgX + 0.5, this.orgY, this.orgZ + 0.5);
+            this.method_1340(this.orgX + 0.5, this.orgY, this.orgZ + 0.5);
             this.velocityX = 0.0;
             this.velocityY = 0.0;
             this.velocityZ = 0.0;
@@ -222,11 +222,11 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
 
     public void burnEntities()
     {
-        final List list = this.level.getEntities(this, this.boundingBox.expand(0.0, 4.0, 0.0));
+        final List list = this.world.getEntities(this, this.boundingBox.expand(0.0, 4.0, 0.0));
         for (int j = 0; j < list.size(); ++j)
         {
-            final EntityBase entity1 = (EntityBase) list.get(j);
-            if (entity1 instanceof Living && !((EntityBaseAccessor) entity1).getImmunityToFire())
+            final Entity entity1 = (Entity) list.get(j);
+            if (entity1 instanceof LivingEntity && !((EntityBaseAccessor) entity1).getImmunityToFire())
             {
                 entity1.damage(this, 10);
                 entity1.fire = 300;
@@ -241,13 +241,13 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         for (int i = 0; i < 8; ++i)
         {
             final int b = this.orgY - 2 + i;
-            if (this.level.getMaterial(x, b, z) == Material.WATER)
+            if (this.world.method_1779(x, b, z) == Material.WATER)
             {
-                this.level.setTile(x, b, z, 0);
-                this.level.playSound((double) (x + 0.5f), (double) (b + 0.5f), (double) (z + 0.5f), "random.fizz", 0.5f, 2.6f + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8f);
+                this.world.setBlock(x, b, z, 0);
+                this.world.playSound((double) (x + 0.5f), (double) (b + 0.5f), (double) (z + 0.5f), "random.fizz", 0.5f, 2.6f + (this.random.nextFloat() - this.random.nextFloat()) * 0.8f);
                 for (int l = 0; l < 8; ++l)
                 {
-                    this.level.addParticle("largesmoke", x + Math.random(), b + 0.75, z + Math.random(), 0.0, 0.0, 0.0);
+                    this.world.addParticle("largesmoke", x + Math.random(), b + 0.75, z + Math.random(), 0.0, 0.0, 0.0);
                 }
             }
         }
@@ -255,18 +255,18 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
 
     public void makeFireBall(final int shots)
     {
-        this.level.playSound((EntityBase) this, "mob.ghast.fireball", 5.0f, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f);
+        this.world.playSound((Entity) this, "mob.ghast.fireball", 5.0f, (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
         boolean flag = false;
         ++this.ballCount;
-        if (this.ballCount >= 3 + this.rand.nextInt(3))
+        if (this.ballCount >= 3 + this.random.nextInt(3))
         {
             flag = true;
             this.ballCount = 0;
         }
         for (int i = 0; i < shots; ++i)
         {
-            final EntityFiroBall e1 = new EntityFiroBall(this.level, this.x - this.velocityX / 2.0, this.y, this.z - this.velocityZ / 2.0, flag);
-            this.level.spawnEntity(e1);
+            final EntityFiroBall e1 = new EntityFiroBall(this.world, this.x - this.velocityX / 2.0, this.y, this.z - this.velocityZ / 2.0, flag);
+            this.world.method_210(e1);
         }
     }
 
@@ -275,33 +275,33 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         final int x = MathHelper.floor(this.x);
         final int z = MathHelper.floor(this.z);
         final int b = this.orgY - 2;
-        if (AetherBlocks.isGood(this.level.getTileId(x, b, z), this.level.getTileMeta(x, b, z)))
+        if (AetherBlocks.isGood(this.world.getBlockId(x, b, z), this.world.getBlockMeta(x, b, z)))
         {
-            this.level.setTile(x, b, z, BlockBase.FIRE.id);
+            this.world.setBlock(x, b, z, Block.FIRE.id);
         }
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("OriginX", (short) this.orgX);
-        tag.put("OriginY", (short) this.orgY);
-        tag.put("OriginZ", (short) this.orgZ);
-        tag.put("Wideness", (short) this.wideness);
-        tag.put("FlameCount", (short) this.flameCount);
-        tag.put("BallCount", (short) this.ballCount);
-        tag.put("ChatLog", (short) this.chatLog);
-        tag.put("Rotary", (float) this.rotary);
-        tag.put("GotTarget", this.gotTarget = (this.target != null));
-        tag.put("IsCurrentBoss", this.isCurrentBoss());
-        tag.put("BossName", this.bossName);
+        super.writeNbt(tag);
+        tag.putShort("OriginX", (short) this.orgX);
+        tag.putShort("OriginY", (short) this.orgY);
+        tag.putShort("OriginZ", (short) this.orgZ);
+        tag.putShort("Wideness", (short) this.wideness);
+        tag.putShort("FlameCount", (short) this.flameCount);
+        tag.putShort("BallCount", (short) this.ballCount);
+        tag.putShort("ChatLog", (short) this.chatLog);
+        tag.putFloat("Rotary", (float) this.rotary);
+        tag.putBoolean("GotTarget", this.gotTarget = (this.target != null));
+        tag.putBoolean("IsCurrentBoss", this.isCurrentBoss());
+        tag.putString("BossName", this.bossName);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.orgX = tag.getShort("OriginX");
         this.orgY = tag.getShort("OriginY");
         this.orgZ = tag.getShort("OriginZ");
@@ -324,7 +324,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER)
             return;
 
-        ((Minecraft) FabricLoader.getInstance().getGameInstance()).overlay.addChatMessage(s);
+        ((Minecraft) FabricLoader.getInstance().getGameInstance()).inGameHud.addChatMessage(s);
     }
 
     public boolean chatWithMe()
@@ -408,7 +408,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         return false;
     }
 
-    public boolean interact(final PlayerBase ep)
+    public boolean method_1323(final PlayerEntity ep)
     {
         if (this.chatWithMe())
         {
@@ -420,17 +420,17 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         return false;
     }
 
-    public void accelerate(final double x, final double y, final double z)
+    public void method_1322(final double x, final double y, final double z)
     {
     }
 
     @Override
-    public void method_925(final EntityBase entity, final int i, final double d, final double d1)
+    public void method_925(final Entity entity, final int i, final double d, final double d1)
     {
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
         if (target == null || !(target instanceof EntityFiroBall))
         {
@@ -442,11 +442,11 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
         {
             this.hurtness = 15;
             this.texture = "aether:textures/entity/firemonsterHurt.png";
-            final EntityFireMinion minion = new EntityFireMinion(this.level);
-            minion.setPositionAndAngles(this.x, this.y, this.z, this.yaw, 0.0f);
-            this.level.spawnEntity(minion);
-            this.level.spawnEntity(minion);
-            this.level.spawnEntity(minion);
+            final EntityFireMinion minion = new EntityFireMinion(this.world);
+            minion.method_1341(this.x, this.y, this.z, this.yaw, 0.0f);
+            this.world.method_210(minion);
+            this.world.method_210(minion);
+            this.world.method_210(minion);
             if (this.health <= 0)
             {
                 AetherMod.currentBoss = null;
@@ -459,9 +459,9 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        this.dropItem(new ItemInstance(AetherItems.Key, 1, 2), 0.0f);
+        this.method_1327(new ItemStack(AetherItems.Key, 1, 2), 0.0f);
     }
 
     private void setDoor(final int ID)
@@ -472,7 +472,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
             {
                 for (int z = this.orgZ - 1; z < this.orgZ + 2; ++z)
                 {
-                    this.level.setTileWithMetadata(this.orgX + ((this.direction == 0) ? -11 : 11), y, z, ID, 2);
+                    this.world.method_154(this.orgX + ((this.direction == 0) ? -11 : 11), y, z, ID, 2);
                 }
             }
         }
@@ -482,7 +482,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
             {
                 for (int x = this.orgX - 1; x < this.orgX + 2; ++x)
                 {
-                    this.level.setTileWithMetadata(x, y, this.orgZ + ((this.direction == 3) ? 11 : -11), ID, 2);
+                    this.world.method_154(x, y, this.orgZ + ((this.direction == 3) ? 11 : -11), ID, 2);
                 }
             }
         }
@@ -496,7 +496,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
             {
                 for (int z = this.orgZ - 1; z < this.orgZ + 2; ++z)
                 {
-                    this.level.setTileInChunk(this.orgX + ((this.direction == 0) ? 11 : -11), y, z, 0);
+                    this.world.method_200(this.orgX + ((this.direction == 0) ? 11 : -11), y, z, 0);
                 }
             }
         }
@@ -506,7 +506,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
             {
                 for (int x = this.orgX - 1; x < this.orgX + 2; ++x)
                 {
-                    this.level.setTileInChunk(x, y, this.orgZ + ((this.direction == 3) ? -11 : 11), 0);
+                    this.world.method_200(x, y, this.orgZ + ((this.direction == 3) ? -11 : 11), 0);
                 }
             }
         }
@@ -517,14 +517,14 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
             {
                 for (int z2 = this.orgZ - 20; z2 < this.orgZ + 20; ++z2)
                 {
-                    final int id = this.level.getTileId(x2, y2, z2);
+                    final int id = this.world.getBlockId(x2, y2, z2);
                     if (id == AetherBlocks.LOCKED_DUNGEON_STONE.id)
                     {
-                        this.level.setTileWithMetadata(x2, y2, z2, AetherBlocks.DUNGEON_STONE.id, this.level.getTileMeta(x2, y2, z2));
+                        this.world.method_154(x2, y2, z2, AetherBlocks.DUNGEON_STONE.id, this.world.getBlockMeta(x2, y2, z2));
                     }
                     if (id == AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id)
                     {
-                        this.level.setTileWithMetadata(x2, y2, z2, AetherBlocks.LIGHT_DUNGEON_STONE.id, this.level.getTileMeta(x2, y2, z2));
+                        this.world.method_154(x2, y2, z2, AetherBlocks.LIGHT_DUNGEON_STONE.id, this.world.getBlockMeta(x2, y2, z2));
                     }
                 }
             }
@@ -552,7 +552,7 @@ public class EntityFireMonster extends FlyingBase implements IAetherBoss, MobSpa
     @Override
     public int getBossEntityID()
     {
-        return this.entityId;
+        return this.id;
     }
 
     @Override

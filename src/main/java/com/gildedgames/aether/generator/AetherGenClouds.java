@@ -1,11 +1,11 @@
 package com.gildedgames.aether.generator;
 
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Structure;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenClouds extends Structure
+public class AetherGenClouds extends Feature
 {
     private int cloudBlockId;
     private int meta;
@@ -21,7 +21,7 @@ public class AetherGenClouds extends Structure
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         int x2 = x;
         int y2 = y;
@@ -42,9 +42,9 @@ public class AetherGenClouds extends Structure
                 {
                     for (int z3 = z2; z3 < z2 + rand.nextInt(4) + 3 * (this.flat ? 3 : 1); ++z3)
                     {
-                        if (level.getTileId(x3, y3, z3) == 0 && Math.abs(x3 - x2) + Math.abs(y3 - y2) + Math.abs(z3 - z2) < 4 * (this.flat ? 3 : 1) + rand.nextInt(2))
+                        if (level.getBlockId(x3, y3, z3) == 0 && Math.abs(x3 - x2) + Math.abs(y3 - y2) + Math.abs(z3 - z2) < 4 * (this.flat ? 3 : 1) + rand.nextInt(2))
                         {
-                            level.placeBlockWithMetaData(x3, y3, z3, this.cloudBlockId, this.meta);
+                            level.method_201(x3, y3, z3, this.cloudBlockId, this.meta);
                         }
                     }
                 }

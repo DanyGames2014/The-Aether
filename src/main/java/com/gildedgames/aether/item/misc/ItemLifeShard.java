@@ -1,23 +1,23 @@
 package com.gildedgames.aether.item.misc;
 
 import com.gildedgames.aether.AetherMod;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemLifeShard extends TemplateItemBase
+public class ItemLifeShard extends TemplateItem
 {
     public ItemLifeShard(final @NotNull Identifier identifier)
     {
         super(identifier);
-        this.maxStackSize = 1;
+        this.maxCount = 1;
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
         --item.count;
         AetherMod.getPlayerHandler(player).increaseMaxHP(2);

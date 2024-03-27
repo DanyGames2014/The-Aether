@@ -3,15 +3,15 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.client.render.model.ModelAerbunny;
 import com.gildedgames.aether.entity.animal.EntityAerbunny;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelBase;
-import net.minecraft.entity.Living;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.entity.LivingEntity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderAerbunny extends LivingEntityRenderer
 {
     public ModelAerbunny mb;
 
-    public RenderAerbunny(final EntityModelBase modelbase, final float f)
+    public RenderAerbunny(final EntityModel modelbase, final float f)
     {
         super(modelbase, f);
         this.mb = (ModelAerbunny) modelbase;
@@ -19,7 +19,7 @@ public class RenderAerbunny extends LivingEntityRenderer
 
     protected void rotAerbunny(final EntityAerbunny entitybunny)
     {
-        if (!entitybunny.onGround && entitybunny.vehicle == null)
+        if (!entitybunny.field_1623 && entitybunny.field_1595 == null)
         {
             if (entitybunny.velocityY > 0.5)
             {
@@ -38,7 +38,7 @@ public class RenderAerbunny extends LivingEntityRenderer
     }
 
     @Override
-    protected void method_823(final Living entityliving, final float f)
+    protected void method_823(final LivingEntity entityliving, final float f)
     {
         this.rotAerbunny((EntityAerbunny) entityliving);
     }

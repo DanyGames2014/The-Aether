@@ -2,15 +2,15 @@ package com.gildedgames.aether.client.render.entity;
 
 import com.gildedgames.aether.entity.animal.EntitySwet;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelBase;
-import net.minecraft.entity.Living;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.entity.LivingEntity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderSwet extends LivingEntityRenderer
 {
-    private EntityModelBase field_22001_a;
+    private EntityModel field_22001_a;
 
-    public RenderSwet(final EntityModelBase modelbase, final EntityModelBase modelbase1, final float f)
+    public RenderSwet(final EntityModel modelbase, final EntityModel modelbase1, final float f)
     {
         super(modelbase, f);
         this.field_22001_a = modelbase1;
@@ -20,7 +20,7 @@ public class RenderSwet extends LivingEntityRenderer
     {
         if (i == 0)
         {
-            this.setModel(this.field_22001_a);
+            this.method_815(this.field_22001_a);
             GL11.glEnable(2977);
             GL11.glEnable(3042);
             GL11.glBlendFunc(770, 771);
@@ -39,7 +39,7 @@ public class RenderSwet extends LivingEntityRenderer
         float f3;
         float f2 = f3 = 1.0f;
         float f4 = 1.5f;
-        if (!entityswets.onGround)
+        if (!entityswets.field_1623)
         {
             if (entityswets.velocityY > 0.8500000238418579)
             {
@@ -58,21 +58,21 @@ public class RenderSwet extends LivingEntityRenderer
                 f2 -= f5;
             }
         }
-        if (entityswets.passenger != null)
+        if (entityswets.field_1594 != null)
         {
-            f4 = 1.5f + (entityswets.passenger.width + entityswets.passenger.height) * 0.75f;
+            f4 = 1.5f + (entityswets.field_1594.spacingXZ + entityswets.field_1594.spacingY) * 0.75f;
         }
         GL11.glScalef(f2 * f4, f3 * f4, f2 * f4);
     }
 
     @Override
-    protected void method_823(final Living entityliving, final float f)
+    protected void method_823(final LivingEntity entityliving, final float f)
     {
         this.a((EntitySwet) entityliving, f);
     }
 
     @Override
-    protected boolean render(final Living entityliving, final int i, final float f)
+    protected boolean method_825(final LivingEntity entityliving, final int i, final float f)
     {
         return this.a((EntitySwet) entityliving, i, f);
     }

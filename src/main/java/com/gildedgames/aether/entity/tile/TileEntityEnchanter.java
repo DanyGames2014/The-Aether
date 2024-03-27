@@ -3,22 +3,22 @@ package com.gildedgames.aether.entity.tile;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
 import com.gildedgames.aether.utils.Enchantment;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.inventory.InventoryBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.tileentity.TileEntityBase;
-import net.minecraft.util.io.AbstractTag;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.io.ListTag;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
+public class TileEntityEnchanter extends BlockEntity implements Inventory
 {
     private static List<Enchantment> enchantments;
-    private ItemInstance[] enchanterItemStacks;
+    private ItemStack[] enchanterItemStacks;
     public int enchantProgress;
     public int enchantPowerRemaining;
     public int enchantTimeForItem;
@@ -26,26 +26,26 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
 
     public TileEntityEnchanter()
     {
-        this.enchanterItemStacks = new ItemInstance[3];
+        this.enchanterItemStacks = new ItemStack[3];
         this.enchantProgress = 0;
         this.enchantPowerRemaining = 0;
         this.enchantTimeForItem = 0;
     }
 
     @Override
-    public int getInventorySize()
+    public int size()
     {
         return this.enchanterItemStacks.length;
     }
 
     @Override
-    public ItemInstance getInventoryItem(final int index)
+    public ItemStack getStack(final int index)
     {
         return this.enchanterItemStacks[index];
     }
 
     @Override
-    public ItemInstance takeInventoryItem(final int index, final int count)
+    public ItemStack removeStack(final int index, final int count)
     {
         if (this.enchanterItemStacks[index] == null)
         {
@@ -53,11 +53,11 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
         }
         if (this.enchanterItemStacks[index].count <= count)
         {
-            final ItemInstance itemstack = this.enchanterItemStacks[index];
+            final ItemStack itemstack = this.enchanterItemStacks[index];
             this.enchanterItemStacks[index] = null;
             return itemstack;
         }
-        final ItemInstance itemstack2 = this.enchanterItemStacks[index].split(count);
+        final ItemStack itemstack2 = this.enchanterItemStacks[index].split(count);
         if (this.enchanterItemStacks[index].count == 0)
         {
             this.enchanterItemStacks[index] = null;
@@ -66,34 +66,34 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void setInventoryItem(final int slot, final ItemInstance stack)
+    public void setStack(final int slot, final ItemStack stack)
     {
         this.enchanterItemStacks[slot] = stack;
-        if (stack != null && stack.count > this.getMaxItemCount())
+        if (stack != null && stack.count > this.getMaxCountPerStack())
         {
-            stack.count = this.getMaxItemCount();
+            stack.count = this.getMaxCountPerStack();
         }
     }
 
     @Override
-    public String getContainerName()
+    public String getName()
     {
         return "Enchanter";
     }
 
     @Override
-    public void readIdentifyingData(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readIdentifyingData(tag);
-        final ListTag nbttaglist = tag.getListTag("Items");
-        this.enchanterItemStacks = new ItemInstance[this.getInventorySize()];
+        super.readNbt(tag);
+        final NbtList nbttaglist = tag.getList("Items");
+        this.enchanterItemStacks = new ItemStack[this.size()];
         for (int i = 0; i < nbttaglist.size(); ++i)
         {
-            final CompoundTag nbttagcompound1 = (CompoundTag) nbttaglist.get(i);
+            final NbtCompound nbttagcompound1 = (NbtCompound) nbttaglist.get(i);
             final byte byte0 = nbttagcompound1.getByte("Slot");
             if (byte0 >= 0 && byte0 < this.enchanterItemStacks.length)
             {
-                this.enchanterItemStacks[byte0] = new ItemInstance(nbttagcompound1);
+                this.enchanterItemStacks[byte0] = new ItemStack(nbttagcompound1);
             }
         }
         this.enchantProgress = tag.getShort("BurnTime");
@@ -101,27 +101,27 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void writeIdentifyingData(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeIdentifyingData(tag);
-        tag.put("BurnTime", (short) this.enchantProgress);
-        tag.put("CookTime", (short) this.enchantTimeForItem);
-        final ListTag nbttaglist = new ListTag();
+        super.writeNbt(tag);
+        tag.putShort("BurnTime", (short) this.enchantProgress);
+        tag.putShort("CookTime", (short) this.enchantTimeForItem);
+        final NbtList nbttaglist = new NbtList();
         for (int i = 0; i < this.enchanterItemStacks.length; ++i)
         {
             if (this.enchanterItemStacks[i] != null)
             {
-                final CompoundTag nbttagcompound1 = new CompoundTag();
-                nbttagcompound1.put("Slot", (byte) i);
-                this.enchanterItemStacks[i].toTag(nbttagcompound1);
+                final NbtCompound nbttagcompound1 = new NbtCompound();
+                nbttagcompound1.putByte("Slot", (byte) i);
+                this.enchanterItemStacks[i].writeNbt(nbttagcompound1);
                 nbttaglist.add(nbttagcompound1);
             }
         }
-        tag.put("Items", (AbstractTag) nbttaglist);
+        tag.put("Items", (NbtElement) nbttaglist);
     }
 
     @Override
-    public int getMaxItemCount()
+    public int getMaxCountPerStack()
     {
         return 64;
     }
@@ -146,7 +146,7 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void tick()
+    public void method_1076()
     {
         if (this.enchantPowerRemaining > 0)
         {
@@ -165,25 +165,25 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
         {
             if (this.enchanterItemStacks[2] == null)
             {
-                this.setInventoryItem(2, new ItemInstance(this.currentEnchantment.enchantTo.getType(), 1, this.currentEnchantment.enchantTo.getDamage()));
+                this.setStack(2, new ItemStack(this.currentEnchantment.enchantTo.getItem(), 1, this.currentEnchantment.enchantTo.getDamage()));
             }
             else
             {
-                this.setInventoryItem(2, new ItemInstance(this.currentEnchantment.enchantTo.getType(), this.getInventoryItem(2).count + 1, this.currentEnchantment.enchantTo.getDamage()));
+                this.setStack(2, new ItemStack(this.currentEnchantment.enchantTo.getItem(), this.getStack(2).count + 1, this.currentEnchantment.enchantTo.getDamage()));
             }
-            this.takeInventoryItem(0, 1);
+            this.removeStack(0, 1);
             this.enchantProgress = 0;
             this.currentEnchantment = null;
             this.enchantTimeForItem = 0;
         }
-        if (this.enchantPowerRemaining <= 0 && this.currentEnchantment != null && this.getInventoryItem(1) != null && this.getInventoryItem(1).itemId == AetherItems.AmbrosiumShard.id)
+        if (this.enchantPowerRemaining <= 0 && this.currentEnchantment != null && this.getStack(1) != null && this.getStack(1).itemId == AetherItems.AmbrosiumShard.id)
         {
             this.enchantPowerRemaining += 500;
-            this.takeInventoryItem(1, 1);
+            this.removeStack(1, 1);
         }
         if (this.currentEnchantment == null)
         {
-            final ItemInstance itemstack = this.getInventoryItem(0);
+            final ItemStack itemstack = this.getStack(0);
             for (int i = 0; i < TileEntityEnchanter.enchantments.size(); ++i)
             {
                 if (itemstack != null && TileEntityEnchanter.enchantments.get(i) != null && itemstack.itemId == ((Enchantment) TileEntityEnchanter.enchantments.get(i)).enchantFrom.itemId)
@@ -193,7 +193,7 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
                         this.currentEnchantment = (Enchantment) TileEntityEnchanter.enchantments.get(i);
                         this.enchantTimeForItem = this.currentEnchantment.enchantPowerNeeded;
                     }
-                    else if (this.enchanterItemStacks[2].itemId == ((Enchantment) TileEntityEnchanter.enchantments.get(i)).enchantTo.itemId && ((Enchantment) TileEntityEnchanter.enchantments.get(i)).enchantTo.getType().getMaxStackSize() > this.enchanterItemStacks[2].count)
+                    else if (this.enchanterItemStacks[2].itemId == ((Enchantment) TileEntityEnchanter.enchantments.get(i)).enchantTo.itemId && ((Enchantment) TileEntityEnchanter.enchantments.get(i)).enchantTo.getItem().getMaxCount() > this.enchanterItemStacks[2].count)
                     {
                         this.currentEnchantment = (Enchantment) TileEntityEnchanter.enchantments.get(i);
                         this.enchantTimeForItem = this.currentEnchantment.enchantPowerNeeded;
@@ -204,12 +204,12 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public boolean canPlayerUse(final PlayerBase player)
+    public boolean canPlayerUse(final PlayerEntity player)
     {
-        return this.level.getTileEntity(this.x, this.y, this.z) == this && player.squaredDistanceTo(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
+        return this.world.method_1777(this.x, this.y, this.z) == this && player.method_1347(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
     }
 
-    public static void addEnchantment(final ItemInstance from, final ItemInstance to, final int i)
+    public static void addEnchantment(final ItemStack from, final ItemStack to, final int i)
     {
         TileEntityEnchanter.enchantments.add(new Enchantment(from, to, i));
     }
@@ -217,87 +217,87 @@ public class TileEntityEnchanter extends TileEntityBase implements InventoryBase
     static
     {
         TileEntityEnchanter.enchantments = new ArrayList<Enchantment>();
-        addEnchantment(new ItemInstance(AetherBlocks.GRAVITITE_ORE, 1), new ItemInstance(AetherBlocks.ENCHANTED_GRAVITITE, 1), 1000);
-        addEnchantment(new ItemInstance(AetherItems.PickSkyroot, 1), new ItemInstance(AetherItems.PickSkyroot, 1), 250);
-        addEnchantment(new ItemInstance(AetherItems.SwordSkyroot, 1), new ItemInstance(AetherItems.SwordSkyroot, 1), 250);
-        addEnchantment(new ItemInstance(AetherItems.ShovelSkyroot, 1), new ItemInstance(AetherItems.ShovelSkyroot, 1), 200);
-        addEnchantment(new ItemInstance(AetherItems.AxeSkyroot, 1), new ItemInstance(AetherItems.AxeSkyroot, 1), 200);
-        addEnchantment(new ItemInstance(AetherItems.PickHolystone, 1), new ItemInstance(AetherItems.PickHolystone, 1), 600);
-        addEnchantment(new ItemInstance(AetherItems.SwordHolystone, 1), new ItemInstance(AetherItems.SwordHolystone, 1), 600);
-        addEnchantment(new ItemInstance(AetherItems.ShovelHolystone, 1), new ItemInstance(AetherItems.ShovelHolystone, 1), 500);
-        addEnchantment(new ItemInstance(AetherItems.AxeHolystone, 1), new ItemInstance(AetherItems.AxeHolystone, 1), 500);
-        addEnchantment(new ItemInstance(AetherItems.PickZanite, 1), new ItemInstance(AetherItems.PickZanite, 1), 2500);
-        addEnchantment(new ItemInstance(AetherItems.SwordZanite, 1), new ItemInstance(AetherItems.SwordZanite, 1), 2500);
-        addEnchantment(new ItemInstance(AetherItems.ShovelZanite, 1), new ItemInstance(AetherItems.ShovelZanite, 1), 2000);
-        addEnchantment(new ItemInstance(AetherItems.AxeZanite, 1), new ItemInstance(AetherItems.AxeZanite, 1), 2000);
-        addEnchantment(new ItemInstance(AetherItems.PickGravitite, 1), new ItemInstance(AetherItems.PickGravitite, 1), 6000);
-        addEnchantment(new ItemInstance(AetherItems.SwordGravitite, 1), new ItemInstance(AetherItems.SwordGravitite, 1), 6000);
-        addEnchantment(new ItemInstance(AetherItems.ShovelGravitite, 1), new ItemInstance(AetherItems.ShovelGravitite, 1), 5000);
-        addEnchantment(new ItemInstance(AetherItems.AxeGravitite, 1), new ItemInstance(AetherItems.AxeGravitite, 1), 5000);
-        addEnchantment(new ItemInstance(AetherItems.Dart, 1, 0), new ItemInstance(AetherItems.Dart, 1, 2), 250);
-        addEnchantment(new ItemInstance(AetherItems.Bucket, 1, 2), new ItemInstance(AetherItems.Bucket, 1, 3), 1000);
+        addEnchantment(new ItemStack(AetherBlocks.GRAVITITE_ORE, 1), new ItemStack(AetherBlocks.ENCHANTED_GRAVITITE, 1), 1000);
+        addEnchantment(new ItemStack(AetherItems.PickSkyroot, 1), new ItemStack(AetherItems.PickSkyroot, 1), 250);
+        addEnchantment(new ItemStack(AetherItems.SwordSkyroot, 1), new ItemStack(AetherItems.SwordSkyroot, 1), 250);
+        addEnchantment(new ItemStack(AetherItems.ShovelSkyroot, 1), new ItemStack(AetherItems.ShovelSkyroot, 1), 200);
+        addEnchantment(new ItemStack(AetherItems.AxeSkyroot, 1), new ItemStack(AetherItems.AxeSkyroot, 1), 200);
+        addEnchantment(new ItemStack(AetherItems.PickHolystone, 1), new ItemStack(AetherItems.PickHolystone, 1), 600);
+        addEnchantment(new ItemStack(AetherItems.SwordHolystone, 1), new ItemStack(AetherItems.SwordHolystone, 1), 600);
+        addEnchantment(new ItemStack(AetherItems.ShovelHolystone, 1), new ItemStack(AetherItems.ShovelHolystone, 1), 500);
+        addEnchantment(new ItemStack(AetherItems.AxeHolystone, 1), new ItemStack(AetherItems.AxeHolystone, 1), 500);
+        addEnchantment(new ItemStack(AetherItems.PickZanite, 1), new ItemStack(AetherItems.PickZanite, 1), 2500);
+        addEnchantment(new ItemStack(AetherItems.SwordZanite, 1), new ItemStack(AetherItems.SwordZanite, 1), 2500);
+        addEnchantment(new ItemStack(AetherItems.ShovelZanite, 1), new ItemStack(AetherItems.ShovelZanite, 1), 2000);
+        addEnchantment(new ItemStack(AetherItems.AxeZanite, 1), new ItemStack(AetherItems.AxeZanite, 1), 2000);
+        addEnchantment(new ItemStack(AetherItems.PickGravitite, 1), new ItemStack(AetherItems.PickGravitite, 1), 6000);
+        addEnchantment(new ItemStack(AetherItems.SwordGravitite, 1), new ItemStack(AetherItems.SwordGravitite, 1), 6000);
+        addEnchantment(new ItemStack(AetherItems.ShovelGravitite, 1), new ItemStack(AetherItems.ShovelGravitite, 1), 5000);
+        addEnchantment(new ItemStack(AetherItems.AxeGravitite, 1), new ItemStack(AetherItems.AxeGravitite, 1), 5000);
+        addEnchantment(new ItemStack(AetherItems.Dart, 1, 0), new ItemStack(AetherItems.Dart, 1, 2), 250);
+        addEnchantment(new ItemStack(AetherItems.Bucket, 1, 2), new ItemStack(AetherItems.Bucket, 1, 3), 1000);
         //addEnchantment(new ItemInstance(ItemBase.record13, 1), new ItemInstance(AetherItems.BlueMusicDisk, 1), 2500);
         //(new ItemInstance(ItemBase.recordCat, 1), new ItemInstance(AetherItems.BlueMusicDisk, 1), 2500);
-        addEnchantment(new ItemInstance(ItemBase.leatherHelmet, 1), new ItemInstance(ItemBase.leatherHelmet, 1), 400);
-        addEnchantment(new ItemInstance(ItemBase.leatherChestplate, 1), new ItemInstance(ItemBase.leatherChestplate, 1), 500);
-        addEnchantment(new ItemInstance(ItemBase.leatherLeggings, 1), new ItemInstance(ItemBase.leatherLeggings, 1), 500);
-        addEnchantment(new ItemInstance(ItemBase.leatherBoots, 1), new ItemInstance(ItemBase.leatherBoots, 1), 400);
-        addEnchantment(new ItemInstance(ItemBase.woodPickaxe, 1), new ItemInstance(ItemBase.woodPickaxe, 1), 500);
-        addEnchantment(new ItemInstance(ItemBase.woodShovel, 1), new ItemInstance(ItemBase.woodShovel, 1), 400);
-        addEnchantment(new ItemInstance(ItemBase.woodSword, 1), new ItemInstance(ItemBase.woodSword, 1), 500);
-        addEnchantment(new ItemInstance(ItemBase.woodAxe, 1), new ItemInstance(ItemBase.woodAxe, 1), 400);
-        addEnchantment(new ItemInstance(ItemBase.woodHoe, 1), new ItemInstance(ItemBase.woodHoe, 1), 300);
-        addEnchantment(new ItemInstance(ItemBase.stonePickaxe, 1), new ItemInstance(ItemBase.stonePickaxe, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.stoneShovel, 1), new ItemInstance(ItemBase.stoneShovel, 1), 750);
-        addEnchantment(new ItemInstance(ItemBase.stoneSword, 1), new ItemInstance(ItemBase.stoneSword, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.stoneAxe, 1), new ItemInstance(ItemBase.stoneAxe, 1), 750);
-        addEnchantment(new ItemInstance(ItemBase.stoneHoe, 1), new ItemInstance(ItemBase.stoneHoe, 1), 750);
-        addEnchantment(new ItemInstance(ItemBase.ironHelmet, 1), new ItemInstance(ItemBase.ironHelmet, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.ironChestplate, 1), new ItemInstance(ItemBase.ironChestplate, 1), 2000);
-        addEnchantment(new ItemInstance(ItemBase.ironLeggings, 1), new ItemInstance(ItemBase.ironLeggings, 1), 2000);
-        addEnchantment(new ItemInstance(ItemBase.ironBoots, 1), new ItemInstance(ItemBase.ironBoots, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.ironPickaxe, 1), new ItemInstance(ItemBase.ironPickaxe, 1), 2500);
-        addEnchantment(new ItemInstance(ItemBase.ironShovel, 1), new ItemInstance(ItemBase.ironShovel, 1), 2000);
-        addEnchantment(new ItemInstance(ItemBase.ironSword, 1), new ItemInstance(ItemBase.ironSword, 1), 2500);
-        addEnchantment(new ItemInstance(ItemBase.ironAxe, 1), new ItemInstance(ItemBase.ironAxe, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.ironHoe, 1), new ItemInstance(ItemBase.ironHoe, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.goldHelmet, 1), new ItemInstance(ItemBase.goldHelmet, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.goldChestplate, 1), new ItemInstance(ItemBase.goldChestplate, 1), 1200);
-        addEnchantment(new ItemInstance(ItemBase.goldLeggings, 1), new ItemInstance(ItemBase.goldLeggings, 1), 1200);
-        addEnchantment(new ItemInstance(ItemBase.goldBoots, 1), new ItemInstance(ItemBase.goldBoots, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.goldPickaxe, 1), new ItemInstance(ItemBase.goldPickaxe, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.goldShovel, 1), new ItemInstance(ItemBase.goldShovel, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.goldSword, 1), new ItemInstance(ItemBase.goldSword, 1), 1500);
-        addEnchantment(new ItemInstance(ItemBase.goldAxe, 1), new ItemInstance(ItemBase.goldAxe, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.goldHoe, 1), new ItemInstance(ItemBase.goldHoe, 1), 1000);
-        addEnchantment(new ItemInstance(ItemBase.diamondHelmet, 1), new ItemInstance(ItemBase.diamondHelmet, 1), 5000);
-        addEnchantment(new ItemInstance(ItemBase.diamondChestplate, 1), new ItemInstance(ItemBase.diamondChestplate, 1), 6000);
-        addEnchantment(new ItemInstance(ItemBase.diamondLeggings, 1), new ItemInstance(ItemBase.diamondLeggings, 1), 6000);
-        addEnchantment(new ItemInstance(ItemBase.diamondBoots, 1), new ItemInstance(ItemBase.diamondBoots, 1), 5000);
-        addEnchantment(new ItemInstance(ItemBase.diamondPickaxe, 1), new ItemInstance(ItemBase.diamondPickaxe, 1), 7000);
-        addEnchantment(new ItemInstance(ItemBase.diamondShovel, 1), new ItemInstance(ItemBase.diamondShovel, 1), 6000);
-        addEnchantment(new ItemInstance(ItemBase.diamondSword, 1), new ItemInstance(ItemBase.diamondSword, 1), 6500);
-        addEnchantment(new ItemInstance(ItemBase.diamondAxe, 1), new ItemInstance(ItemBase.diamondAxe, 1), 6000);
-        addEnchantment(new ItemInstance(ItemBase.diamondHoe, 1), new ItemInstance(ItemBase.diamondHoe, 1), 6000);
-        addEnchantment(new ItemInstance(ItemBase.fishingRod, 1), new ItemInstance(ItemBase.fishingRod, 1), 500);
-        addEnchantment(new ItemInstance(AetherBlocks.QUICKSOIL, 1), new ItemInstance(AetherBlocks.QUICKSOIL_GLASS, 1), 250);
-        addEnchantment(new ItemInstance(AetherBlocks.HOLYSTONE, 1), new ItemInstance(AetherItems.HealingStone, 1), 750);
-        addEnchantment(new ItemInstance(AetherItems.GravititeHelmet, 1), new ItemInstance(AetherItems.GravititeHelmet, 1), 12000);
-        addEnchantment(new ItemInstance(AetherItems.GravititeBodyplate, 1), new ItemInstance(AetherItems.GravititeBodyplate, 1), 20000);
-        addEnchantment(new ItemInstance(AetherItems.GravititePlatelegs, 1), new ItemInstance(AetherItems.GravititePlatelegs, 1), 15000);
-        addEnchantment(new ItemInstance(AetherItems.GravititeBoots, 1), new ItemInstance(AetherItems.GravititeBoots, 1), 12000);
-        addEnchantment(new ItemInstance(AetherItems.GravititeGlove, 1), new ItemInstance(AetherItems.GravititeGlove, 1), 10000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteHelmet, 1), new ItemInstance(AetherItems.ZaniteHelmet, 1), 6000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteChestplate, 1), new ItemInstance(AetherItems.ZaniteChestplate, 1), 10000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteLeggings, 1), new ItemInstance(AetherItems.ZaniteLeggings, 1), 8000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteBoots, 1), new ItemInstance(AetherItems.ZaniteBoots, 1), 5000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteGlove, 1), new ItemInstance(AetherItems.ZaniteGlove, 1), 4000);
-        addEnchantment(new ItemInstance(AetherItems.ZaniteRing, 1), new ItemInstance(AetherItems.ZaniteRing, 1), 2000);
-        addEnchantment(new ItemInstance(AetherItems.ZanitePendant, 1), new ItemInstance(AetherItems.ZanitePendant, 1), 2000);
-        addEnchantment(new ItemInstance(AetherItems.LeatherGlove, 1), new ItemInstance(AetherItems.LeatherGlove, 1), 300);
-        addEnchantment(new ItemInstance(AetherItems.IronGlove, 1), new ItemInstance(AetherItems.IronGlove, 1), 1200);
-        addEnchantment(new ItemInstance(AetherItems.GoldGlove, 1), new ItemInstance(AetherItems.GoldGlove, 1), 800);
-        addEnchantment(new ItemInstance(AetherItems.DiamondGlove, 1), new ItemInstance(AetherItems.DiamondGlove, 1), 4000);
-        addEnchantment(new ItemInstance(AetherItems.DartShooter, 1, 0), new ItemInstance(AetherItems.DartShooter, 1, 2), 2000);
+        addEnchantment(new ItemStack(Item.LEATHER_HELMET, 1), new ItemStack(Item.LEATHER_HELMET, 1), 400);
+        addEnchantment(new ItemStack(Item.LEATHER_CHESTPLATE, 1), new ItemStack(Item.LEATHER_CHESTPLATE, 1), 500);
+        addEnchantment(new ItemStack(Item.LEATHER_LEGGINGS, 1), new ItemStack(Item.LEATHER_LEGGINGS, 1), 500);
+        addEnchantment(new ItemStack(Item.LEATHER_BOOTS, 1), new ItemStack(Item.LEATHER_BOOTS, 1), 400);
+        addEnchantment(new ItemStack(Item.WOODEN_PICKAXE, 1), new ItemStack(Item.WOODEN_PICKAXE, 1), 500);
+        addEnchantment(new ItemStack(Item.WOODEN_SHOVEL, 1), new ItemStack(Item.WOODEN_SHOVEL, 1), 400);
+        addEnchantment(new ItemStack(Item.WOODEN_SWORD, 1), new ItemStack(Item.WOODEN_SWORD, 1), 500);
+        addEnchantment(new ItemStack(Item.WOODEN_AXE, 1), new ItemStack(Item.WOODEN_AXE, 1), 400);
+        addEnchantment(new ItemStack(Item.WOODEN_HOE, 1), new ItemStack(Item.WOODEN_HOE, 1), 300);
+        addEnchantment(new ItemStack(Item.STONE_PICKAXE, 1), new ItemStack(Item.STONE_PICKAXE, 1), 1000);
+        addEnchantment(new ItemStack(Item.STONE_SHOVEL, 1), new ItemStack(Item.STONE_SHOVEL, 1), 750);
+        addEnchantment(new ItemStack(Item.STONE_SWORD, 1), new ItemStack(Item.STONE_SWORD, 1), 1000);
+        addEnchantment(new ItemStack(Item.STONE_HATCHET, 1), new ItemStack(Item.STONE_HATCHET, 1), 750);
+        addEnchantment(new ItemStack(Item.STONE_HOE, 1), new ItemStack(Item.STONE_HOE, 1), 750);
+        addEnchantment(new ItemStack(Item.IRON_HELMET, 1), new ItemStack(Item.IRON_HELMET, 1), 1500);
+        addEnchantment(new ItemStack(Item.IRON_CHESTPLATE, 1), new ItemStack(Item.IRON_CHESTPLATE, 1), 2000);
+        addEnchantment(new ItemStack(Item.IRON_LEGGINGS, 1), new ItemStack(Item.IRON_LEGGINGS, 1), 2000);
+        addEnchantment(new ItemStack(Item.IRON_BOOTS, 1), new ItemStack(Item.IRON_BOOTS, 1), 1500);
+        addEnchantment(new ItemStack(Item.IRON_PICKAXE, 1), new ItemStack(Item.IRON_PICKAXE, 1), 2500);
+        addEnchantment(new ItemStack(Item.IRON_SHOVEL, 1), new ItemStack(Item.IRON_SHOVEL, 1), 2000);
+        addEnchantment(new ItemStack(Item.IRON_SWORD, 1), new ItemStack(Item.IRON_SWORD, 1), 2500);
+        addEnchantment(new ItemStack(Item.IRON_AXE, 1), new ItemStack(Item.IRON_AXE, 1), 1500);
+        addEnchantment(new ItemStack(Item.IRON_HOE, 1), new ItemStack(Item.IRON_HOE, 1), 1500);
+        addEnchantment(new ItemStack(Item.GOLDEN_HELMET, 1), new ItemStack(Item.GOLDEN_HELMET, 1), 1000);
+        addEnchantment(new ItemStack(Item.GOLDEN_CHESTPLATE, 1), new ItemStack(Item.GOLDEN_CHESTPLATE, 1), 1200);
+        addEnchantment(new ItemStack(Item.GOLDEN_LEGGINGS, 1), new ItemStack(Item.GOLDEN_LEGGINGS, 1), 1200);
+        addEnchantment(new ItemStack(Item.GOLDEN_BOOTS, 1), new ItemStack(Item.GOLDEN_BOOTS, 1), 1000);
+        addEnchantment(new ItemStack(Item.GOLDEN_PICKAXE, 1), new ItemStack(Item.GOLDEN_PICKAXE, 1), 1500);
+        addEnchantment(new ItemStack(Item.GOLDEN_SHOVEL, 1), new ItemStack(Item.GOLDEN_SHOVEL, 1), 1000);
+        addEnchantment(new ItemStack(Item.GOLDEN_SWORD, 1), new ItemStack(Item.GOLDEN_SWORD, 1), 1500);
+        addEnchantment(new ItemStack(Item.GOLDEN_AXE, 1), new ItemStack(Item.GOLDEN_AXE, 1), 1000);
+        addEnchantment(new ItemStack(Item.GOLDEN_HOE, 1), new ItemStack(Item.GOLDEN_HOE, 1), 1000);
+        addEnchantment(new ItemStack(Item.DIAMOND_HELMET, 1), new ItemStack(Item.DIAMOND_HELMET, 1), 5000);
+        addEnchantment(new ItemStack(Item.DIAMOND_CHESTPLATE, 1), new ItemStack(Item.DIAMOND_CHESTPLATE, 1), 6000);
+        addEnchantment(new ItemStack(Item.DIAMOND_LEGGINGS, 1), new ItemStack(Item.DIAMOND_LEGGINGS, 1), 6000);
+        addEnchantment(new ItemStack(Item.DIAMOND_BOOTS, 1), new ItemStack(Item.DIAMOND_BOOTS, 1), 5000);
+        addEnchantment(new ItemStack(Item.DIAMOND_PICKAXE, 1), new ItemStack(Item.DIAMOND_PICKAXE, 1), 7000);
+        addEnchantment(new ItemStack(Item.DIAMOND_SHOVEL, 1), new ItemStack(Item.DIAMOND_SHOVEL, 1), 6000);
+        addEnchantment(new ItemStack(Item.DIAMOND_SWORD, 1), new ItemStack(Item.DIAMOND_SWORD, 1), 6500);
+        addEnchantment(new ItemStack(Item.DIAMOND_AXE, 1), new ItemStack(Item.DIAMOND_AXE, 1), 6000);
+        addEnchantment(new ItemStack(Item.DIAMOND_HOE, 1), new ItemStack(Item.DIAMOND_HOE, 1), 6000);
+        addEnchantment(new ItemStack(Item.FISHING_ROD, 1), new ItemStack(Item.FISHING_ROD, 1), 500);
+        addEnchantment(new ItemStack(AetherBlocks.QUICKSOIL, 1), new ItemStack(AetherBlocks.QUICKSOIL_GLASS, 1), 250);
+        addEnchantment(new ItemStack(AetherBlocks.HOLYSTONE, 1), new ItemStack(AetherItems.HealingStone, 1), 750);
+        addEnchantment(new ItemStack(AetherItems.GravititeHelmet, 1), new ItemStack(AetherItems.GravititeHelmet, 1), 12000);
+        addEnchantment(new ItemStack(AetherItems.GravititeBodyplate, 1), new ItemStack(AetherItems.GravititeBodyplate, 1), 20000);
+        addEnchantment(new ItemStack(AetherItems.GravititePlatelegs, 1), new ItemStack(AetherItems.GravititePlatelegs, 1), 15000);
+        addEnchantment(new ItemStack(AetherItems.GravititeBoots, 1), new ItemStack(AetherItems.GravititeBoots, 1), 12000);
+        addEnchantment(new ItemStack(AetherItems.GravititeGlove, 1), new ItemStack(AetherItems.GravititeGlove, 1), 10000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteHelmet, 1), new ItemStack(AetherItems.ZaniteHelmet, 1), 6000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteChestplate, 1), new ItemStack(AetherItems.ZaniteChestplate, 1), 10000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteLeggings, 1), new ItemStack(AetherItems.ZaniteLeggings, 1), 8000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteBoots, 1), new ItemStack(AetherItems.ZaniteBoots, 1), 5000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteGlove, 1), new ItemStack(AetherItems.ZaniteGlove, 1), 4000);
+        addEnchantment(new ItemStack(AetherItems.ZaniteRing, 1), new ItemStack(AetherItems.ZaniteRing, 1), 2000);
+        addEnchantment(new ItemStack(AetherItems.ZanitePendant, 1), new ItemStack(AetherItems.ZanitePendant, 1), 2000);
+        addEnchantment(new ItemStack(AetherItems.LeatherGlove, 1), new ItemStack(AetherItems.LeatherGlove, 1), 300);
+        addEnchantment(new ItemStack(AetherItems.IronGlove, 1), new ItemStack(AetherItems.IronGlove, 1), 1200);
+        addEnchantment(new ItemStack(AetherItems.GoldGlove, 1), new ItemStack(AetherItems.GoldGlove, 1), 800);
+        addEnchantment(new ItemStack(AetherItems.DiamondGlove, 1), new ItemStack(AetherItems.DiamondGlove, 1), 4000);
+        addEnchantment(new ItemStack(AetherItems.DartShooter, 1, 0), new ItemStack(AetherItems.DartShooter, 1, 2), 2000);
     }
 }

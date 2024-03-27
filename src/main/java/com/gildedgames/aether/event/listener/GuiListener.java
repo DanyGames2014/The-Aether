@@ -12,12 +12,12 @@ import com.gildedgames.aether.gui.GuiTreasureChest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mine_diver.unsafeevents.listener.EventListener;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.inventory.InventoryBase;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.modificationstation.stationapi.api.event.registry.GuiHandlerRegistryEvent;
 import net.modificationstation.stationapi.api.registry.GuiHandlerRegistry;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.modificationstation.stationapi.api.util.Identifier;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 public class GuiListener
@@ -36,25 +36,25 @@ public class GuiListener
     }
 
     @Environment(EnvType.CLIENT)
-    public ScreenBase openTreasureChest(PlayerBase player, InventoryBase inventoryBase)
+    public Screen openTreasureChest(PlayerEntity player, Inventory inventoryBase)
     {
         return new GuiTreasureChest(player.inventory, (TileEntityTreasureChest) inventoryBase);
     }
 
     @Environment(EnvType.CLIENT)
-    public ScreenBase openFreezer(PlayerBase player, InventoryBase inventoryBase)
+    public Screen openFreezer(PlayerEntity player, Inventory inventoryBase)
     {
         return new GuiFreezer(player.inventory, (TileEntityFreezer) inventoryBase);
     }
 
     @Environment(EnvType.CLIENT)
-    public ScreenBase openEnchanter(PlayerBase player, InventoryBase inventoryBase)
+    public Screen openEnchanter(PlayerEntity player, Inventory inventoryBase)
     {
         return new GuiEnchanter(player.inventory, (TileEntityEnchanter) inventoryBase);
     }
 
     @Environment(EnvType.CLIENT)
-    public ScreenBase openIncubator(PlayerBase player, InventoryBase inventoryBase)
+    public Screen openIncubator(PlayerEntity player, Inventory inventoryBase)
     {
         return new GuiIncubator(player.inventory, (TileEntityIncubator) inventoryBase);
     }

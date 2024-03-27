@@ -1,14 +1,14 @@
 package com.gildedgames.aether.item.tool;
 
 import com.gildedgames.aether.item.misc.ItemAether;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public class ItemNotchHammer extends ItemAether
@@ -18,44 +18,44 @@ public class ItemNotchHammer extends ItemAether
     public ItemNotchHammer(final @NotNull Identifier identifier)
     {
         super(identifier);
-        this.maxStackSize = 1;
+        this.maxCount = 1;
         // field_1690 is IRON
-        this.setDurability(ToolMaterial.field_1690.getDurability());
-        this.weaponDamage = 4 + ToolMaterial.field_1690.getAttackDamage() * 2;
+        this.setMaxDamage(ToolMaterial.IRON.getDurability());
+        this.weaponDamage = 4 + ToolMaterial.IRON.getAttackDamage() * 2;
     }
 
     @Override
-    public float getStrengthOnBlock(final ItemInstance item, final BlockBase tile)
+    public float getMiningSpeedMultiplier(final ItemStack item, final Block tile)
     {
         return 1.5f;
     }
 
     @Override
-    public boolean postHit(final ItemInstance itemstack, final Living damageSource, final Living damageTarget)
+    public boolean postHit(final ItemStack itemstack, final LivingEntity damageSource, final LivingEntity damageTarget)
     {
-        itemstack.applyDamage(1, damageTarget);
+        itemstack.damage(1, damageTarget);
         return true;
     }
 
     @Override
-    public boolean postMine(final ItemInstance itemstack, final int i, final int j, final int k, final int l, final Living damageTarget)
+    public boolean postMine(final ItemStack itemstack, final int i, final int j, final int k, final int l, final LivingEntity damageTarget)
     {
-        itemstack.applyDamage(2, damageTarget);
+        itemstack.damage(2, damageTarget);
         return true;
     }
 
     @Override
-    public int getAttack(final EntityBase entity)
+    public int getAttackDamage(final Entity entity)
     {
         return this.weaponDamage;
     }
 
     @Override
-    public ItemInstance use(final ItemInstance item, final Level level, final PlayerBase player)
+    public ItemStack use(final ItemStack item, final World level, final PlayerEntity player)
     {
-        item.applyDamage(1, player);
-        level.playSound((EntityBase) player, "mob.ghast.fireball", 1.0f, 1.0f / (ItemNotchHammer.rand.nextFloat() * 0.4f + 0.8f));
-        if (!level.isServerSide)
+        item.damage(1, player);
+        level.playSound((Entity) player, "mob.ghast.fireball", 1.0f, 1.0f / (ItemNotchHammer.random.nextFloat() * 0.4f + 0.8f));
+        if (!level.isRemote)
         {
             /*TODO: NotchWave final EntityNotchWave notchwave = new EntityNotchWave(level, player);
             level.spawnEntity(notchwave);*/
@@ -64,7 +64,7 @@ public class ItemNotchHammer extends ItemAether
     }
 
     @Override
-    public boolean isRendered3d()
+    public boolean isHandheld()
     {
         return true;
     }

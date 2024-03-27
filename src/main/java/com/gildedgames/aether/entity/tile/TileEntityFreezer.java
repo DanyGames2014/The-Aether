@@ -3,23 +3,23 @@ package com.gildedgames.aether.entity.tile;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
 import com.gildedgames.aether.utils.Frozen;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.inventory.InventoryBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.tileentity.TileEntityBase;
-import net.minecraft.util.io.AbstractTag;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.io.ListTag;
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityFreezer extends TileEntityBase implements InventoryBase
+public class TileEntityFreezer extends BlockEntity implements Inventory
 {
     private static List<Frozen> frozen;
-    private ItemInstance[] frozenItemStacks;
+    private ItemStack[] frozenItemStacks;
     public int frozenProgress;
     public int frozenPowerRemaining;
     public int frozenTimeForItem;
@@ -27,26 +27,26 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
 
     public TileEntityFreezer()
     {
-        this.frozenItemStacks = new ItemInstance[3];
+        this.frozenItemStacks = new ItemStack[3];
         this.frozenProgress = 0;
         this.frozenPowerRemaining = 0;
         this.frozenTimeForItem = 0;
     }
 
     @Override
-    public int getInventorySize()
+    public int size()
     {
         return this.frozenItemStacks.length;
     }
 
     @Override
-    public ItemInstance getInventoryItem(final int index)
+    public ItemStack getStack(final int index)
     {
         return this.frozenItemStacks[index];
     }
 
     @Override
-    public ItemInstance takeInventoryItem(final int index, final int count)
+    public ItemStack removeStack(final int index, final int count)
     {
         if (this.frozenItemStacks[index] == null)
         {
@@ -54,11 +54,11 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
         }
         if (this.frozenItemStacks[index].count <= count)
         {
-            final ItemInstance itemstack = this.frozenItemStacks[index];
+            final ItemStack itemstack = this.frozenItemStacks[index];
             this.frozenItemStacks[index] = null;
             return itemstack;
         }
-        final ItemInstance itemstack2 = this.frozenItemStacks[index].split(count);
+        final ItemStack itemstack2 = this.frozenItemStacks[index].split(count);
         if (this.frozenItemStacks[index].count == 0)
         {
             this.frozenItemStacks[index] = null;
@@ -67,34 +67,34 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void setInventoryItem(final int slot, final ItemInstance stack)
+    public void setStack(final int slot, final ItemStack stack)
     {
         this.frozenItemStacks[slot] = stack;
-        if (stack != null && stack.count > this.getMaxItemCount())
+        if (stack != null && stack.count > this.getMaxCountPerStack())
         {
-            stack.count = this.getMaxItemCount();
+            stack.count = this.getMaxCountPerStack();
         }
     }
 
     @Override
-    public String getContainerName()
+    public String getName()
     {
         return "Freezer";
     }
 
     @Override
-    public void readIdentifyingData(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readIdentifyingData(tag);
-        final ListTag nbttaglist = tag.getListTag("Items");
-        this.frozenItemStacks = new ItemInstance[this.getInventorySize()];
+        super.readNbt(tag);
+        final NbtList nbttaglist = tag.getList("Items");
+        this.frozenItemStacks = new ItemStack[this.size()];
         for (int i = 0; i < nbttaglist.size(); ++i)
         {
-            final CompoundTag nbttagcompound1 = (CompoundTag) nbttaglist.get(i);
+            final NbtCompound nbttagcompound1 = (NbtCompound) nbttaglist.get(i);
             final byte byte0 = nbttagcompound1.getByte("Slot");
             if (byte0 >= 0 && byte0 < this.frozenItemStacks.length)
             {
-                this.frozenItemStacks[byte0] = new ItemInstance(nbttagcompound1);
+                this.frozenItemStacks[byte0] = new ItemStack(nbttagcompound1);
             }
         }
         this.frozenProgress = tag.getShort("BurnTime");
@@ -102,27 +102,27 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void writeIdentifyingData(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeIdentifyingData(tag);
-        tag.put("BurnTime", (short) this.frozenProgress);
-        tag.put("CookTime", (short) this.frozenTimeForItem);
-        final ListTag nbttaglist = new ListTag();
+        super.writeNbt(tag);
+        tag.putShort("BurnTime", (short) this.frozenProgress);
+        tag.putShort("CookTime", (short) this.frozenTimeForItem);
+        final NbtList nbttaglist = new NbtList();
         for (int i = 0; i < this.frozenItemStacks.length; ++i)
         {
             if (this.frozenItemStacks[i] != null)
             {
-                final CompoundTag nbttagcompound1 = new CompoundTag();
-                nbttagcompound1.put("Slot", (byte) i);
-                this.frozenItemStacks[i].toTag(nbttagcompound1);
+                final NbtCompound nbttagcompound1 = new NbtCompound();
+                nbttagcompound1.putByte("Slot", (byte) i);
+                this.frozenItemStacks[i].writeNbt(nbttagcompound1);
                 nbttaglist.add(nbttagcompound1);
             }
         }
-        tag.put("Items", (AbstractTag) nbttaglist);
+        tag.put("Items", (NbtElement) nbttaglist);
     }
 
     @Override
-    public int getMaxItemCount()
+    public int getMaxCountPerStack()
     {
         return 64;
     }
@@ -147,7 +147,7 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public void tick()
+    public void method_1076()
     {
         if (this.frozenPowerRemaining > 0)
         {
@@ -166,36 +166,36 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
         {
             if (this.frozenItemStacks[2] == null)
             {
-                this.setInventoryItem(2, new ItemInstance(this.currentFrozen.frozenTo.getType(), 1, this.currentFrozen.frozenTo.getDamage()));
+                this.setStack(2, new ItemStack(this.currentFrozen.frozenTo.getItem(), 1, this.currentFrozen.frozenTo.getDamage()));
             }
             else
             {
-                this.setInventoryItem(2, new ItemInstance(this.currentFrozen.frozenTo.getType(), this.getInventoryItem(2).count + 1, this.currentFrozen.frozenTo.getDamage()));
+                this.setStack(2, new ItemStack(this.currentFrozen.frozenTo.getItem(), this.getStack(2).count + 1, this.currentFrozen.frozenTo.getDamage()));
             }
-            if (this.getInventoryItem(0).itemId == ItemBase.waterBucket.id || this.getInventoryItem(0).itemId == ItemBase.lavaBucket.id)
+            if (this.getStack(0).itemId == Item.WATER_BUCKET.id || this.getStack(0).itemId == Item.LAVA_BUCKET.id)
             {
-                this.setInventoryItem(0, new ItemInstance(ItemBase.bucket));
+                this.setStack(0, new ItemStack(Item.BUCKET));
             }
-            else if (this.getInventoryItem(0).itemId == AetherItems.Bucket.id)
+            else if (this.getStack(0).itemId == AetherItems.Bucket.id)
             {
-                this.setInventoryItem(0, new ItemInstance(AetherItems.Bucket));
+                this.setStack(0, new ItemStack(AetherItems.Bucket));
             }
             else
             {
-                this.takeInventoryItem(0, 1);
+                this.removeStack(0, 1);
             }
             this.frozenProgress = 0;
             this.currentFrozen = null;
             this.frozenTimeForItem = 0;
         }
-        if (this.frozenPowerRemaining <= 0 && this.currentFrozen != null && this.getInventoryItem(1) != null && this.getInventoryItem(1).itemId == AetherBlocks.ICESTONE.id)
+        if (this.frozenPowerRemaining <= 0 && this.currentFrozen != null && this.getStack(1) != null && this.getStack(1).itemId == AetherBlocks.ICESTONE.id)
         {
             this.frozenPowerRemaining += 500;
-            this.takeInventoryItem(1, 1);
+            this.removeStack(1, 1);
         }
         if (this.currentFrozen == null)
         {
-            final ItemInstance itemstack = this.getInventoryItem(0);
+            final ItemStack itemstack = this.getStack(0);
             for (int i = 0; i < TileEntityFreezer.frozen.size(); ++i)
             {
                 if (itemstack != null && TileEntityFreezer.frozen.get(i) != null && itemstack.itemId == ((Frozen) TileEntityFreezer.frozen.get(i)).frozenFrom.itemId && itemstack.getDamage() == ((Frozen) TileEntityFreezer.frozen.get(i)).frozenFrom.getDamage())
@@ -205,7 +205,7 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
                         this.currentFrozen = (Frozen) TileEntityFreezer.frozen.get(i);
                         this.frozenTimeForItem = this.currentFrozen.frozenPowerNeeded;
                     }
-                    else if (this.frozenItemStacks[2].itemId == ((Frozen) TileEntityFreezer.frozen.get(i)).frozenTo.itemId && ((Frozen) TileEntityFreezer.frozen.get(i)).frozenTo.getType().getMaxStackSize() > this.frozenItemStacks[2].count)
+                    else if (this.frozenItemStacks[2].itemId == ((Frozen) TileEntityFreezer.frozen.get(i)).frozenTo.itemId && ((Frozen) TileEntityFreezer.frozen.get(i)).frozenTo.getItem().getMaxCount() > this.frozenItemStacks[2].count)
                     {
                         this.currentFrozen = (Frozen) TileEntityFreezer.frozen.get(i);
                         this.frozenTimeForItem = this.currentFrozen.frozenPowerNeeded;
@@ -216,12 +216,12 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
     }
 
     @Override
-    public boolean canPlayerUse(final PlayerBase player)
+    public boolean canPlayerUse(final PlayerEntity player)
     {
-        return this.level.getTileEntity(this.x, this.y, this.z) == this && player.squaredDistanceTo(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
+        return this.world.method_1777(this.x, this.y, this.z) == this && player.method_1347(this.x + 0.5, this.y + 0.5, this.z + 0.5) <= 64.0;
     }
 
-    public static void addFrozen(final ItemInstance from, final ItemInstance to, final int i)
+    public static void addFrozen(final ItemStack from, final ItemStack to, final int i)
     {
         TileEntityFreezer.frozen.add(new Frozen(from, to, i));
     }
@@ -229,13 +229,13 @@ public class TileEntityFreezer extends TileEntityBase implements InventoryBase
     static
     {
         TileEntityFreezer.frozen = (List<Frozen>) new ArrayList();
-        addFrozen(new ItemInstance(ItemBase.waterBucket, 1), new ItemInstance(BlockBase.ICE, 5), 500);
-        addFrozen(new ItemInstance(AetherItems.Bucket, 1, 8), new ItemInstance(BlockBase.ICE, 5), 500);
-        addFrozen(new ItemInstance(ItemBase.lavaBucket, 1), new ItemInstance(BlockBase.OBSIDIAN, 2), 500);
-        addFrozen(new ItemInstance(AetherBlocks.AERCLOUD, 1, 0), new ItemInstance(AetherBlocks.AERCLOUD, 1, 1), 50);
-        addFrozen(new ItemInstance(AetherItems.GoldPendant, 1), new ItemInstance(AetherItems.IcePendant, 1), 2500);
-        addFrozen(new ItemInstance(AetherItems.GoldRing, 1), new ItemInstance(AetherItems.IceRing, 1), 1500);
-        addFrozen(new ItemInstance(AetherItems.IronRing, 1), new ItemInstance(AetherItems.IceRing, 1), 1500);
-        addFrozen(new ItemInstance(AetherItems.IronPendant, 1), new ItemInstance(AetherItems.IcePendant, 1), 2500);
+        addFrozen(new ItemStack(Item.WATER_BUCKET, 1), new ItemStack(Block.ICE, 5), 500);
+        addFrozen(new ItemStack(AetherItems.Bucket, 1, 8), new ItemStack(Block.ICE, 5), 500);
+        addFrozen(new ItemStack(Item.LAVA_BUCKET, 1), new ItemStack(Block.OBSIDIAN, 2), 500);
+        addFrozen(new ItemStack(AetherBlocks.AERCLOUD, 1, 0), new ItemStack(AetherBlocks.AERCLOUD, 1, 1), 50);
+        addFrozen(new ItemStack(AetherItems.GoldPendant, 1), new ItemStack(AetherItems.IcePendant, 1), 2500);
+        addFrozen(new ItemStack(AetherItems.GoldRing, 1), new ItemStack(AetherItems.IceRing, 1), 1500);
+        addFrozen(new ItemStack(AetherItems.IronRing, 1), new ItemStack(AetherItems.IceRing, 1), 1500);
+        addFrozen(new ItemStack(AetherItems.IronPendant, 1), new ItemStack(AetherItems.IcePendant, 1), 2500);
     }
 }

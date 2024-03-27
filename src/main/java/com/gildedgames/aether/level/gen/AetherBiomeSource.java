@@ -1,13 +1,13 @@
 package com.gildedgames.aether.level.gen;
 
 import com.gildedgames.aether.level.biome.AetherBiomes;
-import net.minecraft.level.biome.Biome;
-import net.minecraft.level.gen.BiomeSource;
-import net.minecraft.util.maths.Vec2i;
+import net.minecraft.class_519;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.biome.Biome;
 
 import java.util.Arrays;
 
-public class AetherBiomeSource extends BiomeSource
+public class AetherBiomeSource extends class_519
 {
 
     private final Biome biome;
@@ -20,25 +20,25 @@ public class AetherBiomeSource extends BiomeSource
     }
 
     @Override
-    public Biome getBiomeInChunk(Vec2i pos)
+    public Biome method_1789(ChunkPos pos)
     {
         return biome;
     }
 
     @Override
-    public Biome getBiome(int x, int z)
+    public Biome method_1787(int x, int z)
     {
         return biome;
     }
 
     @Override
-    public double getTemperature(int x, int z)
+    public double method_1786(int x, int z)
     {
         return temperature;
     }
 
     @Override
-    public double[] getTemperatures(double[] temperatures, int x, int z, int xSize, int zSize)
+    public double[] method_1790(double[] temperatures, int x, int z, int xSize, int zSize)
     {
         if (temperatures == null || temperatures.length < xSize * zSize)
             temperatures = new double[xSize * zSize];
@@ -47,14 +47,14 @@ public class AetherBiomeSource extends BiomeSource
     }
 
     @Override
-    public Biome[] getBiomes(Biome[] biomes, int x, int z, int xSize, int zSize)
+    public Biome[] method_1791(Biome[] biomes, int x, int z, int xSize, int zSize)
     {
         if (biomes == null || biomes.length < xSize * zSize)
             biomes = new Biome[xSize * zSize];
-        if (temperatureNoises == null || temperatureNoises.length < xSize * zSize)
+        if (field_2235 == null || field_2235.length < xSize * zSize)
         {
-            temperatureNoises = new double[xSize * zSize];
-            rainfallNoises = new double[xSize * zSize];
+            field_2235 = new double[xSize * zSize];
+            field_2236 = new double[xSize * zSize];
         }
         Arrays.fill(biomes, 0, xSize * zSize, biome);
         return biomes;

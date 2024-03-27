@@ -4,14 +4,14 @@ import com.gildedgames.aether.block.BlockTreasureChest;
 import com.gildedgames.aether.entity.boss.EntityFireMonster;
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.block.BlockBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Structure;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenDungeon extends Structure
+public class AetherGenDungeon extends Feature
 {
     //public boolean generate(Level level, Random random, int i, int i2, int i3) {return false;}
     //public boolean generate(Level level, Random random, int i, int i2, int i3,int i4) {return false;}
@@ -23,7 +23,7 @@ public class AetherGenDungeon extends Structure
 
     private int floors()
     {
-        return BlockBase.DOUBLE_STONE_SLAB.id;
+        return Block.DOUBLE_SLAB.id;
     }
 
     private int walls()
@@ -47,12 +47,12 @@ public class AetherGenDungeon extends Structure
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         return this.generate(level, rand, x, y, z, 24);
     }
 
-    public boolean generate(final Level world, final Random random, final int x, final int y, final int z, int r)
+    public boolean generate(final World world, final Random random, final int x, final int y, final int z, int r)
     {
         r = (int) Math.floor(r * 0.8);
         final int wid = (int) Math.sqrt((double) (r * r / 2));
@@ -83,10 +83,10 @@ public class AetherGenDungeon extends Structure
                         }
                         else
                         {
-                            world.setTileInChunk(x + i, y + j, z + k, 0);
+                            world.method_200(x + i, y + j, z + k, 0);
                             if (j == -2 && (i == a - 1 || -i == a - 1 || k == a - 1 || -k == a - 1) && (i % 3 == 0 || k % 3 == 0))
                             {
-                                world.setTileInChunk(x + i, y + j + 2, z + k, this.torches());
+                                world.method_200(x + i, y + j + 2, z + k, this.torches());
                             }
                         }
                     }
@@ -95,8 +95,8 @@ public class AetherGenDungeon extends Structure
                         this.setBlock(world, random, x + i, y + j, z + k, this.walls(), 2, this.ceilings(), 2, 10);
                         if ((i == a - 2 || -i == a - 2) && (k == a - 2 || -k == a - 2))
                         {
-                            world.setTileInChunk(x + i, y + j + 1, z + k, BlockBase.NETHERRACK.id);
-                            world.setTileInChunk(x + i, y + j + 2, z + k, BlockBase.FIRE.id);
+                            world.method_200(x + i, y + j + 1, z + k, Block.NETHERRACK.id);
+                            world.method_200(x + i, y + j + 2, z + k, Block.FIRE.id);
                         }
                     }
                 }
@@ -127,7 +127,7 @@ public class AetherGenDungeon extends Structure
                         a2 = -a2;
                         b = -b;
                     }
-                    if (!AetherBlocks.isGood(world.getTileId(x + a2, y + m, z + b), world.getTileMeta(x + a2, y + m, z + b)))
+                    if (!AetherBlocks.isGood(world.getBlockId(x + a2, y + m, z + b), world.getBlockMeta(x + a2, y + m, z + b)))
                     {
                         flag = true;
                         if (m == -3)
@@ -140,7 +140,7 @@ public class AetherGenDungeon extends Structure
                             {
                                 if (k2 < 2 && k2 > -2 && m < 0)
                                 {
-                                    world.setTileInChunk(x + a2, y + m, z + b, this.doors());
+                                    world.method_200(x + a2, y + m, z + b, this.doors());
                                 }
                                 else
                                 {
@@ -153,10 +153,10 @@ public class AetherGenDungeon extends Structure
                             }
                             else
                             {
-                                world.setTileInChunk(x + a2, y + m, z + b, 0);
+                                world.method_200(x + a2, y + m, z + b, 0);
                                 if (m == -1 && (k2 == 2 || k2 == -2) && (l - wid - 2) % 3 == 0)
                                 {
-                                    world.setTileInChunk(x + a2, y + m, z + b, this.torches());
+                                    world.method_200(x + a2, y + m, z + b, this.torches());
                                 }
                             }
                         }
@@ -204,10 +204,10 @@ public class AetherGenDungeon extends Structure
                             }
                             else
                             {
-                                world.setTileInChunk(x + a2, y + m, z + b, 0);
+                                world.method_200(x + a2, y + m, z + b, 0);
                                 if (m == -1 && (k2 == 2 || k2 == -2) && (l - wid - 2) % 3 == 0)
                                 {
-                                    world.setTileInChunk(x + a2, y + m, z + b, this.torches());
+                                    world.method_200(x + a2, y + m, z + b, this.torches());
                                 }
                             }
                         }
@@ -224,53 +224,53 @@ public class AetherGenDungeon extends Structure
             }
         }
         final EntityFireMonster boss = new EntityFireMonster(world, x, y - 1, z, wid, direction);
-        world.spawnEntity(boss);
+        world.method_210(boss);
         System.out.println("Gold Dungeon: " + x + ", " + y + ", " + z);
         return true;
     }
 
-    private void setBlock(final Level world, final Random random, final int i, final int j, final int k, final int block1, final int meta1, final int block2, final int meta2, final int chance)
+    private void setBlock(final World world, final Random random, final int i, final int j, final int k, final int block1, final int meta1, final int block2, final int meta2, final int chance)
     {
         if (random.nextInt(chance) == 0)
         {
-            world.setTileWithMetadata(i, j, k, block2, meta2);
+            world.method_154(i, j, k, block2, meta2);
         }
         else
         {
-            world.setTileWithMetadata(i, j, k, block1, meta1);
+            world.method_154(i, j, k, block1, meta1);
         }
     }
 
-    private ItemInstance getGoldLoot(final Random random)
+    private ItemStack getGoldLoot(final Random random)
     {
         final int item = random.nextInt(8);
         switch (item)
         {
             case 0:
             {
-                return new ItemInstance(AetherItems.IronBubble);
+                return new ItemStack(AetherItems.IronBubble);
             }
             case 1:
             {
-                return new ItemInstance(AetherItems.VampireBlade);
+                return new ItemStack(AetherItems.VampireBlade);
             }
             case 2:
             {
-                return new ItemInstance(AetherItems.PigSlayer);
+                return new ItemStack(AetherItems.PigSlayer);
             }
             case 3:
             {
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.PhoenixHelm);
+                    return new ItemStack(AetherItems.PhoenixHelm);
                 }
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.PhoenixLegs);
+                    return new ItemStack(AetherItems.PhoenixLegs);
                 }
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.PhoenixBody);
+                    return new ItemStack(AetherItems.PhoenixBody);
                 }
                 break;
             }
@@ -278,27 +278,27 @@ public class AetherGenDungeon extends Structure
             {
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.PhoenixBoots);
+                    return new ItemStack(AetherItems.PhoenixBoots);
                 }
-                return new ItemInstance(AetherItems.PhoenixGlove);
+                return new ItemStack(AetherItems.PhoenixGlove);
             }
             case 5:
             {
-                return new ItemInstance(AetherItems.LifeShard);
+                return new ItemStack(AetherItems.LifeShard);
             }
             case 6:
             {
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.GravititeHelmet);
+                    return new ItemStack(AetherItems.GravititeHelmet);
                 }
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.GravititePlatelegs);
+                    return new ItemStack(AetherItems.GravititePlatelegs);
                 }
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.GravititeBodyplate);
+                    return new ItemStack(AetherItems.GravititeBodyplate);
                 }
                 break;
             }
@@ -306,12 +306,12 @@ public class AetherGenDungeon extends Structure
             {
                 if (random.nextBoolean())
                 {
-                    return new ItemInstance(AetherItems.GravititeBoots);
+                    return new ItemStack(AetherItems.GravititeBoots);
                 }
-                return new ItemInstance(AetherItems.GravititeGlove);
+                return new ItemStack(AetherItems.GravititeGlove);
             }
         }
         //return null;
-        return new ItemInstance(AetherItems.ObsidianBody);
+        return new ItemStack(AetherItems.ObsidianBody);
     }
 }

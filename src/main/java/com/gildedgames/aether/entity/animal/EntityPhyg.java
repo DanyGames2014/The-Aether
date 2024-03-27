@@ -6,12 +6,12 @@ import com.gildedgames.aether.mixin.access.EntityBaseAccessor;
 import com.gildedgames.aether.mixin.access.LivingAccessor;
 import com.gildedgames.aether.registry.AetherAchievements;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class EntityPhyg extends EntityAetherAnimal
 {
@@ -24,12 +24,12 @@ public class EntityPhyg extends EntityAetherAnimal
     private boolean jpress;
     private int ticks;
 
-    public EntityPhyg(final Level level)
+    public EntityPhyg(final World level)
     {
         super(level);
         this.getSaddled = false;
         this.texture = "aether:textures/entity/FlyingPigBase.png";
-        this.setSize(0.9f, 1.3f);
+        this.setBoundingBoxSpacing(0.9f, 1.3f);
         this.jrem = 0;
         this.jumps = 1;
         this.ticks = 0;
@@ -44,9 +44,9 @@ public class EntityPhyg extends EntityAetherAnimal
     }
 
     @Override
-    protected boolean canClimb()
+    protected boolean bypassesSteppingEffects()
     {
-        return this.onGround;
+        return this.field_1623;
     }
 
     @Override
@@ -56,18 +56,18 @@ public class EntityPhyg extends EntityAetherAnimal
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Jumps", (short) this.jumps);
-        tag.put("Remaining", (short) this.jrem);
-        tag.put("getSaddled", this.getSaddled);
+        super.writeNbt(tag);
+        tag.putShort("Jumps", (short) this.jumps);
+        tag.putShort("Remaining", (short) this.jrem);
+        tag.putBoolean("getSaddled", this.getSaddled);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.jumps = tag.getShort("Jumps");
         this.jrem = tag.getShort("Remaining");
         this.getSaddled = tag.getBoolean("getSaddled");
@@ -78,7 +78,7 @@ public class EntityPhyg extends EntityAetherAnimal
     }
 
     @Override
-    protected void jump()
+    protected void method_944()
     {
         this.velocityY = 0.6;
     }
@@ -87,7 +87,7 @@ public class EntityPhyg extends EntityAetherAnimal
     public void tick()
     {
         super.tick();
-        if (this.onGround)
+        if (this.field_1623)
         {
             this.wingAngle *= 0.8f;
             this.aimingForFold = 0.1f;
@@ -101,32 +101,32 @@ public class EntityPhyg extends EntityAetherAnimal
         ++this.ticks;
         this.wingAngle = this.wingFold * (float) Math.sin((double) (this.ticks / 31.830988f));
         this.wingFold += (this.aimingForFold - this.wingFold) / 5.0f;
-        this.fallDistance = 0.0f;
+        this.field_1636 = 0.0f;
         if (this.velocityY < -0.2)
         {
             this.velocityY = -0.2;
         }
     }
 
-    public void tickHandSwing()
+    public void method_910()
     {
-        if (this.level.isServerSide)
+        if (this.world.isRemote)
         {
             return;
         }
-        if (this.passenger != null && this.passenger instanceof Living)
+        if (this.field_1594 != null && this.field_1594 instanceof LivingEntity)
         {
             this.field_1029 = 0.0f;
             this.field_1060 = 0.0f;
             this.jumping = false;
-            ((EntityBaseAccessor) this.passenger).setFallDistance(0.0f);
-            final float yaw = this.passenger.yaw;
+            ((EntityBaseAccessor) this.field_1594).setFallDistance(0.0f);
+            final float yaw = this.field_1594.yaw;
             this.yaw = yaw;
             this.prevYaw = yaw;
-            final float pitch = this.passenger.pitch;
+            final float pitch = this.field_1594.pitch;
             this.pitch = pitch;
             this.prevPitch = pitch;
-            final Living entityliving = (Living) this.passenger;
+            final LivingEntity entityliving = (LivingEntity) this.field_1594;
             final float f = 3.141593f;
             final float f2 = f / 180.0f;
             if (((LivingAccessor) entityliving).get1029() > 0.1f)
@@ -153,14 +153,14 @@ public class EntityPhyg extends EntityAetherAnimal
                 this.velocityX += ((LivingAccessor) entityliving).get1060() * Math.cos((double) f6) * 0.17499999701976776;
                 this.velocityZ += ((LivingAccessor) entityliving).get1060() * Math.sin((double) f6) * 0.17499999701976776;
             }
-            if (this.onGround && ((LivingAccessor) entityliving).getJumping())
+            if (this.field_1623 && ((LivingAccessor) entityliving).getJumping())
             {
-                this.onGround = false;
+                this.field_1623 = false;
                 this.velocityY = 1.4;
                 this.jpress = true;
                 --this.jrem;
             }
-            else if (this.method_1393() && ((LivingAccessor) entityliving).getJumping())
+            else if (this.isSubmergedInWater() && ((LivingAccessor) entityliving).getJumping())
             {
                 this.velocityY = 0.5;
                 this.jpress = true;
@@ -185,40 +185,40 @@ public class EntityPhyg extends EntityAetherAnimal
             }
             return;
         }
-        super.tickHandSwing();
+        super.method_910();
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "mob.pig";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.pig";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.pigdeath";
     }
 
     @Override
-    public boolean interact(final PlayerBase entityplayer)
+    public boolean method_1323(final PlayerEntity entityplayer)
     {
-        if (!this.getSaddled && entityplayer.inventory.getHeldItem() != null && entityplayer.inventory.getHeldItem().itemId == ItemBase.saddle.id)
+        if (!this.getSaddled && entityplayer.inventory.getSelectedItem() != null && entityplayer.inventory.getSelectedItem().itemId == Item.SADDLE.id)
         {
-            entityplayer.inventory.setInventoryItem(entityplayer.inventory.selectedHotbarSlot, null);
+            entityplayer.inventory.setStack(entityplayer.inventory.selectedSlot, null);
             this.getSaddled = true;
             this.texture = "aether:textures/entity/FlyingPigSaddle.png";
             return true;
         }
-        if (this.getSaddled && !this.level.isServerSide && (this.passenger == null || this.passenger == entityplayer))
+        if (this.getSaddled && !this.world.isRemote && (this.field_1594 == null || this.field_1594 == entityplayer))
         {
-            entityplayer.startRiding(this);
+            entityplayer.method_1376(this);
             AetherMod.giveAchievement(AetherAchievements.flyingPig, entityplayer);
             return true;
         }
@@ -226,15 +226,15 @@ public class EntityPhyg extends EntityAetherAnimal
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        PlayerBase player = this.level.getClosestPlayerTo(this, 10);
+        PlayerEntity player = this.world.method_186(this, 10);
         int count = 1;
         if (player != null)
-            if (player.getHeldItem() != null)
-                if (player.getHeldItem().getType() == AetherItems.SwordSkyroot)
+            if (player.getHand() != null)
+                if (player.getHand().getItem() == AetherItems.SwordSkyroot)
                     count *= 2;
-        this.dropItem(this.rand.nextBoolean() ? ItemBase.feather.id : ItemBase.rawPorkchop.id, count);
+        this.method_1339(this.random.nextBoolean() ? Item.FEATHER.id : Item.RAW_PORKCHOP.id, count);
     }
 
     @Override

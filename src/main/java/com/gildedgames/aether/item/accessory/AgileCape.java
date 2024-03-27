@@ -1,8 +1,8 @@
 package com.gildedgames.aether.item.accessory;
 
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class AgileCape extends CosmeticCape
 {
@@ -12,13 +12,13 @@ public class AgileCape extends CosmeticCape
     }
 
     @Override
-    public void onAccessoryAdded(PlayerBase playerBase, ItemInstance itemInstance)
+    public void onAccessoryAdded(PlayerEntity playerBase, ItemStack itemInstance)
     {
         playerBase.field_1641 = 1.0f;
     }
 
     @Override
-    public void onAccessoryRemoved(PlayerBase playerBase, ItemInstance itemInstance)
+    public void onAccessoryRemoved(PlayerEntity playerBase, ItemStack itemInstance)
     {
         playerBase.field_1641 = 0.5f;
     }

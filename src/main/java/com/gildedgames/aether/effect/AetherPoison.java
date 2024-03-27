@@ -1,7 +1,7 @@
 package com.gildedgames.aether.effect;
 
-import net.minecraft.entity.EntityBase;
-import net.minecraft.level.Level;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 
 public class AetherPoison
 {
@@ -17,7 +17,7 @@ public class AetherPoison
     public static final int poisonDmg = 1;
     public static final int poisonHurts = 10;
     public static final int maxPoisonTime = 500;
-    public static Level world;
+    public static World world;
     public static double rotDFac;
     public static double rotD;
     public static double rotTaper;
@@ -30,12 +30,12 @@ public class AetherPoison
 
     }
 
-    public static boolean canPoison(final EntityBase entity)
+    public static boolean canPoison(final Entity entity)
     {
         return false;
     }
 
-    public static void distractEntity(final EntityBase ent)
+    public static void distractEntity(final Entity ent)
     {
     }
 

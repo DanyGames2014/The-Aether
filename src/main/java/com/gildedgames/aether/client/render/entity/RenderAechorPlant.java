@@ -3,7 +3,7 @@ package com.gildedgames.aether.client.render.entity;
 import com.gildedgames.aether.client.render.model.ModelAechorPlant;
 import com.gildedgames.aether.entity.animal.EntityAechorPlant;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.entity.Living;
+import net.minecraft.entity.LivingEntity;
 import org.lwjgl.opengl.GL11;
 
 public class RenderAechorPlant extends LivingEntityRenderer
@@ -13,12 +13,12 @@ public class RenderAechorPlant extends LivingEntityRenderer
     public RenderAechorPlant(final ModelAechorPlant mb, final float f)
     {
         super(mb, f);
-        this.setModel(mb);
+        this.method_815(mb);
         this.xd = mb;
     }
 
     @Override
-    protected void method_823(final Living entityliving, final float f)
+    protected void method_823(final LivingEntity entityliving, final float f)
     {
         final EntityAechorPlant b1 = (EntityAechorPlant) entityliving;
         float f2 = (float) Math.sin((double) b1.sinage);
@@ -64,7 +64,7 @@ public class RenderAechorPlant extends LivingEntityRenderer
     }
 
     @Override
-    protected boolean render(final Living entityliving, final int i, final float f)
+    protected boolean method_825(final LivingEntity entityliving, final int i, final float f)
     {
         return this.a((EntityAechorPlant) entityliving, i, f);
     }

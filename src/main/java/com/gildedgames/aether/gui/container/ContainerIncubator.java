@@ -2,13 +2,13 @@ package com.gildedgames.aether.gui.container;
 
 import com.gildedgames.aether.entity.tile.TileEntityIncubator;
 import com.gildedgames.aether.slot.TileEntityIncubatorSlot;
-import net.minecraft.container.ContainerBase;
-import net.minecraft.container.slot.Slot;
-import net.minecraft.entity.player.PlayerBase;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemInstance;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerIncubator extends ContainerBase
+public class ContainerIncubator extends ScreenHandler
 {
     private TileEntityIncubator Incubator;
     private int cookTime;
@@ -37,40 +37,40 @@ public class ContainerIncubator extends ContainerBase
     }
 
     @Override
-    protected void insertItem(final ItemInstance itemstack, final int i, final int j, final boolean flag)
+    protected void method_2081(final ItemStack itemstack, final int i, final int j, final boolean flag)
     {
     }
 
     @Override
-    public boolean canUse(final PlayerBase player)
+    public boolean canUse(final PlayerEntity player)
     {
         return this.Incubator.canPlayerUse(player);
     }
 
     @Override
-    public ItemInstance transferSlot(final int slotIndex)
+    public ItemStack getStackInSlot(final int slotIndex)
     {
-        ItemInstance itemstack = null;
+        ItemStack itemstack = null;
         final Slot slot = (Slot) this.slots.get(slotIndex);
-        if (slot != null && slot.hasItem())
+        if (slot != null && slot.hasStack())
         {
-            final ItemInstance itemstack2 = slot.getItem();
+            final ItemStack itemstack2 = slot.getStack();
             itemstack = itemstack2.copy();
             if (slotIndex == 2)
             {
-                this.insertItem(itemstack2, 3, 39, true);
+                this.method_2081(itemstack2, 3, 39, true);
             }
             else if (slotIndex >= 3 && slotIndex < 30)
             {
-                this.insertItem(itemstack2, 30, 39, false);
+                this.method_2081(itemstack2, 30, 39, false);
             }
             else if (slotIndex >= 30 && slotIndex < 39)
             {
-                this.insertItem(itemstack2, 3, 30, false);
+                this.method_2081(itemstack2, 3, 30, false);
             }
             else
             {
-                this.insertItem(itemstack2, 3, 39, false);
+                this.method_2081(itemstack2, 3, 39, false);
             }
             if (itemstack2.count == 0)
             {

@@ -2,28 +2,28 @@ package com.gildedgames.aether.item.accessory;
 
 import com.gildedgames.aether.player.AetherPlayerHandler;
 import com.matthewperiut.accessoryapi.api.Accessory;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 
-public class RegenerationStone extends TemplateItemBase implements Accessory
+public class RegenerationStone extends TemplateItem implements Accessory
 {
     public RegenerationStone(Identifier identifier)
     {
         super(identifier);
-        this.setMaxStackSize(1);
-        this.setDurability(250);
+        this.setMaxCount(1);
+        this.setMaxDamage(250);
     }
 
     @Override
-    public String[] getAccessoryTypes(ItemInstance item)
+    public String[] getAccessoryTypes(ItemStack item)
     {
         return new String[]{"misc"};
     }
 
     @Override
-    public ItemInstance tickWhileWorn(PlayerBase playerBase, ItemInstance itemInstance)
+    public ItemStack tickWhileWorn(PlayerEntity playerBase, ItemStack itemInstance)
     {
         if (playerBase.field_1645 % 200 == 0)
         {
@@ -31,7 +31,7 @@ public class RegenerationStone extends TemplateItemBase implements Accessory
             if (playerBase.health < maxHealth)
             {
                 playerBase.health += 1;
-                itemInstance.applyDamage(1, playerBase);
+                itemInstance.damage(1, playerBase);
             }
         }
         return itemInstance;

@@ -1,14 +1,14 @@
 package com.gildedgames.aether.generator;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Structure;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenGoldenOak extends Structure
+public class AetherGenGoldenOak extends Feature
 {
-    public boolean branch(final Level world, final Random random, int i, int j, int k, final int slant)
+    public boolean branch(final World world, final Random random, int i, int j, int k, final int slant)
     {
         final int directionX = random.nextInt(3) - 1;
         final int directionY = slant;
@@ -18,18 +18,18 @@ public class AetherGenGoldenOak extends Structure
             i += directionX;
             j += directionY;
             k += directionZ;
-            if (world.getTileId(i, j, k) == AetherBlocks.GOLDEN_OAK_LEAVES.id)
+            if (world.getBlockId(i, j, k) == AetherBlocks.GOLDEN_OAK_LEAVES.id)
             {
-                world.setTile(i, j, k, AetherBlocks.GOLDEN_OAK_LOG.id);
+                world.setBlock(i, j, k, AetherBlocks.GOLDEN_OAK_LOG.id);
             }
         }
         return true;
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
-        if (level.getTileId(x, y - 1, z) != AetherBlocks.AETHER_GRASS_BLOCK.id && level.getTileId(x, y - 1, z) != AetherBlocks.AETHER_DIRT.id)
+        if (level.getBlockId(x, y - 1, z) != AetherBlocks.AETHER_GRASS_BLOCK.id && level.getBlockId(x, y - 1, z) != AetherBlocks.AETHER_DIRT.id)
         {
             return false;
         }
@@ -40,9 +40,9 @@ public class AetherGenGoldenOak extends Structure
             {
                 for (int z2 = z - 3; z2 < z + 4; ++z2)
                 {
-                    if ((x2 - x) * (x2 - x) + (y2 - y - 8) * (y2 - y - 8) + (z2 - z) * (z2 - z) < 12 + rand.nextInt(5) && level.getTileId(x2, y2, z2) == 0)
+                    if ((x2 - x) * (x2 - x) + (y2 - y - 8) * (y2 - y - 8) + (z2 - z) * (z2 - z) < 12 + rand.nextInt(5) && level.getBlockId(x2, y2, z2) == 0)
                     {
-                        level.setTileInChunk(x2, y2, z2, AetherBlocks.GOLDEN_OAK_LEAVES.id);
+                        level.method_200(x2, y2, z2, AetherBlocks.GOLDEN_OAK_LEAVES.id);
                     }
                 }
             }
@@ -53,7 +53,7 @@ public class AetherGenGoldenOak extends Structure
             {
                 this.branch(level, rand, x, y + n, z, n / 4 - 1);
             }
-            level.setTile(x, y + n, z, AetherBlocks.GOLDEN_OAK_LOG.id);
+            level.setBlock(x, y + n, z, AetherBlocks.GOLDEN_OAK_LOG.id);
         }
         return true;
     }

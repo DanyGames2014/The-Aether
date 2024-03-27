@@ -1,12 +1,12 @@
 package com.gildedgames.aether.client.render.model;
 
-import net.minecraft.client.model.Cuboid;
-import net.minecraft.client.render.entity.model.EntityModelBase;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.entity.model.EntityModel;
 import org.lwjgl.opengl.GL11;
 
-public class ModelSlider extends EntityModelBase
+public class ModelSlider extends EntityModel
 {
-    public Cuboid head;
+    public ModelPart head;
 
     public ModelSlider()
     {
@@ -20,8 +20,8 @@ public class ModelSlider extends EntityModelBase
 
     public ModelSlider(final float f, final float f1)
     {
-        (this.head = new Cuboid(0, 0)).method_1818(-8.0f, -16.0f, -8.0f, 16, 16, 16, f);
-        this.head.setRotationPoint(0.0f, 0.0f + f1, 0.0f);
+        (this.head = new ModelPart(0, 0)).addCuboid(-8.0f, -16.0f, -8.0f, 16, 16, 16, f);
+        this.head.setPivot(0.0f, 0.0f + f1, 0.0f);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ModelSlider extends EntityModelBase
         this.setAngles(f, f1, f2, f3, f4, f5);
         GL11.glPushMatrix();
         GL11.glScalef(2.0f, 2.0f, 2.0f);
-        this.head.method_1815(f5);
+        this.head.render(f5);
         GL11.glPopMatrix();
     }
 

@@ -1,40 +1,33 @@
 package com.gildedgames.aether.block;
 
 import com.gildedgames.aether.event.listener.TextureListener;
-import net.minecraft.block.material.Material;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.block.TemplateBlockBase;
+import net.minecraft.block.Material;
+import net.modificationstation.stationapi.api.template.block.TemplateBlock;
+import net.modificationstation.stationapi.api.util.Identifier;
 
-public class BlockPillar extends TemplateBlockBase
-{
+public class BlockPillar extends TemplateBlock {
 
-    public BlockPillar(final Identifier id)
-    {
+    public BlockPillar(final Identifier id) {
         super(id, Material.STONE);
     }
 
     @Override
-    public int getTextureForSide(final int side, final int meta)
-    {
-        if (side == 0 || side == 1)
-        {
+    public int getTexture(final int side, final int meta) {
+        if (side == 0 || side == 1) {
             return TextureListener.sprPillarTop;
         }
-        if (meta == 0)
-        {
+        if (meta == 0) {
             return TextureListener.sprPillarSide;
         }
         return TextureListener.sprPillarTopSide;
     }
 
     @Override
-    protected int droppedMeta(final int meta)
-    {
+    protected int getDroppedItemMeta(final int meta) {
         return meta;
     }
 
-    static
-    {
+    static {
 
     }
 }

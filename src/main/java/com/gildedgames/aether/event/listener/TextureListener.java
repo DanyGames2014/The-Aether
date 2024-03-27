@@ -7,8 +7,8 @@ import net.mine_diver.unsafeevents.listener.EventListener;
 import net.modificationstation.stationapi.api.client.event.texture.TextureRegisterEvent;
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlases;
 import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.registry.ModID;
+import net.modificationstation.stationapi.api.util.Identifier;
+import net.modificationstation.stationapi.api.util.Namespace;
 import net.modificationstation.stationapi.api.util.Null;
 
 public class TextureListener
@@ -74,7 +74,7 @@ public class TextureListener
         ItemSkyrootBucket.sprRemedy = Atlases.getGuiItems().addTexture(Identifier.of(MOD_ID, "items/BucketRemedy")).index;
 
         //Some textures for blocks
-        AetherBlocks.AMBROSIUM_TORCH.texture = sprAmbrosiumTorch;
+        AetherBlocks.AMBROSIUM_TORCH.textureId = sprAmbrosiumTorch;
 
         AetherItems.AmbrosiumShard.setTexture(Identifier.of(MOD_ID, "items/AmbrosiumShard"));
         AetherItems.Key.setTexture(Identifier.of(MOD_ID, "items/Key"));
@@ -182,6 +182,6 @@ public class TextureListener
     public static int sprGoldenLogSide;
     public static int sprZaniteOre;
     public static int sprGravititeOre;
-    @Entrypoint.ModID
-    public static final ModID MOD_ID = Null.get();
+    @Entrypoint.Namespace
+    public static final Namespace MOD_ID = Null.get();
 }

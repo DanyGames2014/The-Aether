@@ -1,8 +1,8 @@
 package com.gildedgames.aether.item.accessory;
 
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class ZaniteRing extends Ring
 {
@@ -12,7 +12,7 @@ public class ZaniteRing extends Ring
     }
 
     @Override
-    public ItemInstance tickWhileWorn(PlayerBase playerBase, ItemInstance itemInstance)
+    public ItemStack tickWhileWorn(PlayerEntity playerBase, ItemStack itemInstance)
     {
         // todo: mine faster
         return itemInstance;

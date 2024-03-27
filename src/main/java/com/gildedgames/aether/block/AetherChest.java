@@ -2,153 +2,122 @@ package com.gildedgames.aether.block;
 
 import com.gildedgames.aether.registry.AetherBlocks;
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.level.Level;
-import net.minecraft.tileentity.TileEntityChest;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.block.TemplateChest;
+import net.minecraft.block.Block;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.template.block.TemplateChestBlock;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 import java.util.Random;
 
-public class AetherChest extends TemplateChest
-{
+public class AetherChest extends TemplateChestBlock {
     Random rand;
 
-    public AetherChest(Identifier identifier)
-    {
+    public AetherChest(Identifier identifier) {
         super(identifier);
         rand = new Random();
     }
 
-    private ItemInstance getNormalLoot(final Random random)
-    {
+    private ItemStack getNormalLoot(final Random random) {
         final int item = random.nextInt(15);
-        switch (item)
-        {
-            case 0:
-            {
-                return new ItemInstance(AetherItems.PickZanite);
+        switch (item) {
+            case 0: {
+                return new ItemStack(AetherItems.PickZanite);
             }
-            case 1:
-            {
-                return new ItemInstance(AetherItems.Bucket, 1, 2);
+            case 1: {
+                return new ItemStack(AetherItems.Bucket, 1, 2);
             }
-            case 2:
-            {
-                return new ItemInstance(AetherItems.DartShooter);
+            case 2: {
+                return new ItemStack(AetherItems.DartShooter);
             }
-            case 3:
-            {
-                return new ItemInstance(AetherItems.MoaEgg, 1, 0);
+            case 3: {
+                return new ItemStack(AetherItems.MoaEgg, 1, 0);
             }
-            case 4:
-            {
-                return new ItemInstance(AetherItems.AmbrosiumShard, random.nextInt(10) + 1);
+            case 4: {
+                return new ItemStack(AetherItems.AmbrosiumShard, random.nextInt(10) + 1);
             }
-            case 5:
-            {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(5) + 1, 0);
+            case 5: {
+                return new ItemStack(AetherItems.Dart, random.nextInt(5) + 1, 0);
             }
-            case 6:
-            {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(3) + 1, 1);
+            case 6: {
+                return new ItemStack(AetherItems.Dart, random.nextInt(3) + 1, 1);
             }
-            case 7:
-            {
-                return new ItemInstance(AetherItems.Dart, random.nextInt(3) + 1, 2);
+            case 7: {
+                return new ItemStack(AetherItems.Dart, random.nextInt(3) + 1, 2);
             }
-            case 8:
-            {
-                if (random.nextInt(20) == 0)
-                {
-                    return new ItemInstance(AetherItems.BlueMusicDisk);
+            case 8: {
+                if (random.nextInt(20) == 0) {
+                    return new ItemStack(AetherItems.BlueMusicDisk);
                 }
                 break;
             }
-            case 9:
-            {
-                return new ItemInstance(AetherItems.Bucket);
+            case 9: {
+                return new ItemStack(AetherItems.Bucket);
             }
-            case 10:
-            {
-                if (random.nextInt(10) == 0)
-                {
-                    return new ItemInstance(ItemBase.byId[ItemBase.record13.id + random.nextInt(2)]);
+            case 10: {
+                if (random.nextInt(10) == 0) {
+                    return new ItemStack(Item.ITEMS[Item.RECORD_THIRTEEN.id + random.nextInt(2)]);
                 }
                 break;
             }
-            case 11:
-            {
-                if (random.nextInt(2) == 0)
-                {
-                    return new ItemInstance(AetherItems.ZaniteBoots);
+            case 11: {
+                if (random.nextInt(2) == 0) {
+                    return new ItemStack(AetherItems.ZaniteBoots);
                 }
-                if (random.nextInt(2) == 0)
-                {
-                    return new ItemInstance(AetherItems.ZaniteHelmet);
+                if (random.nextInt(2) == 0) {
+                    return new ItemStack(AetherItems.ZaniteHelmet);
                 }
-                if (random.nextInt(2) == 0)
-                {
-                    return new ItemInstance(AetherItems.ZaniteLeggings);
+                if (random.nextInt(2) == 0) {
+                    return new ItemStack(AetherItems.ZaniteLeggings);
                 }
-                if (random.nextInt(2) == 0)
-                {
-                    return new ItemInstance(AetherItems.ZaniteChestplate);
+                if (random.nextInt(2) == 0) {
+                    return new ItemStack(AetherItems.ZaniteChestplate);
                 }
                 break;
             }
-            case 12:
-            {
-                if (random.nextInt(4) == 0)
-                {
-                    return new ItemInstance(AetherItems.IronPendant);
+            case 12: {
+                if (random.nextInt(4) == 0) {
+                    return new ItemStack(AetherItems.IronPendant);
                 }
             }
-            case 13:
-            {
-                if (random.nextInt(10) == 0)
-                {
-                    return new ItemInstance(AetherItems.GoldPendant);
+            case 13: {
+                if (random.nextInt(10) == 0) {
+                    return new ItemStack(AetherItems.GoldPendant);
                 }
             }
-            case 14:
-            {
-                if (random.nextInt(15) == 0)
-                {
-                    return new ItemInstance(AetherItems.ZaniteRing);
+            case 14: {
+                if (random.nextInt(15) == 0) {
+                    return new ItemStack(AetherItems.ZaniteRing);
                 }
                 break;
             }
         }
-        return new ItemInstance(AetherBlocks.AMBROSIUM_TORCH, random.nextInt(5));
+        return new ItemStack(AetherBlocks.AMBROSIUM_TORCH, random.nextInt(5));
     }
 
     @Override
-    public boolean canUse(Level level, int x, int y, int z, PlayerBase player)
-    {
-        level.setTile(x,y,z, CHEST.id);
+    public boolean onUse(World level, int x, int y, int z, PlayerEntity player) {
+        level.setBlock(x, y, z, Block.CHEST.id);
 
-        final TileEntityChest chest = (TileEntityChest) level.getTileEntity(x,y,z);
-        for (int i = 0; i < 3 + rand.nextInt(3); ++i)
-        {
-            final ItemInstance item = this.getNormalLoot(rand);
-            chest.setInventoryItem(rand.nextInt(chest.getInventorySize()), item);
+        final ChestBlockEntity chest = (ChestBlockEntity) level.method_1777(x, y, z);
+        for (int i = 0; i < 3 + rand.nextInt(3); ++i) {
+            final ItemStack item = this.getNormalLoot(rand);
+            chest.setStack(rand.nextInt(chest.size()), item);
         }
 
-        return CHEST.canUse(level, x, y, z, player);
+        return Block.CHEST.onUse(level, x, y, z, player);
     }
 
     @Override
-    public int getDropId(int i, Random random)
-    {
+    public int getDroppedItemId(int i, Random random) {
         return CHEST.id;
     }
 
     @Override
-    public void onBlockPlaced(Level arg, int i, int j, int k)
-    {
-        
+    public void onPlaced(World arg, int i, int j, int k) {
+
     }
 }

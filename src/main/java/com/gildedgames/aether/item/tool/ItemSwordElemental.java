@@ -2,23 +2,23 @@ package com.gildedgames.aether.item.tool;
 
 import com.gildedgames.aether.entity.projectile.EntityAetherLightning;
 import com.gildedgames.aether.utils.EnumElement;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.monster.Skeleton;
-import net.minecraft.entity.monster.Zombie;
-import net.minecraft.entity.monster.ZombiePigman;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.tool.TemplateSword;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.PigZombieEntity;
+import net.minecraft.entity.mob.SkeletonEntity;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.modificationstation.stationapi.api.template.item.TemplateSwordItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class ItemSwordElemental extends TemplateSword
+public class ItemSwordElemental extends TemplateSwordItem
 {
-    public static ArrayList<Class<? extends Living>> undead;
+    public static ArrayList<Class<? extends LivingEntity>> undead;
     private int weaponDamage;
     private int holyDamage;
     private EnumElement element;
@@ -27,9 +27,9 @@ public class ItemSwordElemental extends TemplateSword
 
     public ItemSwordElemental(final @NotNull Identifier identifier, final EnumElement element, final int colour)
     {
-        super(identifier, ToolMaterial.field_1691); // (ToolMaterial) field_1691 = EMERALD
-        this.maxStackSize = 1;
-        this.setDurability((element == EnumElement.Holy) ? 128 : 32);
+        super(identifier, ToolMaterial.DIAMOND); // (ToolMaterial) field_1691 = EMERALD
+        this.maxCount = 1;
+        this.setMaxDamage((element == EnumElement.Holy) ? 128 : 32);
         this.weaponDamage = 4;
         this.holyDamage = 20;
         this.element = element;
@@ -37,20 +37,20 @@ public class ItemSwordElemental extends TemplateSword
     }
 
     @Override
-    public float getStrengthOnBlock(final ItemInstance item, final BlockBase tile)
+    public float getMiningSpeedMultiplier(final ItemStack item, final Block tile)
     {
         return 1.5f;
     }
 
     @Override
-    public boolean postMine(final ItemInstance itemstack, final int i, final int j, final int k, final int l, final Living damageTarget)
+    public boolean postMine(final ItemStack itemstack, final int i, final int j, final int k, final int l, final LivingEntity damageTarget)
     {
-        itemstack.applyDamage(2, damageTarget);
+        itemstack.damage(2, damageTarget);
         return true;
     }
 
     @Override
-    public boolean postHit(final ItemInstance itemstack, final Living damageSource, final Living damageTarget)
+    public boolean postHit(final ItemStack itemstack, final LivingEntity damageSource, final LivingEntity damageTarget)
     {
         if (this.element == EnumElement.Fire)
         {
@@ -58,20 +58,20 @@ public class ItemSwordElemental extends TemplateSword
         }
         else if (this.element == EnumElement.Lightning)
         {
-            damageTarget.level.spawnEntity(new EntityAetherLightning(damageSource.level, damageSource.x, damageSource.y, damageSource.z));
+            damageTarget.world.method_210(new EntityAetherLightning(damageSource.world, damageSource.x, damageSource.y, damageSource.z));
             // aether lightning ModLoader.getMinecraftInstance().level.spawnEntity(new EntityAetherLightning(ModLoader.getMinecraftInstance().level, (int)damageSource.x, (int)damageSource.y, (int)damageSource.z));
         }
-        itemstack.applyDamage(1, damageTarget);
+        itemstack.damage(1, damageTarget);
         return true;
     }
 
     @Override
-    public int getAttack(final EntityBase entity)
+    public int getAttackDamage(final Entity entity)
     {
-        if (this.element == EnumElement.Holy && entity instanceof Living)
+        if (this.element == EnumElement.Holy && entity instanceof LivingEntity)
         {
-            final Living living = (Living) entity;
-            for (final Class<? extends Living> cls : ItemSwordElemental.undead)
+            final LivingEntity living = (LivingEntity) entity;
+            for (final Class<? extends LivingEntity> cls : ItemSwordElemental.undead)
             {
                 if (living.getClass().isAssignableFrom((Class) cls))
                 {
@@ -83,21 +83,21 @@ public class ItemSwordElemental extends TemplateSword
     }
 
     @Override
-    public int getColourMultiplier(final int i)
+    public int method_440(final int i)
     {
         return this.colour;
     }
 
     @Override
-    public boolean isRendered3d()
+    public boolean isHandheld()
     {
         return true;
     }
 
     static
     {
-        (ItemSwordElemental.undead = new ArrayList<Class<? extends Living>>()).add(Zombie.class);
-        ItemSwordElemental.undead.add(Skeleton.class);
-        ItemSwordElemental.undead.add(ZombiePigman.class);
+        (ItemSwordElemental.undead = new ArrayList<Class<? extends LivingEntity>>()).add(ZombieEntity.class);
+        ItemSwordElemental.undead.add(SkeletonEntity.class);
+        ItemSwordElemental.undead.add(PigZombieEntity.class);
     }
 }

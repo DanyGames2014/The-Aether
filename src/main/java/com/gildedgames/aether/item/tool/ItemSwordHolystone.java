@@ -1,17 +1,17 @@
 package com.gildedgames.aether.item.tool;
 
 import com.gildedgames.aether.registry.AetherItems;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.tool.TemplateSword;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.modificationstation.stationapi.api.template.item.TemplateSwordItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
-public class ItemSwordHolystone extends TemplateSword
+public class ItemSwordHolystone extends TemplateSwordItem
 {
     public ItemSwordHolystone(final @NotNull Identifier identifier, final ToolMaterial mat)
     {
@@ -19,14 +19,14 @@ public class ItemSwordHolystone extends TemplateSword
     }
 
     @Override
-    public boolean postHit(final ItemInstance itemstack, final Living damageSource, final Living damageTarget)
+    public boolean postHit(final ItemStack itemstack, final LivingEntity damageSource, final LivingEntity damageTarget)
     {
-        if (new Random().nextInt(25) == 0 && damageTarget != null && damageTarget instanceof PlayerBase && (damageSource.hurtTime > 0 || damageSource.deathTime > 0))
+        if (new Random().nextInt(25) == 0 && damageTarget != null && damageTarget instanceof PlayerEntity && (damageSource.hurtTime > 0 || damageSource.field_1041 > 0))
         {
-            damageSource.dropItem(AetherItems.AmbrosiumShard.id, 1, 0.0f);
-            itemstack.applyDamage(1, damageTarget);
+            damageSource.method_1325(AetherItems.AmbrosiumShard.id, 1, 0.0f);
+            itemstack.damage(1, damageTarget);
         }
-        itemstack.applyDamage(1, damageTarget);
+        itemstack.damage(1, damageTarget);
         return true;
     }
 }

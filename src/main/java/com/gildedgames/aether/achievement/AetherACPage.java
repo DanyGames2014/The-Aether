@@ -2,8 +2,8 @@ package com.gildedgames.aether.achievement;
 
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.event.listener.TextureListener;
-import net.minecraft.block.BlockBase;
-import net.modificationstation.stationapi.api.client.gui.screen.menu.AchievementPage;
+import net.minecraft.block.Block;
+import net.modificationstation.stationapi.api.client.gui.screen.achievement.AchievementPage;
 
 import java.util.Random;
 
@@ -17,7 +17,7 @@ public class AetherACPage extends AchievementPage
     @Override
     public int getBackgroundTexture(final Random random, final int i, final int j, int randomizedRow, int currentTexture)
     {
-        int k = BlockBase.SAND.texture;
+        int k = Block.SAND.textureId;
         final int l = randomizedRow;
         if (l > 37 || j == 35)
         {

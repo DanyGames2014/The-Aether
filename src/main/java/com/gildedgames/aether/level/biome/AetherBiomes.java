@@ -1,6 +1,6 @@
 package com.gildedgames.aether.level.biome;
 
-import net.minecraft.level.biome.Biome;
+import net.minecraft.world.biome.Biome;
 
 public class AetherBiomes
 {

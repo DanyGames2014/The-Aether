@@ -1,10 +1,10 @@
 package com.gildedgames.aether.item.accessory;
 
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.block.Material;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class IcePendant extends Pendant
 {
@@ -14,7 +14,7 @@ public class IcePendant extends Pendant
     }
 
     @Override
-    public ItemInstance tickWhileWorn(PlayerBase player, ItemInstance itemInstance)
+    public ItemStack tickWhileWorn(PlayerEntity player, ItemStack itemInstance)
     {
         super.tickWhileWorn(player, itemInstance);
 
@@ -22,29 +22,29 @@ public class IcePendant extends Pendant
         final int j = MathHelper.floor(player.boundingBox.minY);
         final int k = MathHelper.floor(player.z);
         final double yoff = player.y - j;
-        final Material mat0 = player.level.getMaterial(i, j, k);
-        final Material mat2 = player.level.getMaterial(i, j - 1, k);
+        final Material mat0 = player.world.method_1779(i, j, k);
+        final Material mat2 = player.world.method_1779(i, j - 1, k);
         for (int l = i - 1; l <= i + 1; ++l)
         {
             for (int i2 = j - 1; i2 <= j + 1; ++i2)
             {
                 for (int j2 = k - 1; j2 <= k + 1; ++j2)
                 {
-                    if (player.level.getTileId(l, i2, j2) == 8)
+                    if (player.world.getBlockId(l, i2, j2) == 8)
                     {
-                        player.level.setTile(l, i2, j2, 79);
+                        player.world.setBlock(l, i2, j2, 79);
                     }
-                    else if (player.level.getTileId(l, i2, j2) == 9)
+                    else if (player.world.getBlockId(l, i2, j2) == 9)
                     {
-                        player.level.setTile(l, i2, j2, 79);
+                        player.world.setBlock(l, i2, j2, 79);
                     }
-                    else if (player.level.getTileId(l, i2, j2) == 10)
+                    else if (player.world.getBlockId(l, i2, j2) == 10)
                     {
-                        player.level.setTile(l, i2, j2, 49);
+                        player.world.setBlock(l, i2, j2, 49);
                     }
-                    else if (player.level.getTileId(l, i2, j2) == 11)
+                    else if (player.world.getBlockId(l, i2, j2) == 11)
                     {
-                        player.level.setTile(l, i2, j2, 49);
+                        player.world.setBlock(l, i2, j2, 49);
                     }
                 }
             }

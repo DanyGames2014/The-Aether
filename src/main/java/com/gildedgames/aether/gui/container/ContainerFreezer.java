@@ -1,15 +1,15 @@
 package com.gildedgames.aether.gui.container;
 
 import com.gildedgames.aether.entity.tile.TileEntityFreezer;
-import net.minecraft.container.ContainerBase;
-import net.minecraft.container.ContainerListener;
-import net.minecraft.container.slot.FurnaceOutput;
-import net.minecraft.container.slot.Slot;
-import net.minecraft.entity.player.PlayerBase;
+import net.minecraft.class_633;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemInstance;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.FurnaceOutputSlot;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerFreezer extends ContainerBase
+public class ContainerFreezer extends ScreenHandler
 {
     private TileEntityFreezer freezer;
     private int cookTime;
@@ -24,7 +24,7 @@ public class ContainerFreezer extends ContainerBase
         this.freezer = tileentityfreezer;
         this.addSlot(new Slot(tileentityfreezer, 0, 56, 17));
         this.addSlot(new Slot(tileentityfreezer, 1, 56, 53));
-        this.addSlot(new FurnaceOutput(inventoryplayer.player, tileentityfreezer, 2, 116, 35));
+        this.addSlot(new FurnaceOutputSlot(inventoryplayer.player, tileentityfreezer, 2, 116, 35));
         for (int i = 0; i < 3; ++i)
         {
             for (int k = 0; k < 9; ++k)
@@ -39,28 +39,28 @@ public class ContainerFreezer extends ContainerBase
     }
 
     @Override
-    protected void insertItem(final ItemInstance itemstack, final int i, final int j, final boolean flag)
+    protected void method_2081(final ItemStack itemstack, final int i, final int j, final boolean flag)
     {
     }
 
     @Override
-    public void tick()
+    public void method_2075()
     {
-        super.tick();
+        super.method_2075();
         for (int i = 0; i < this.listeners.size(); ++i)
         {
-            final ContainerListener icrafting = (ContainerListener) this.listeners.get(i);
+            final class_633 icrafting = (class_633) this.listeners.get(i);
             if (this.cookTime != this.freezer.frozenTimeForItem)
             {
-                icrafting.updateProperty(this, 0, this.freezer.frozenTimeForItem);
+                icrafting.method_2099(this, 0, this.freezer.frozenTimeForItem);
             }
             if (this.burnTime != this.freezer.frozenProgress)
             {
-                icrafting.updateProperty(this, 1, this.freezer.frozenProgress);
+                icrafting.method_2099(this, 1, this.freezer.frozenProgress);
             }
             if (this.itemBurnTime != this.freezer.frozenPowerRemaining)
             {
-                icrafting.updateProperty(this, 2, this.freezer.frozenPowerRemaining);
+                icrafting.method_2099(this, 2, this.freezer.frozenPowerRemaining);
             }
         }
         this.cookTime = this.freezer.frozenTimeForItem;
@@ -69,7 +69,7 @@ public class ContainerFreezer extends ContainerBase
     }
 
     @Override
-    public void setProperty(final int index, final int value)
+    public void method_2077(final int index, final int value)
     {
         if (index == 0)
         {
@@ -86,35 +86,35 @@ public class ContainerFreezer extends ContainerBase
     }
 
     @Override
-    public boolean canUse(final PlayerBase player)
+    public boolean canUse(final PlayerEntity player)
     {
         return this.freezer.canPlayerUse(player);
     }
 
     @Override
-    public ItemInstance transferSlot(final int slotIndex)
+    public ItemStack getStackInSlot(final int slotIndex)
     {
-        ItemInstance itemstack = null;
+        ItemStack itemstack = null;
         final Slot slot = (Slot) this.slots.get(slotIndex);
-        if (slot != null && slot.hasItem())
+        if (slot != null && slot.hasStack())
         {
-            final ItemInstance itemstack2 = slot.getItem();
+            final ItemStack itemstack2 = slot.getStack();
             itemstack = itemstack2.copy();
             if (slotIndex == 2)
             {
-                this.insertItem(itemstack2, 3, 39, true);
+                this.method_2081(itemstack2, 3, 39, true);
             }
             else if (slotIndex >= 3 && slotIndex < 30)
             {
-                this.insertItem(itemstack2, 30, 39, false);
+                this.method_2081(itemstack2, 30, 39, false);
             }
             else if (slotIndex >= 30 && slotIndex < 39)
             {
-                this.insertItem(itemstack2, 3, 30, false);
+                this.method_2081(itemstack2, 3, 30, false);
             }
             else
             {
-                this.insertItem(itemstack2, 3, 39, false);
+                this.method_2081(itemstack2, 3, 39, false);
             }
             if (itemstack2.count == 0)
             {

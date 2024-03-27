@@ -1,13 +1,13 @@
 package com.gildedgames.aether.generator;
 
 import com.gildedgames.aether.registry.AetherBlocks;
-import net.minecraft.level.Level;
-import net.minecraft.level.structure.Structure;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.Feature;
 
 import java.util.Random;
 
-public class AetherGenGumdropCaves extends Structure
+public class AetherGenGumdropCaves extends Feature
 {
     private int field_100003_a;
     private int field_100002_b;
@@ -19,7 +19,7 @@ public class AetherGenGumdropCaves extends Structure
     }
 
     @Override
-    public boolean generate(final Level level, final Random rand, final int x, final int y, final int z)
+    public boolean generate(final World level, final Random rand, final int x, final int y, final int z)
     {
         final float f = rand.nextFloat() * 3.141593f;
         final double d = x + 8 + MathHelper.sin(f) * this.field_100002_b / 8.0f;
@@ -55,11 +55,11 @@ public class AetherGenGumdropCaves extends Structure
                             for (int i3 = k1; i3 <= j2; ++i3)
                             {
                                 final double d15 = (i3 + 0.5 - d9) / (d11 / 2.0);
-                                final int bID = level.getTileId(k2, l3, i3);
-                                final int meta = level.getTileMeta(k2, l3, i3);
+                                final int bID = level.getBlockId(k2, l3, i3);
+                                final int meta = level.getBlockMeta(k2, l3, i3);
                                 if (d13 * d13 + d14 * d14 + d15 * d15 < 1.0 && ((bID == AetherBlocks.HOLYSTONE.id && meta <= 1) || bID == AetherBlocks.AETHER_GRASS_BLOCK.id || bID == AetherBlocks.AETHER_DIRT.id))
                                 {
-                                    level.setTile(k2, l3, i3, this.field_100003_a);
+                                    level.setBlock(k2, l3, i3, this.field_100003_a);
                                 }
                             }
                         }

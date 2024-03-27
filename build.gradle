@@ -1,5 +1,5 @@
 plugins {
-	id 'babric-loom' version '1.1-SNAPSHOT'
+	id 'babric-loom' version '1.5.3'
 	id 'maven-publish'
 }
 
@@ -10,6 +10,9 @@ version = project.mod_version
 group = project.maven_group
 
 loom {
+	mixin {
+		useLegacyMixinAp = true
+	}
 	gluedMinecraftJar()
 	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${minecraft_version}.json")
 	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
@@ -51,25 +54,26 @@ repositories {
 dependencies {
 	implementation 'org.projectlombok:lombok:1.18.26'
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.glasslauncher:bin:${project.yarn_mappings}"
+	mappings "net.glasslauncher:biny:${project.yarn_mappings}:v2"
 	modImplementation "babric:fabric-loader:${project.loader_version}"
 
 	implementation "org.slf4j:slf4j-api:1.8.0-beta4"
 	implementation "org.apache.logging.log4j:log4j-slf4j18-impl:2.16.0"
+	implementation "blue.endless:jankson:1.2.1"
+
 	modImplementation("net.modificationstation:StationAPI:${project.stapi_version}")
+
 	//modImplementation "com.github.paulevsGitch:BHCreative:${project.bhcreative_version}"
 
 	modImplementation("com.github.matthewperiut:accessory-api:${project.accessoryapi_version}") {
 		transitive false
 	}
-	modImplementation("com.github.matthewperiut:spc-babric:${project.spc_version}") {
-		transitive false
-	}
-
+//	modImplementation("com.github.matthewperiut:spc-babric:${project.spc_version}") {
+//		transitive false
+//	}
 	modLocalRuntime("com.github.calmilamsy:ModMenu:${project.modmenu_version}") {
 		transitive false
 	}
-	implementation "blue.endless:jankson:1.2.1"
 	modLocalRuntime("net.glasslauncher.mods:GlassConfigAPI:${project.gcapi_version}") {
 		transitive false
 	}

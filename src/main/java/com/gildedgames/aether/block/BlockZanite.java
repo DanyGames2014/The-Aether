@@ -1,28 +1,24 @@
 package com.gildedgames.aether.block;
 
-import net.minecraft.block.BlockBase;
-import net.minecraft.block.material.Material;
-import net.minecraft.level.BlockView;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.block.TemplateBlockBase;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.world.BlockView;
+import net.modificationstation.stationapi.api.template.block.TemplateBlock;
+import net.modificationstation.stationapi.api.util.Identifier;
 
-public class BlockZanite extends TemplateBlockBase
-{
-    public BlockZanite(final Identifier id)
-    {
+public class BlockZanite extends TemplateBlock {
+    public BlockZanite(final Identifier id) {
         super(id, Material.STONE);
-        this.texture = BlockBase.IRON_BLOCK.texture;
+        this.textureId = Block.IRON_BLOCK.textureId;
     }
 
     @Override
-    public int getBaseColour(final int i)
-    {
+    public int getColor(final int i) {
         return 10066431;
     }
 
     @Override
-    public int getColourMultiplier(final BlockView tileView, final int x, final int y, final int z)
-    {
-        return this.getBaseColour(tileView.getTileMeta(x, y, z));
+    public int getColorMultiplier(final BlockView tileView, final int x, final int y, final int z) {
+        return this.getColor(tileView.getBlockMeta(x, y, z));
     }
 }

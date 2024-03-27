@@ -1,14 +1,14 @@
 package com.gildedgames.aether.mixin.data;
 
-import net.minecraft.level.dimension.DimensionFile;
+import net.minecraft.class_81;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.io.File;
 
-@Mixin(DimensionFile.class)
+@Mixin(class_81.class)
 public interface DimensionFileAccessor
 {
-    @Accessor("parentFolder")
+    @Accessor("field_279")
     public File getSaveFolder();
 }

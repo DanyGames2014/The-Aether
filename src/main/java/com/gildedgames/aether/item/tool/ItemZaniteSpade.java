@@ -1,15 +1,15 @@
 package com.gildedgames.aether.item.tool;
 
-import net.minecraft.block.BlockBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.tool.TemplateShovel;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.modificationstation.stationapi.api.template.item.TemplateShovelItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemZaniteSpade extends TemplateShovel
+public class ItemZaniteSpade extends TemplateShovelItem
 {
-    private static BlockBase[] blocksEffectiveAgainst;
+    private static Block[] blocksEffectiveAgainst;
 
     public ItemZaniteSpade(final @NotNull Identifier identifier, final ToolMaterial enumtoolmaterial)
     {
@@ -17,8 +17,8 @@ public class ItemZaniteSpade extends TemplateShovel
     }
 
     @Override
-    public float getStrengthOnBlock(final ItemInstance item, final BlockBase tile)
+    public float getMiningSpeedMultiplier(final ItemStack item, final Block tile)
     {
-        return super.getStrengthOnBlock(item, tile) * (item.getDamage() / item.getType().getDurability() + 0.5f);
+        return super.getMiningSpeedMultiplier(item, tile) * (item.getDamage() / item.getItem().getMaxDamage() + 0.5f);
     }
 }

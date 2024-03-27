@@ -1,18 +1,18 @@
 package com.gildedgames.aether.item.tool;
 
 import com.gildedgames.aether.entity.projectile.EntityFloatingBlock;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.minecraft.level.Level;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.block.BlockState;
-import net.modificationstation.stationapi.api.registry.Identifier;
 import net.modificationstation.stationapi.api.tag.TagKey;
-import net.modificationstation.stationapi.api.template.item.tool.TemplateHatchet;
+import net.modificationstation.stationapi.api.template.item.TemplateAxeItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemGravititeAxe extends TemplateHatchet
+public class ItemGravititeAxe extends TemplateAxeItem
 {
     public ItemGravititeAxe(final @NotNull Identifier identifier, final ToolMaterial enumtoolmaterial)
     {
@@ -20,23 +20,23 @@ public class ItemGravititeAxe extends TemplateHatchet
     }
 
     @Override
-    public boolean useOnTile(ItemInstance item, PlayerBase player, Level level, int x, int y, int z, int idk)
+    public boolean useOnBlock(ItemStack item, PlayerEntity player, World level, int x, int y, int z, int idk)
     {
-        if (!level.isServerSide)
+        if (!level.isRemote)
         {
             BlockState b = level.getBlockState(x, y, z);
 
-            TagKey<BlockBase> tag = this.getEffectiveBlocks(item);
+            TagKey<Block> tag = this.getEffectiveBlocks(item);
             if (b.isIn(tag))
             {
-                final int blockID = level.getTileId(x, y, z);
-                final int metadata = level.getTileMeta(x, y, z);
+                final int blockID = level.getBlockId(x, y, z);
+                final int metadata = level.getBlockMeta(x, y, z);
                 final EntityFloatingBlock floating = new EntityFloatingBlock(level, x + 0.5f, y + 0.5f, z + 0.5f, blockID, metadata);
-                level.spawnEntity(floating);
-                item.applyDamage(1, player);
+                level.method_210(floating);
+                item.damage(1, player);
             }
 
-            return super.useOnTile(item, player, level, x, y, z, idk);
+            return super.useOnBlock(item, player, level, x, y, z, idk);
         }
         return false;
     }

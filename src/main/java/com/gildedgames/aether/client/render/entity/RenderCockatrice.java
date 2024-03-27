@@ -2,22 +2,22 @@ package com.gildedgames.aether.client.render.entity;
 
 import com.gildedgames.aether.entity.mobs.EntityCockatrice;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 
 public class RenderCockatrice extends LivingEntityRenderer
 {
-    public RenderCockatrice(final EntityModelBase modelbase, final float f)
+    public RenderCockatrice(final EntityModel modelbase, final float f)
     {
         super(modelbase, f);
     }
 
     public void renderChicken(final EntityCockatrice entitybadmoa, final double d, final double d1, final double d2, final float f, final float f1)
     {
-        super.method_822(entitybadmoa, d, d1, d2, f, f1);
+        super.render(entitybadmoa, d, d1, d2, f, f1);
     }
 
     protected float getWingRotation(final EntityCockatrice entitybadmoa, final float f)
@@ -28,19 +28,19 @@ public class RenderCockatrice extends LivingEntityRenderer
     }
 
     @Override
-    protected float method_828(final Living entityliving, final float f)
+    protected float method_828(final LivingEntity entityliving, final float f)
     {
         return this.getWingRotation((EntityCockatrice) entityliving, f);
     }
 
     @Override
-    public void method_822(final Living entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final LivingEntity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.renderChicken((EntityCockatrice) entity, x, y, z, f, f1);
     }
 
     @Override
-    public void render(final EntityBase entity, final double x, final double y, final double z, final float f, final float f1)
+    public void render(final Entity entity, final double x, final double y, final double z, final float f, final float f1)
     {
         this.renderChicken((EntityCockatrice) entity, x, y, z, f, f1);
     }
@@ -51,7 +51,7 @@ public class RenderCockatrice extends LivingEntityRenderer
     }
 
     @Override
-    protected void method_823(final Living entityliving, final float f)
+    protected void method_823(final LivingEntity entityliving, final float f)
     {
         this.scalemoa();
     }

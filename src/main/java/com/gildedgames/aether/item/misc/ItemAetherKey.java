@@ -1,23 +1,23 @@
 package com.gildedgames.aether.item.misc;
 
-import net.minecraft.item.ItemInstance;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.TemplateItemBase;
+import net.minecraft.item.ItemStack;
+import net.modificationstation.stationapi.api.template.item.TemplateItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemAetherKey extends TemplateItemBase
+public class ItemAetherKey extends TemplateItem
 {
     public ItemAetherKey(final @NotNull Identifier identifier)
     {
         super(identifier);
         //this.setTexturePosition(ModLoader.addOverride("/gui/items.png", "/aether/items/Key.png"));
         this.setTranslationKey("AetherKey");
-        this.setHasSubItems(true);
-        this.maxStackSize = 1;
+        this.setHasSubtypes(true);
+        this.maxCount = 1;
     }
 
     @Override
-    public String getTranslationKey(final ItemInstance item)
+    public String getTranslationKey(final ItemStack item)
     {
         int i = item.getDamage();
         if (i > 2)
@@ -28,7 +28,7 @@ public class ItemAetherKey extends TemplateItemBase
     }
 
     @Override
-    public int getColourMultiplier(final int damage)
+    public int method_440(final int damage)
     {
         if (damage == 1)
         {

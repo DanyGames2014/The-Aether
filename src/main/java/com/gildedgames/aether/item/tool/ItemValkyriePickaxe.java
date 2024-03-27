@@ -1,15 +1,15 @@
 package com.gildedgames.aether.item.tool;
 
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.ToolMaterial;
-import net.minecraft.util.hit.HitType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolMaterial;
+import net.minecraft.util.hit.HitResultType;
 import net.modificationstation.stationapi.api.item.CustomReachProvider;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.template.item.tool.TemplatePickaxe;
+import net.modificationstation.stationapi.api.template.item.TemplatePickaxeItem;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemValkyriePickaxe extends TemplatePickaxe implements CustomReachProvider
+public class ItemValkyriePickaxe extends TemplatePickaxeItem implements CustomReachProvider
 {
     public ItemValkyriePickaxe(final @NotNull Identifier identifier, final ToolMaterial enumtoolmaterial)
     {
@@ -17,7 +17,7 @@ public class ItemValkyriePickaxe extends TemplatePickaxe implements CustomReachP
     }
 
     @Override
-    public double getReach(ItemInstance itemInstance, PlayerBase player, HitType type, double currentReach)
+    public double getReach(ItemStack itemInstance, PlayerEntity player, HitResultType type, double currentReach)
     {
         return 10.f;
     }

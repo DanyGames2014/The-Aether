@@ -2,11 +2,11 @@ package com.gildedgames.aether.entity.mobs;
 
 import com.gildedgames.aether.AetherMod;
 import com.gildedgames.aether.entity.base.EntityDungeonMob;
-import net.minecraft.block.BlockBase;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.level.Level;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 
 public class EntityMimic extends EntityDungeonMob
 {
@@ -14,16 +14,16 @@ public class EntityMimic extends EntityDungeonMob
     public float legs;
     private float legsDirection;
 
-    public EntityMimic(final Level level)
+    public EntityMimic(final World level)
     {
         super(level);
         this.legsDirection = 1.0f;
         this.texture = "aether:textures/entity/Mimic.png";
-        this.standingEyeHeight = 0.0f;
-        this.setSize(1.0f, 2.0f);
+        this.eyeHeight = 0.0f;
+        this.setBoundingBoxSpacing(1.0f, 2.0f);
         this.health = 40;
         this.attackStrength = 5;
-        this.entity = level.getClosestPlayerTo(this, 64.0);
+        this.target = level.method_186(this, 64.0);
     }
 
     @Override
@@ -46,47 +46,47 @@ public class EntityMimic extends EntityDungeonMob
         }
     }
 
-    public void method_1353(final EntityBase entity)
+    public void method_1353(final Entity entity)
     {
-        if (!this.removed && entity != null)
+        if (!this.dead && entity != null)
         {
             entity.damage(this, 4);
         }
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
-        if (target instanceof PlayerBase)
+        if (target instanceof PlayerEntity)
         {
             this.method_924(target, 10.0f, 10.0f);
-            this.entity = target;
+            this.target = target;
         }
         return super.damage(target, amount);
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "mob.slime";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "mob.slime";
     }
 
     @Override
-    protected float getSoundVolume()
+    protected float method_915()
     {
         return 0.6f;
     }
 
     @Override
-    protected int getMobDrops()
+    protected int method_914()
     {
-        return BlockBase.CHEST.id;
+        return Block.CHEST.id;
     }
 
     @Override

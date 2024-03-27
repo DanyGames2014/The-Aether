@@ -8,29 +8,29 @@ import com.gildedgames.aether.registry.AetherItems;
 import com.gildedgames.aether.utils.NameGen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockBase;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityBase;
-import net.minecraft.entity.Living;
-import net.minecraft.entity.WalkingBase;
-import net.minecraft.entity.living.FlyingBase;
-import net.minecraft.entity.player.PlayerBase;
-import net.minecraft.item.ItemInstance;
-import net.minecraft.item.tool.Pickaxe;
-import net.minecraft.level.Level;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.maths.MathHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.FlyingEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.PickaxeItem;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.server.entity.MobSpawnDataProvider;
 
 //TODO: add render
-public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDataProvider
+public class EntitySlider extends FlyingEntity implements IAetherBoss, MobSpawnDataProvider
 {
     public int moveTimer;
     public int dennis;
     public int rennis;
     public int chatTime;
-    public EntityBase target;
+    public Entity target;
     public boolean awake;
     public boolean gotMovement;
     public boolean crushed;
@@ -42,12 +42,12 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
     private int dungeonZ;
     public String bossName;
 
-    public EntitySlider(final Level level)
+    public EntitySlider(final World level)
     {
         super(level);
         this.yaw = 0.0f;
         this.pitch = 0.0f;
-        this.setSize(2.0f, 2.0f);
+        this.setBoundingBoxSpacing(2.0f, 2.0f);
         this.health = 500;
         this.dennis = 1;
         this.texture = "aether:textures/entity/sliderSleep.png";
@@ -69,43 +69,43 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
     }
 
     @Override
-    protected String getAmbientSound()
+    protected String method_911()
     {
         return "ambient.cave.cave";
     }
 
     @Override
-    protected String getHurtSound()
+    protected String method_912()
     {
         return "step.stone";
     }
 
     @Override
-    protected String getDeathSound()
+    protected String method_913()
     {
         return "aether:aether.sound.bosses.slider.sliderdeath";
     }
 
     @Override
-    public void writeCustomDataToTag(final CompoundTag tag)
+    public void writeNbt(final NbtCompound tag)
     {
-        super.writeCustomDataToTag(tag);
-        tag.put("Speedy", this.speedy);
-        tag.put("MoveTimer", (short) this.moveTimer);
-        tag.put("Direction", (short) this.direction);
-        tag.put("GotMovement", this.gotMovement);
-        tag.put("Awake", this.awake);
-        tag.put("DungeonX", this.dungeonX);
-        tag.put("DungeonY", this.dungeonY);
-        tag.put("DungeonZ", this.dungeonZ);
-        tag.put("IsCurrentBoss", this.isCurrentBoss());
-        tag.put("BossName", this.bossName);
+        super.writeNbt(tag);
+        tag.putFloat("Speedy", this.speedy);
+        tag.putShort("MoveTimer", (short) this.moveTimer);
+        tag.putShort("Direction", (short) this.direction);
+        tag.putBoolean("GotMovement", this.gotMovement);
+        tag.putBoolean("Awake", this.awake);
+        tag.putInt("DungeonX", this.dungeonX);
+        tag.putInt("DungeonY", this.dungeonY);
+        tag.putInt("DungeonZ", this.dungeonZ);
+        tag.putBoolean("IsCurrentBoss", this.isCurrentBoss());
+        tag.putString("BossName", this.bossName);
     }
 
     @Override
-    public void readCustomDataFromTag(final CompoundTag tag)
+    public void readNbt(final NbtCompound tag)
     {
-        super.readCustomDataFromTag(tag);
+        super.readNbt(tag);
         this.speedy = tag.getFloat("Speedy");
         this.moveTimer = tag.getShort("MoveTimer");
         this.direction = tag.getShort("Direction");
@@ -147,9 +147,9 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         this.field_1012 = field_1012;
         if (this.awake)
         {
-            if (this.target != null && this.target instanceof Living)
+            if (this.target != null && this.target instanceof LivingEntity)
             {
-                final Living e1 = (Living) this.target;
+                final LivingEntity e1 = (LivingEntity) this.target;
                 if (e1.health <= 0)
                 {
                     this.awake = false;
@@ -164,7 +164,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
             }
             else
             {
-                if (this.target != null && this.target.removed)
+                if (this.target != null && this.target.dead)
                 {
                     this.awake = false;
                     AetherMod.currentBoss = null;
@@ -177,7 +177,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
                 }
                 if (this.target == null)
                 {
-                    this.target = this.level.getClosestPlayerTo(this, -1.0);
+                    this.target = this.world.method_186(this, -1.0);
                     if (this.target == null)
                     {
                         this.awake = false;
@@ -258,8 +258,8 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
                     }
                     if (this.crushed)
                     {
-                        this.level.playSound(this.x, this.y, this.z, "random.explode", 3.0f, (0.625f + (this.level.rand.nextFloat() - this.level.rand.nextFloat()) * 0.2f) * 0.7f);
-                        this.level.playSound((EntityBase) this, "aether:aether.sound.bosses.slider.slidercollide", 2.5f, 1.0f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                        this.world.playSound(this.x, this.y, this.z, "random.explode", 3.0f, (0.625f + (this.world.field_214.nextFloat() - this.world.field_214.nextFloat()) * 0.2f) * 0.7f);
+                        this.world.playSound((Entity) this, "aether:aether.sound.bosses.slider.slidercollide", 2.5f, 1.0f / (this.random.nextFloat() * 0.2f + 0.9f));
                     }
                     this.stop();
                 }
@@ -331,7 +331,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
             else if (this.moveTimer > 0)
             {
                 --this.moveTimer;
-                if (this.criticalCondition() && this.rand.nextInt(2) == 0)
+                if (this.criticalCondition() && this.random.nextInt(2) == 0)
                 {
                     --this.moveTimer;
                 }
@@ -360,7 +360,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
                         this.direction = 5;
                     }
                 }
-                if ((b2 > a2 && b2 > c) || (b2 > 0.25 && this.rand.nextInt(5) == 0))
+                if ((b2 > a2 && b2 > c) || (b2 > 0.25 && this.random.nextInt(5) == 0))
                 {
                     this.direction = 0;
                     if (this.y > this.target.y)
@@ -368,7 +368,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
                         this.direction = 1;
                     }
                 }
-                this.level.playSound((EntityBase) this, "aether:aether.sound.bosses.slider.slidermove", 2.5f, 1.0f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                this.world.playSound((Entity) this, "aether:aether.sound.bosses.slider.slidermove", 2.5f, 1.0f / (this.random.nextFloat() * 0.2f + 0.9f));
                 this.gotMovement = true;
             }
         }
@@ -389,27 +389,27 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         {
             for (int z = this.dungeonZ + 6; z < this.dungeonZ + 10; ++z)
             {
-                this.level.setTileInChunk(x, y, z, 0);
+                this.world.method_200(x, y, z, 0);
             }
         }
     }
 
-    public void method_1353(final EntityBase entity)
+    public void method_1353(final Entity entity)
     {
         if (this.awake && this.gotMovement)
         {
             final boolean flag = entity.damage(this, 6);
-            if (flag && entity instanceof Living)
+            if (flag && entity instanceof LivingEntity)
             {
-                this.level.playSound((EntityBase) this, "aether:aether.sound.bosses.slider.slidercollide", 2.5f, 1.0f / (this.rand.nextFloat() * 0.2f + 0.9f));
-                if (entity instanceof WalkingBase || entity instanceof PlayerBase)
+                this.world.playSound((Entity) this, "aether:aether.sound.bosses.slider.slidercollide", 2.5f, 1.0f / (this.random.nextFloat() * 0.2f + 0.9f));
+                if (entity instanceof MobEntity || entity instanceof PlayerEntity)
                 {
-                    final Living living;
-                    final Living ek = living = (Living) entity;
+                    final LivingEntity living;
+                    final LivingEntity ek = living = (LivingEntity) entity;
                     living.velocityY += 0.35;
-                    final Living living2 = ek;
+                    final LivingEntity living2 = ek;
                     living2.velocityX *= 2.0;
-                    final Living living3 = ek;
+                    final LivingEntity living3 = ek;
                     living3.velocityZ *= 2.0;
                 }
                 this.stop();
@@ -418,13 +418,13 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
     }
 
     @Override
-    protected void getDrops()
+    protected void method_933()
     {
-        for (int i = 0; i < 7 + this.rand.nextInt(3); ++i)
+        for (int i = 0; i < 7 + this.random.nextInt(3); ++i)
         {
-            this.dropItem(AetherBlocks.DUNGEON_STONE.id, 1);
+            this.method_1339(AetherBlocks.DUNGEON_STONE.id, 1);
         }
-        this.dropItem(new ItemInstance(AetherItems.Key, 1, 0), 0.0f);
+        this.method_1327(new ItemStack(AetherItems.Key, 1, 0), 0.0f);
     }
 
     @Override
@@ -433,7 +433,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         final int i = MathHelper.floor(this.x);
         final int j = MathHelper.floor(this.boundingBox.minY);
         final int k = MathHelper.floor(this.z);
-        return this.level.getTileId(i, j - 1, k) == BlockBase.GRASS.id && this.level.getLightLevel(i, j, k) > 8 && super.canSpawn();
+        return this.world.getBlockId(i, j - 1, k) == Block.GRASS_BLOCK.id && this.world.method_252(i, j, k) > 8 && super.canSpawn();
     }
 
     public void stop()
@@ -455,31 +455,31 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
 
         if (this.chatTime <= 0)
         {
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).overlay.addChatMessage(s);
+            ((Minecraft) FabricLoader.getInstance().getGameInstance()).inGameHud.addChatMessage(s);
             this.chatTime = 60;
         }
     }
 
     @Override
-    public boolean damage(final EntityBase target, final int amount)
+    public boolean damage(final Entity target, final int amount)
     {
-        if (target == null || !(target instanceof PlayerBase))
+        if (target == null || !(target instanceof PlayerEntity))
         {
             return false;
         }
-        final PlayerBase p1 = (PlayerBase) target;
-        final ItemInstance stack = p1.getHeldItem();
-        if (stack == null || stack.getType() == null)
+        final PlayerEntity p1 = (PlayerEntity) target;
+        final ItemStack stack = p1.getHand();
+        if (stack == null || stack.getItem() == null)
         {
             return false;
         }
-        if (!(stack.getType() instanceof Pickaxe))
+        if (!(stack.getItem() instanceof PickaxeItem))
         {
             this.chatItUp("Hmm. Perhaps I need to attack it with a Pickaxe?");
             return false;
         }
-        final Pickaxe tool = (Pickaxe) stack.getType();
-        if (!tool.isEffectiveOn(BlockBase.STONE))
+        final PickaxeItem tool = (PickaxeItem) stack.getItem();
+        if (!tool.isSuitableFor(Block.STONE))
         {
             this.chatItUp("Hmm. Perhaps I need to attack it with a Pickaxe?");
             return false;
@@ -489,29 +489,29 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         {
             for (int j = 0; j < ((this.health <= 0) ? 16 : 48); ++j)
             {
-                final double a = this.x + (this.rand.nextFloat() - this.rand.nextFloat()) * 1.5;
-                final double b = this.boundingBox.minY + 1.75 + (this.rand.nextFloat() - this.rand.nextFloat()) * 1.5;
-                final double c = this.z + (this.rand.nextFloat() - this.rand.nextFloat()) * 1.5;
+                final double a = this.x + (this.random.nextFloat() - this.random.nextFloat()) * 1.5;
+                final double b = this.boundingBox.minY + 1.75 + (this.random.nextFloat() - this.random.nextFloat()) * 1.5;
+                final double c = this.z + (this.random.nextFloat() - this.random.nextFloat()) * 1.5;
                 if (this.health <= 0)
                 {
-                    this.level.addParticle("explode", a, b, c, 0.0, 0.0, 0.0);
+                    this.world.addParticle("explode", a, b, c, 0.0, 0.0, 0.0);
                 }
             }
             if (this.health <= 0)
             {
-                this.removed = true;
+                this.dead = true;
                 this.openDoor();
                 this.unlockBlock(this.dungeonX, this.dungeonY, this.dungeonZ);
-                this.level.setTileWithMetadata(this.dungeonX + 7, this.dungeonY + 1, this.dungeonZ + 7, BlockBase.TRAPDOOR.id, 3);
-                this.level.setTileWithMetadata(this.dungeonX + 8, this.dungeonY + 1, this.dungeonZ + 7, BlockBase.TRAPDOOR.id, 2);
-                this.level.setTileWithMetadata(this.dungeonX + 7, this.dungeonY + 1, this.dungeonZ + 8, BlockBase.TRAPDOOR.id, 3);
-                this.level.setTileWithMetadata(this.dungeonX + 8, this.dungeonY + 1, this.dungeonZ + 8, BlockBase.TRAPDOOR.id, 2);
+                this.world.method_154(this.dungeonX + 7, this.dungeonY + 1, this.dungeonZ + 7, Block.TRAPDOOR.id, 3);
+                this.world.method_154(this.dungeonX + 8, this.dungeonY + 1, this.dungeonZ + 7, Block.TRAPDOOR.id, 2);
+                this.world.method_154(this.dungeonX + 7, this.dungeonY + 1, this.dungeonZ + 8, Block.TRAPDOOR.id, 3);
+                this.world.method_154(this.dungeonX + 8, this.dungeonY + 1, this.dungeonZ + 8, Block.TRAPDOOR.id, 2);
                 AetherMod.giveAchievement(AetherAchievements.defeatBronze);
                 AetherMod.currentBoss = null;
             }
             else if (!this.awake)
             {
-                this.level.playSound((EntityBase) this, "aether:aether.sound.bosses.slider.sliderawaken", 2.5f, 1.0f / (this.rand.nextFloat() * 0.2f + 0.9f));
+                this.world.playSound((Entity) this, "aether:aether.sound.bosses.slider.sliderawaken", 2.5f, 1.0f / (this.random.nextFloat() * 0.2f + 0.9f));
                 this.awake = true;
                 this.target = target;
                 this.texture = "aether:textures/entity/sliderAwake.png";
@@ -520,7 +520,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
                 {
                     for (int z = this.dungeonZ + 5; z < this.dungeonZ + 11; ++z)
                     {
-                        this.level.setTileInChunk(x, y, z, AetherBlocks.LOCKED_DUNGEON_STONE.id);
+                        this.world.method_200(x, y, z, AetherBlocks.LOCKED_DUNGEON_STONE.id);
                     }
                 }
                 AetherMod.currentBoss = this;
@@ -564,10 +564,10 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
 
     private void unlockBlock(final int i, final int j, final int k)
     {
-        final int id = this.level.getTileId(i, j, k);
+        final int id = this.world.getBlockId(i, j, k);
         if (id == AetherBlocks.LOCKED_DUNGEON_STONE.id)
         {
-            this.level.setTileWithMetadata(i, j, k, AetherBlocks.DUNGEON_STONE.id, this.level.getTileMeta(i, j, k));
+            this.world.method_154(i, j, k, AetherBlocks.DUNGEON_STONE.id, this.world.getBlockMeta(i, j, k));
             this.unlockBlock(i + 1, j, k);
             this.unlockBlock(i - 1, j, k);
             this.unlockBlock(i, j + 1, k);
@@ -577,7 +577,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         }
         if (id == AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id)
         {
-            this.level.setTileWithMetadata(i, j, k, AetherBlocks.LIGHT_DUNGEON_STONE.id, this.level.getTileMeta(i, j, k));
+            this.world.method_154(i, j, k, AetherBlocks.LIGHT_DUNGEON_STONE.id, this.world.getBlockMeta(i, j, k));
             this.unlockBlock(i + 1, j, k);
             this.unlockBlock(i - 1, j, k);
             this.unlockBlock(i, j + 1, k);
@@ -587,37 +587,37 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
         }
     }
 
-    public void accelerate(final double x, final double y, final double z)
+    public void method_1322(final double x, final double y, final double z)
     {
     }
 
     @Override
-    public void method_925(final EntityBase entity, final int i, final double d, final double d1)
+    public void method_925(final Entity entity, final int i, final double d, final double d1)
     {
     }
 
     public void blockCrush(final int x, final int y, final int z)
     {
-        final int a = this.level.getTileId(x, y, z);
-        final int b = this.level.getTileMeta(x, y, z);
+        final int a = this.world.getBlockId(x, y, z);
+        final int b = this.world.getBlockMeta(x, y, z);
         if (a == 0 || a == AetherBlocks.LOCKED_DUNGEON_STONE.id || a == AetherBlocks.LOCKED_LIGHT_DUNGEON_STONE.id)
         {
             return;
         }
         // todo: particleMinecraftClientAccessor.getMCinstance().particleManager.addTileBreakParticles(x, y, z, a, b);
-        BlockBase.BY_ID[a].onBlockRemoved(this.level, x, y, z);
-        BlockBase.BY_ID[a].drop(this.level, x, y, z, b);
-        this.level.setTile(x, y, z, 0);
+        Block.BLOCKS[a].onBreak(this.world, x, y, z);
+        Block.BLOCKS[a].dropStacks(this.world, x, y, z, b);
+        this.world.setBlock(x, y, z, 0);
         this.crushed = true;
         this.addSquirrelButts(x, y, z);
     }
 
     public void addSquirrelButts(final int x, final int y, final int z)
     {
-        final double a = x + 0.5 + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.375;
-        final double b = y + 0.5 + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.375;
-        final double c = z + 0.5 + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.375;
-        this.level.addParticle("explode", a, b, c, 0.0, 0.0, 0.0);
+        final double a = x + 0.5 + (this.random.nextFloat() - this.random.nextFloat()) * 0.375;
+        final double b = y + 0.5 + (this.random.nextFloat() - this.random.nextFloat()) * 0.375;
+        final double c = z + 0.5 + (this.random.nextFloat() - this.random.nextFloat()) * 0.375;
+        this.world.addParticle("explode", a, b, c, 0.0, 0.0, 0.0);
     }
 
     public void setDungeon(final int i, final int j, final int k)
@@ -648,7 +648,7 @@ public class EntitySlider extends FlyingBase implements IAetherBoss, MobSpawnDat
     @Override
     public int getBossEntityID()
     {
-        return this.entityId;
+        return this.id;
     }
 
     @Override
